@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28010.2036
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MultiplayerUNO", "MultiplayerUNO\MultiplayerUNO.csproj", "{3C9B7FE7-92AE-4276-B702-1D97A18E3CEE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3C9B7FE7-92AE-4276-B702-1D97A18E3CEE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3C9B7FE7-92AE-4276-B702-1D97A18E3CEE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3C9B7FE7-92AE-4276-B702-1D97A18E3CEE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3C9B7FE7-92AE-4276-B702-1D97A18E3CEE}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {3A4B91AC-A0D2-4FD2-AA92-83EA4F3342B3}
+	EndGlobalSection
+EndGlobal
