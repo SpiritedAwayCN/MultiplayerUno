@@ -43,5 +43,10 @@ namespace MultiplayerUNO.Utils
             if (newCard.Color == oldCard.Color) return true; // 颜色一致
             return newCard.Number == oldCard.Number; // 数字/图案，万能与+4已在第一个if中直接返回true
         }
+
+        public bool CanResponseTo(Card oldCard)
+        {
+            return CanResponseTo(this, oldCard);
+        }
     }
 }
