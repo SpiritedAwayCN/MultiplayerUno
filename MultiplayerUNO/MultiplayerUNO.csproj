@@ -67,6 +67,12 @@
     </Compile>
     <Compile Include="Utils\Card.cs" />
     <Compile Include="Utils\GameCardPile.cs" />
+    <Compile Include="Utils\LocalPlayerAdapter.cs" />
+    <Compile Include="Utils\PlayerAdapter.cs" />
+    <Compile Include="Utils\RemotePlayerAdapter.cs" />
+    <EmbeddedResource Include="Form1.resx">
+      <DependentUpon>Form1.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
