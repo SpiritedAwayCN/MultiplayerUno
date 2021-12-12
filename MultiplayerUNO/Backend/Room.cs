@@ -47,7 +47,7 @@ namespace MultiplayerUNO.Backend
             
             ingamePlayers =  new LinkedList<Player.Player>(); // 这该死的c#竟然不给线程安全的LinkedList
             // 规定：除初始化外，所有对此容器的操作，均在ProcessThread一个线程中执行
-            // 或者也能暴力加锁，看我心情行事
+            // 或者也能暴力加锁，但还是算了
             LocalPlayer = new LocalPlayer(localPlayerAdapter);
             ingamePlayers.AddLast(LocalPlayer);
 
@@ -76,7 +76,7 @@ namespace MultiplayerUNO.Backend
                         {
                             if (remotePlayer.OpenStream())
                             {
-                                remotePlayer.SendMessage("假装这是房间内全部玩家");
+                                remotePlayer.SendMessage("假装这条是包含房间内全部玩家的信息JSON");
                                 InfoQueue.Add(new MsgArgs()
                                 {
                                     player = remotePlayer,

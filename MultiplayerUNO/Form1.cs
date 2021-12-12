@@ -27,15 +27,16 @@ namespace MultiplayerUNO
         {
             try
             {
+                // 开服需要：端口，(开服的)玩家名称
                 playerAdapter = new LocalPlayerAdapter(int.Parse(portTextBox.Text), sendTextBox.Text);
-                playerAdapter.Initialize();
+                playerAdapter.Initialize(); // 无论什么adapter都要先初始化
 
                 runButton.Enabled = false;
                 connectButton.Enabled = false;
                 sendButton.Enabled = true;
 
-                showInfoThread = new Thread(ShowMsgThread);
-                showInfoThread.IsBackground = true; // 后台线程
+                showInfoThread = new Thread(ShowMsgThread); // 专门收server消息的线程，函数在下面
+                showInfoThread.IsBackground = true; // 后台线程，主线程退出自己没掉
 
                 showInfoThread.Start();
             }
@@ -50,14 +51,16 @@ namespace MultiplayerUNO
         {
             try
             {
+                // 连别人服务器需要：ip(可域名)，端口
                 playerAdapter = new RemotePlayerAdapter(ipInputBox.Text ,int.Parse(portTextBox.Text));
-                playerAdapter.Initialize();
+                playerAdapter.Initialize(); // 无论什么adapter都先初始化
+                // 连上后，服务端不会发任何消息，要求先发自己的玩家名称（后面会修改）
 
                 runButton.Enabled = false;
                 connectButton.Enabled = false;
                 sendButton.Enabled = true;
 
-                showInfoThread = new Thread(ShowMsgThread);
+                showInfoThread = new Thread(ShowMsgThread); // 专门收server消息的线程
                 showInfoThread.IsBackground = true; // 后台线程
 
                 showInfoThread.Start();
@@ -72,6 +75,7 @@ namespace MultiplayerUNO
         // 回显
         private void ShowMsgThread()
         {
+            // 收到的消息会在playerAdapter.RecvQueue里面，这里只是取出来显示在UI上，主要工作会在这里
             while (true)
             {
                 string msg = null;

@@ -12,21 +12,23 @@ namespace MultiplayerUNO.Utils
 {
     class RemotePlayerAdapter : PlayerAdapter
     {
-        protected IPEndPoint endPoint;
+        protected string _hostname;
+        protected int _port;
         protected Socket serverSocket;
 
         public static int BUFFERSIZE = 8192;
 
-        public RemotePlayerAdapter(string iPAddress, int port)
+        public RemotePlayerAdapter(string hostName, int port)
         {
-            endPoint = new IPEndPoint(IPAddress.Parse(iPAddress), port);
+            _hostname = hostName;
+            _port = port;
             serverSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             
         }
 
         public override void Initialize()
         {
-            serverSocket.Connect(endPoint);
+            serverSocket.Connect(_hostname, _port);
 
             sendQueue = new BlockingCollection<string>();
             recvQueue = new BlockingCollection<string>();
