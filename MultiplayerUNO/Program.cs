@@ -13,10 +13,11 @@ namespace MultiplayerUNO {
         static void Main() {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Form1());
+            // Application.Run(new Form1());
 
             // TODO BB UI 测试
-            // Application.Run(new UI.MainForm());
+            Application.Run(new UI.TestForm());
+            //Application.Run(new UI.MainForm());
         }
     }
 }
