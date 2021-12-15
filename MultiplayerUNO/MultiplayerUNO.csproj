@@ -58,6 +58,12 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UI\Animations\Animation.cs" />
+    <Compile Include="UI\Animations\AnimationController.cs" />
+    <Compile Include="UI\Animations\AnimationSeq.cs" />
+    <Compile Include="UI\Animations\Rotate.cs" />
+    <Compile Include="UI\Animations\Scale.cs" />
+    <Compile Include="UI\Animations\Translate.cs" />
     <Compile Include="UI\CardButton.cs">
       <SubType>Component</SubType>
     </Compile>
