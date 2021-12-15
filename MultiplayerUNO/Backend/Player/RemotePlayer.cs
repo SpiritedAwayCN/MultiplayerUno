@@ -5,11 +5,13 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
-
+using LitJson;
+ 
 namespace MultiplayerUNO.Backend.Player
 {
     public class RemotePlayer : Player
     {
+        public static string ProtocolVersion = "0.0.1";
 
         protected Thread sendThread;
         protected Thread recvThread;
@@ -112,7 +114,11 @@ namespace MultiplayerUNO.Backend.Player
                 byte[] content = new byte[BUFFERSIZE];
                 int n = clientSocket.Receive(content);
                 string word = Encoding.UTF8.GetString(content, 0, n);
-                name = word;
+                JsonData json = JsonMapper.ToObject(word);
+                if (!((string)json["version"] == ProtocolVersion))
+                    throw new ArgumentException("Inconsistent Version", "version");
+
+                name = (string)json["name"];
 
                 Console.WriteLine(word);
             }

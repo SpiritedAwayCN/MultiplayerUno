@@ -75,7 +75,6 @@
             // 
             // outputBox
             // 
-            this.outputBox.Enabled = false;
             this.outputBox.Location = new System.Drawing.Point(130, 114);
             this.outputBox.Multiline = true;
             this.outputBox.Name = "outputBox";
@@ -91,7 +90,7 @@
             this.sendTextBox.Name = "sendTextBox";
             this.sendTextBox.Size = new System.Drawing.Size(449, 25);
             this.sendTextBox.TabIndex = 5;
-            this.sendTextBox.Text = "Player";
+            this.sendTextBox.Text = "{\"name\":\"Player 1\", \"version\":\"0.0.1\"}";
             // 
             // sendButton
             // 

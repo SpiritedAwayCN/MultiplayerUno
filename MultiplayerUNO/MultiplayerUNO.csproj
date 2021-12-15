@@ -54,6 +54,8 @@
     <Compile Include="Backend\Player\Player.cs" />
     <Compile Include="Backend\Player\RemotePlayer.cs" />
     <Compile Include="Backend\Room.cs" />
+    <Compile Include="Backend\RoomAI.cs" />
+    <Compile Include="Backend\RoomProcess.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>

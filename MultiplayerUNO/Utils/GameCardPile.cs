@@ -13,6 +13,9 @@ namespace MultiplayerUNO.Utils
         private LinkedList<Card> CardPile = new LinkedList<Card>();
         private LinkedList<Card> DiscardPile = new LinkedList<Card>();
 
+        public int CardPileLeft { get { return CardPile.Count; } }
+        public int DiscardPileLeft { get { return DiscardPile.Count; } }
+
         public GameCardPile()
         {
             for (int i = 0; i < 108; i++)
@@ -28,7 +31,7 @@ namespace MultiplayerUNO.Utils
         public Card[] DrawCards(int number)
         {
             if (number < 1) throw new ArgumentOutOfRangeException("number should be greater than 0.");
-            if (CardPile.Count + DiscardPile.Count < number) throw new TileExceptions();
+            if (CardPile.Count + DiscardPile.Count < number) throw new TieExceptions();
 
             if (CardPile.Count < number) ShuffleCards();
 

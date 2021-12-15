@@ -14,7 +14,7 @@ namespace MultiplayerUNO.Backend.Player
         public LocalPlayer(LocalPlayerAdapter localPlayerAdapter)
         {
             adapter = localPlayerAdapter;
-            name = adapter.Playername;
+            name = adapter.PlayerName;
             sendQueue = adapter.RecvQueue; // 服务器直接发到本地对应的ReceiveQueue
         }
     }

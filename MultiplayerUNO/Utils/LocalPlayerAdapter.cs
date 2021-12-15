@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using LitJson;
 
 namespace MultiplayerUNO.Utils
 {
@@ -12,11 +13,11 @@ namespace MultiplayerUNO.Utils
     {
         protected Room gameRoom;
         public IPEndPoint EndPoint { get; }
-        public string Playername { get; }
+        public string PlayerName { get; }
 
-        public LocalPlayerAdapter(int port, string playerName)
+        public LocalPlayerAdapter(int port, string initJson)
         {
-            Playername = playerName;
+            PlayerName = (string)JsonMapper.ToObject(initJson)["name"];
 
             recvQueue = new BlockingCollection<string>();
             EndPoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), port);
