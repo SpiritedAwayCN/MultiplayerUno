@@ -8,11 +8,17 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using LitJson;
 
 namespace MultiplayerUNO.Backend
 {
-    public class Room
+    public partial class Room
     {
+        public static readonly int MinPlayerNumber = 2;
+        public static readonly int MaxPlayerNumber = 6;
+
+        public static readonly int MaxSeatIDCounter = 4096;
+
         public class MsgArgs
         {
             public Player.Player player;
@@ -24,7 +30,9 @@ namespace MultiplayerUNO.Backend
         {
             Remote,
             PlayerJoin,
-            PlayerLeave
+            PlayerLeave,
+            PlayerTimeout,
+            RobotResponse
         }
 
 
@@ -51,10 +59,12 @@ namespace MultiplayerUNO.Backend
             LocalPlayer = new LocalPlayer(localPlayerAdapter);
             ingamePlayers.AddLast(LocalPlayer);
 
+            currentStatus = GameStatus.Waiting;
         }
 
         protected Socket listenSocket;
         protected LinkedList<Player.Player> ingamePlayers;
+        protected int assignedSeatID = 0;
 
         public void InitializeRoom()
         {
@@ -76,7 +86,6 @@ namespace MultiplayerUNO.Backend
                         {
                             if (remotePlayer.OpenStream())
                             {
-                                remotePlayer.SendMessage("假装这条是包含房间内全部玩家的信息JSON");
                                 InfoQueue.Add(new MsgArgs()
                                 {
                                     player = remotePlayer,
@@ -105,6 +114,21 @@ namespace MultiplayerUNO.Backend
             listenThread.Start();
         }
 
+
+        protected enum GameStatus
+        {
+            Waiting, 
+            Common, 
+            QueryPlayer, 
+            Plus2Loop,
+            CardsDrawing,
+            Plus4Loop,
+            Questioning,
+            GameEnd
+        };
+
+
+        protected GameStatus currentStatus;
         public void ProcessThreadFunc()
         {
             while (true)
@@ -134,28 +158,154 @@ namespace MultiplayerUNO.Backend
                     continue;
                 }
 
+                JsonData cameJson = null;
+                try{ cameJson = JsonMapper.ToObject(msgArgs.msg); }
+                catch (JsonException) { continue; }
+
                 string info = string.Format("[{0}] {1}", msgArgs.player.Name, msgArgs.msg);
                 Console.WriteLine(info);
-                foreach (Player.Player p in ingamePlayers)
-                    p.SendMessage(info);
+
+                try
+                {
+                    switch (currentStatus)
+                    {
+                        case GameStatus.Waiting:
+                            ProcWaiting(cameJson, msgArgs.player);
+                            break;
+                        case GameStatus.Common:
+                            ProcCommon(cameJson, msgArgs.player);
+                            break;
+                        case GameStatus.QueryPlayer:
+                            ProcQuery(cameJson, msgArgs.player);
+                            break;
+                        case GameStatus.Plus2Loop:
+                            ProcPlus2Loop(cameJson, msgArgs.player);
+                            break;
+                        case GameStatus.Plus4Loop:
+                            ProcPlus4Loop(cameJson, msgArgs.player);
+                            break;
+                    }
+                }
+                catch (TieExceptions)
+                {
+                    JsonData json = new JsonData
+                    {
+                        ["turnID"] = 0
+                    };
+                    GameEndProcess(json);
+                }
+                catch (PlayerFinishException e)
+                {
+                    JsonData json = new JsonData
+                    {
+                        ["turnID"] = e.player.ingameID,
+                        ["card"] = lastCard.CardId,
+                        ["intInfo"] = lastCardInfo
+                    };
+                    GameEndProcess(json);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                    continue;
+                }
+                
+
+                // foreach (Player.Player p in ingamePlayers)
+                //     p.SendMessage(info);
             }
+        }
+
+        protected void GameEndProcess(JsonData json)
+        {
+            gameTimer.Dispose(); //终止计时器
+            currentStatus = GameStatus.GameEnd;
+
+            json["state"] = (int)currentStatus;
+            json["playerCards"] = new JsonData();
+            json["playerCards"].SetJsonType(JsonType.Array);
+
+            foreach (Player.Player p in ingamePlayers)
+                json["playerCards"].Add(p.BuildPlayerMapJson(true));
+            string sendJson = json.ToJson();
+
+            // 以下：剔除所有被AI接管的玩家
+            LinkedList<Player.Player> tempPlayers = new LinkedList<Player.Player>();
+            foreach (Player.Player p in ingamePlayers)
+            {
+                if (p.isRobot == 0)
+                {
+                    tempPlayers.AddLast(p);
+                    p.SendMessage(sendJson);
+                }
+            }
+            ingamePlayers = tempPlayers;
+
+            currentStatus = GameStatus.Waiting;
+
         }
 
         public void PlayerJoin(Player.Player player)
         {
+            if(ingamePlayers.Count >= MaxPlayerNumber || currentStatus != GameStatus.Waiting
+                || assignedSeatID >= MaxSeatIDCounter)
+            {
+                // 不再接受玩家加入
+                RemotePlayer remote = player as RemotePlayer;
+                remote?.Leave(); //直接把玩家踢了
+                return;
+            }
+
+            // 玩家加入房间
             ingamePlayers.AddLast(player);
+            
+            assignedSeatID++;
+            player.seatID = assignedSeatID;
+
+            JsonData json = BuildPlayerWaitingJson();
+            player.SendMessage(json.ToJson());
+
+            string joinJson = new JsonData
+            {
+                ["type"] = 3,
+                ["player"] = player.GetPlayerJson()
+            }.ToJson();
 
             foreach (Player.Player p in ingamePlayers)
-                p.SendMessage("Player (" + player.Name + ") has joined the room");
+                p.SendMessage(joinJson);
         }
 
         public bool PlayerLeave(Player.Player player)
         {
-            bool res = ingamePlayers.Remove(player);
-            if (!res) return false;
+            if(currentStatus == GameStatus.Waiting)
+            {
+                // 等待状态下有玩家退出：直接退
+                bool res = ingamePlayers.Remove(player);
+                if (!res) return false;
 
-            foreach (Player.Player p in ingamePlayers)
-                p.SendMessage("Player (" + player.Name + ") has left the room");
+                string leaveJson = new JsonData
+                {
+                    ["type"] = 2,
+                    ["player"] = player.GetPlayerJson()
+                }.ToJson();
+
+                foreach (Player.Player p in ingamePlayers)
+                    p.SendMessage(leaveJson);
+            }
+            else
+            {
+                // 游戏过程中玩家退出：AI接管
+                player.isRobot = 1;
+                string leaveJson = new JsonData
+                {
+                    ["state"] = -1,
+                    ["playerID"] = player.ingameID
+                }.ToJson();
+
+                foreach (Player.Player p in ingamePlayers)
+                    p.SendMessage(leaveJson);
+            }
+
             return true;
         }
 
@@ -171,6 +321,20 @@ namespace MultiplayerUNO.Backend
             }
         }
 
+        public JsonData BuildPlayerWaitingJson()
+        {
 
+            JsonData json = new JsonData();
+            json["type"] = 0;
+            json["player"] = new JsonData();
+            json["player"].SetJsonType(JsonType.Array);
+
+            foreach (Player.Player player in ingamePlayers)
+            {
+                json["player"].Add(player.GetPlayerJson());
+            }
+
+            return json;
+        }
     }
 }

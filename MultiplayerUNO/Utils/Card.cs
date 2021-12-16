@@ -37,16 +37,22 @@ namespace MultiplayerUNO.Utils
             }
         }
 
-        public static bool CanResponseTo(Card newCard, Card oldCard)
+        public static bool CanResponseTo(Card newCard, Card oldCard, CardColor color = CardColor.Invalid)
         {
             if (newCard.Color == CardColor.Invalid) return true; // 万能与+4能响应任何牌
             if (newCard.Color == oldCard.Color) return true; // 颜色一致
+            if (oldCard.Color == CardColor.Invalid && newCard.Color == color) return true; //万能/+4与声明的一致
             return newCard.Number == oldCard.Number; // 数字/图案，万能与+4已在第一个if中直接返回true
         }
 
-        public bool CanResponseTo(Card oldCard)
+        public bool CanResponseTo(Card oldCard, CardColor color = CardColor.Invalid)
         {
-            return CanResponseTo(this, oldCard);
+            return CanResponseTo(this, oldCard, color);
+        }
+
+        public bool IsPlus4()
+        {
+            return CardId >= 104;
         }
     }
 }
