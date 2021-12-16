@@ -47,7 +47,7 @@ namespace MultiplayerUNO.UI {
             textBox1_KeyDown(this.textBox1, new KeyEventArgs(Keys.Enter));
         }
 
-        private void button2_Click(object sender, EventArgs e) {
+        private void button2_Click(object sender, EventArgs e) { 
             CardButton btn = null;
             foreach (var s in this.Controls) {
                 if (s as CardButton != null) {

@@ -10,6 +10,7 @@ namespace MultiplayerUNO.UI {
 
         // 静态常量
         private static Bitmap[] IMAGES = null;
+        public static float ScaleRatio = 0.8f; // TODO 和屏幕大小相结合
 
         // Tile 类型需要 Border, Stretch 不需要
         public static readonly int BoardPixel = 0;//4;
@@ -35,8 +36,8 @@ namespace MultiplayerUNO.UI {
             IsFlipped = back;
 
             // Button 设置
-            this.Width = ORI_WIDTH + BoardPixel2;
-            this.Height = ORI_HEIGHT + BoardPixel2;
+            this.Width = (int)((ORI_WIDTH + BoardPixel2) * ScaleRatio);
+            this.Height = (int)((ORI_HEIGHT + BoardPixel2) * ScaleRatio);
             this.BackgroundImageLayout = ImageLayout.Stretch;
             SetBackGroundImage();
         }
@@ -64,7 +65,7 @@ namespace MultiplayerUNO.UI {
                 // img: cannot reverse +2
                 int startx = i >> 3;
                 if (startx == 11) { startx = 12; }
-                if (startx == 12) { startx = 11; }
+                else if (startx == 12) { startx = 11; }
                 // color: R Y G B
                 //   img: R G B Y
                 int starty = i & 0x3;
@@ -86,19 +87,19 @@ namespace MultiplayerUNO.UI {
             // 因为只会运行一次, 暂时没有考虑重复的优化
             for (int i = 0; i < TotalCard; ++i) {
                 Bitmap imgDest = new Bitmap(
-                    ORI_WIDTH + BoardPixel2, ORI_HEIGHT + BoardPixel2,
+                    this.Width, this.Height,
                     PixelFormat.Format32bppArgb
                 );
                 Graphics g = Graphics.FromImage(imgDest);
-                Rectangle rectSource = new Rectangle(
+                Rectangle srcRect = new Rectangle(
                     CardPosInSprite[i].X * ORI_WIDTH - BoardPixel,
                     CardPosInSprite[i].Y * ORI_HEIGHT - BoardPixel,
                     ORI_WIDTH + BoardPixel2,
                     ORI_HEIGHT + BoardPixel2
                 );
-                Rectangle rectDest =
-                    new Rectangle(0, 0, ORI_WIDTH + BoardPixel2, ORI_HEIGHT + BoardPixel2);
-                g.DrawImage(IMG_SPRITE, rectDest, rectSource, GraphicsUnit.Pixel);
+                Rectangle dstRect =
+                    new Rectangle(0, 0, this.Width, this.Height);
+                g.DrawImage(IMG_SPRITE, dstRect, srcRect, GraphicsUnit.Pixel);
                 IMAGES[i] = imgDest;
                 g.Dispose();
             }
