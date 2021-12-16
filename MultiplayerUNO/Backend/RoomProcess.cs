@@ -8,12 +8,41 @@ namespace MultiplayerUNO.Backend
 {
     public partial class Room
     {
-        protected const int NormalWaitingTime = 25000;
+        protected const int NormalWaitingTime = 45000;
         protected const int ShortWaitingTime = 10000;
 
         protected void SendInvalidIInfo(Player.Player sendPlayer)
         {
             sendPlayer.SendMessage(BuildGamePatternJson().ToJson());
+        }
+
+        protected void ProcPlus4Loop(JsonData jsonData, Player.Player sendPlayer)
+        {
+            int state = (int)jsonData["state"];
+            if (state == 0)
+            {
+                sendPlayer.SendMessage(BuildGameStateJson(sendPlayer).ToJson());
+                return;
+            }
+            int responseID = (int)jsonData["queryID"];
+            if (responseID != queryID || sendPlayer.ingameID != currentPlayerNode.Value.ingameID)
+            {
+                SendInvalidIInfo(sendPlayer);
+                return;
+            }
+
+            if(state == 4)
+            { // 不质疑.准备摸牌
+                DrawCardBack2Common(4, sendPlayer);
+            }
+            else
+            {
+                if (plus4Player.CanHandoutPlus4(plus4ResponseCard, plus4ColorID & 3))
+                    DrawCardBack2Common(6, sendPlayer); // 质疑失败
+                else
+                    DrawCardBack2Common(4, plus4Player); // 质疑成功
+
+            }
         }
 
         protected void ProcPlus2Loop(JsonData jsonData, Player.Player sendPlayer)
@@ -46,57 +75,8 @@ namespace MultiplayerUNO.Backend
             }
             else
             {
-                // 不再叠+2.准备摸牌
-                Card[] drawnCards = cardPile.DrawCards(drawingCardCounter);
-                sendPlayer.GainCard(drawnCards); // 摸等同于积累数的牌
-
-                JsonData json = new JsonData
-                {
-                    ["state"] = 4,
-                    ["lastCard"] = drawingCardCounter, // 摸上的牌数目
-                    ["turnID"] = sendPlayer.ingameID
-                };
+                DrawCardBack2Common(drawingCardCounter, sendPlayer); // 摸牌
                 drawingCardCounter = 0; //计数器归0
-
-                string basicJson = json.ToJson();
-                json["playerCards"] = new JsonData();
-                json["playerCards"].SetJsonType(JsonType.Array);
-
-                foreach(Card card in drawnCards)
-                {
-                    json["playerCards"].Add(card.CardId);
-                }
-                string personalJson = json.ToJson();
-                foreach(Player.Player p in ingamePlayers)
-                {   // 4号状态
-                    p.SendMessage(p.ingameID == sendPlayer.ingameID ? personalJson : basicJson);
-                }
-                // 摸牌结束，回到1号状态
-
-                Change2NextTurnPlayerNode(); // 跳到下一名玩家，lastCard不变
-                currentStatus = GameStatus.Common; // 切换至一号状态，lastCard等属性不变
-
-                TimerStart(new MsgArgs
-                {
-                    msg = AutoPseudoActPlayer(lastCard, currentPlayerNode.Value).ToJson(),
-                    player = currentPlayerNode.Value,
-                    type = MsgType.PlayerTimeout
-                }); // 计时开始
-
-                if (currentPlayerNode.Value.isRobot == 1) // 如果已被AI接管
-                {
-                    InfoQueue.Add(new MsgArgs
-                    {
-                        player = currentPlayerNode.Value,
-                        msg = AutoPseudoActPlayer(lastCard, currentPlayerNode.Value, true).ToJson(),
-                        type = MsgType.RobotResponse
-                    });
-                }
-
-                string patternJson = BuildGamePatternJson().ToJson();
-                foreach (Player.Player p in ingamePlayers)
-                    p.SendMessage(patternJson); // 向每名玩家发送游戏格局Json
-
             }
 
         }
@@ -379,6 +359,59 @@ namespace MultiplayerUNO.Backend
             return null;
         }
 
+        protected void DrawCardBack2Common(int cardCount, Player.Player drawnPlayer)
+        {
+            Card[] drawnCards = cardPile.DrawCards(cardCount);
+            drawnPlayer.GainCard(drawnCards); // 摸牌
+
+            JsonData json = new JsonData
+            {
+                ["state"] = 4,
+                ["lastCard"] = cardCount, // 摸上的牌数目
+                ["turnID"] = drawnPlayer.ingameID
+            };
+            string basicJson = json.ToJson();
+
+            json["playerCards"] = new JsonData();
+            json["playerCards"].SetJsonType(JsonType.Array);
+            foreach (Card card in drawnCards)
+            {
+                json["playerCards"].Add(card.CardId);
+            }
+            string personalJson = json.ToJson();
+
+            foreach (Player.Player p in ingamePlayers)
+            {   // 4号状态
+                p.SendMessage(p.ingameID == drawnPlayer.ingameID ? personalJson : basicJson);
+            }
+            // 摸牌结束，回到1号状态
+
+            Change2NextTurnPlayerNode(); // 跳到下一名玩家，lastCard不变
+            currentStatus = GameStatus.Common; // 切换至一号状态，lastCard等属性不变
+
+            TimerStart(new MsgArgs
+            {
+                msg = AutoPseudoActPlayer(lastCard, currentPlayerNode.Value).ToJson(),
+                player = currentPlayerNode.Value,
+                type = MsgType.PlayerTimeout
+            }); // 计时开始
+
+            if (currentPlayerNode.Value.isRobot == 1) // 如果已被AI接管
+            {
+                InfoQueue.Add(new MsgArgs
+                {
+                    player = currentPlayerNode.Value,
+                    msg = AutoPseudoActPlayer(lastCard, currentPlayerNode.Value, true).ToJson(),
+                    type = MsgType.RobotResponse
+                });
+            }
+
+            string patternJson = BuildGamePatternJson().ToJson();
+            foreach (Player.Player p in ingamePlayers)
+                p.SendMessage(patternJson); // 向每名玩家发送游戏格局Json
+
+        }
+
         protected void PlayerHandCard(Player.Player sendPlayer, Card responseCard, int colorId)
         {
             if (colorId < 0) colorId = 0;
@@ -389,6 +422,9 @@ namespace MultiplayerUNO.Backend
 
             sendPlayer.RemoveCard(responseCard); //玩家失去牌
             cardPile.Move2DiscardPile(responseCard); //牌进入弃牌堆
+
+            Card tempCard = lastCard;
+            int tempinfo = lastCardInfo;
 
             lastCard = responseCard; //更新需要响应的牌为当前打出的牌
             lastCardInfo = 4 * sendPlayer.ingameID +
@@ -406,6 +442,12 @@ namespace MultiplayerUNO.Backend
             {
                 currentStatus = GameStatus.Plus2Loop; // +2牌则开始叠加操作
                 drawingCardCounter += 2; // 计数器叠加
+            }else if(responseCard.CardId >= 104)
+            {
+                plus4ResponseCard = tempCard; // 更新+4响应的牌
+                plus4Player = sendPlayer; // 更新打出+4的玩家
+                plus4ColorID = tempinfo;
+                currentStatus = GameStatus.Plus4Loop; // +4牌，询问质疑
             }
 
             TimerStart(new MsgArgs
@@ -433,13 +475,14 @@ namespace MultiplayerUNO.Backend
 
         protected GameCardPile cardPile;
         protected LinkedListNode<Player.Player> currentPlayerNode;
-        protected Card lastCard, gainCard;
-        protected int lastCardInfo;
+        protected Card lastCard, gainCard, plus4ResponseCard;
+        protected int lastCardInfo, plus4ColorID;
         protected int direction;
         protected Timer gameTimer;
         protected long lastTimerStartMs;
         protected int lastTimerWaitSec;
         protected int drawingCardCounter;
+        protected Player.Player plus4Player;
 
         protected int queryID;
 
@@ -465,6 +508,7 @@ namespace MultiplayerUNO.Backend
             switch (currentStatus)
             {
                 case GameStatus.Common:
+                case GameStatus.Plus4Loop:
                     json["lastCard"] = lastCard == null ? -1 : lastCard.CardId;
                     json["intInfo"] = lastCardInfo;
                     json["turnID"] = currentPlayerNode.Value.ingameID;

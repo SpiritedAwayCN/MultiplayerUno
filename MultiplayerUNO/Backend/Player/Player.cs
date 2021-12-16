@@ -113,5 +113,16 @@ namespace MultiplayerUNO.Backend.Player
 
             return json;
         }
+
+        public bool CanHandoutPlus4(Card lastCard, int colorID)
+        {
+            foreach(Card card in handCards)
+            {
+                if (card.CardId >= 104) continue;
+                if (card.CanResponseTo(lastCard, (Card.CardColor)colorID)) return false;
+            }
+
+            return true;
+        }
     }
 }

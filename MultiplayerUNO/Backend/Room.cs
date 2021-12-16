@@ -178,6 +178,12 @@ namespace MultiplayerUNO.Backend
                         case GameStatus.QueryPlayer:
                             ProcQuery(cameJson, msgArgs.player);
                             break;
+                        case GameStatus.Plus2Loop:
+                            ProcPlus2Loop(cameJson, msgArgs.player);
+                            break;
+                        case GameStatus.Plus4Loop:
+                            ProcPlus4Loop(cameJson, msgArgs.player);
+                            break;
                     }
                 }
                 catch (TieExceptions)

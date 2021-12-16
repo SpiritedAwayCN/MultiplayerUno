@@ -12,6 +12,15 @@ namespace MultiplayerUNO.Backend
     {
         protected JsonData AutoPseudoActPlayer(Card lastCard, Player.Player turnPlayer, bool ai = false)
         {
+            if(currentStatus == GameStatus.Plus4Loop)
+            {
+                return new JsonData // 不质疑
+                {
+                    ["state"] = 4,
+                    ["queryID"] = queryID
+                };
+            }
+
             if(currentStatus == GameStatus.Plus2Loop)
             {
                 return AutoPlus2Action(ai);
