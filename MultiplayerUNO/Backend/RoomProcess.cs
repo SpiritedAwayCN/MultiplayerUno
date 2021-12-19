@@ -284,7 +284,7 @@ namespace MultiplayerUNO.Backend
                 }
             if (!canStart || ingamePlayers.Count < MinPlayerNumber)
             {
-                sendPlayer.SendMessage("{\"type\":5}");
+                sendPlayer.SendMessage("{\"type\":6}");
                 return;
             }
 
