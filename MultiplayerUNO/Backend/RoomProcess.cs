@@ -65,7 +65,7 @@ namespace MultiplayerUNO.Backend
                 int cardId = (int)jsonData["card"];
                 Card responseCard = FindCardInPlayerHandcards(cardId, sendPlayer);
 
-                if (responseCard == null || responseCard.CardId != 11)
+                if (responseCard == null || responseCard.Number != 11)
                 {
                     SendInvalidIInfo(sendPlayer);
                     return;
@@ -84,7 +84,7 @@ namespace MultiplayerUNO.Backend
         protected void ProcQuery(JsonData jsonData, Player.Player sendPlayer)
         {
             int state = (int)jsonData["state"];
-            if(state == 0)
+           if(state == 0)
             {
                 sendPlayer.SendMessage(BuildGameStateJson(sendPlayer).ToJson());
                 return;
@@ -545,7 +545,7 @@ namespace MultiplayerUNO.Backend
             JsonData json = new JsonData {
                 ["cardpileLeft"] = cardPile.CardPileLeft,
                 ["direction"] = direction,
-                ["turnInfo"] = BuildGamePatternJson(),
+                ["turnInfo"] = BuildGamePatternJson(queryPlayer),
                 ["yourID"] = queryPlayer.ingameID
             };
 
