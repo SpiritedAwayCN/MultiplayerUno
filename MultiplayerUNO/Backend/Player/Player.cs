@@ -119,6 +119,7 @@ namespace MultiplayerUNO.Backend.Player
             foreach(Card card in handCards)
             {
                 if (card.CardId >= 104) continue;
+                if (lastCard == null) return false;
                 if (card.CanResponseTo(lastCard, (Card.CardColor)colorID)) return false;
             }
 

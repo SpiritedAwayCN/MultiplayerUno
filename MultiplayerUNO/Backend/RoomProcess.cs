@@ -65,7 +65,7 @@ namespace MultiplayerUNO.Backend
                 int cardId = (int)jsonData["card"];
                 Card responseCard = FindCardInPlayerHandcards(cardId, sendPlayer);
 
-                if (responseCard == null || responseCard.CardId != 11)
+                if (responseCard == null || responseCard.Number != 11)
                 {
                     SendInvalidIInfo(sendPlayer);
                     return;
@@ -84,7 +84,7 @@ namespace MultiplayerUNO.Backend
         protected void ProcQuery(JsonData jsonData, Player.Player sendPlayer)
         {
             int state = (int)jsonData["state"];
-            if(state == 0)
+           if(state == 0)
             {
                 sendPlayer.SendMessage(BuildGameStateJson(sendPlayer).ToJson());
                 return;
@@ -98,6 +98,11 @@ namespace MultiplayerUNO.Backend
             if(gainCard.Color == Card.CardColor.Invalid)
             {
                 colorId = (int)jsonData["color"];
+                if(colorId >> 2 != 0)
+                {
+                    SendInvalidIInfo(sendPlayer);
+                    return;
+                }
             }
 
             if(responseID != queryID)
@@ -292,6 +297,9 @@ namespace MultiplayerUNO.Backend
             lastCardInfo = -1; // 仅lastCard为+4/万能时有意义
             queryID = 1; // 重置请求编号计数器
             drawingCardCounter = 0; // +2的摸牌计数器
+            plus4ColorID = -1;
+            plus4Player = null;
+            plus4ResponseCard = null;
 
             currentStatus = GameStatus.Common;  // 进入1号状态
 
@@ -537,7 +545,7 @@ namespace MultiplayerUNO.Backend
             JsonData json = new JsonData {
                 ["cardpileLeft"] = cardPile.CardPileLeft,
                 ["direction"] = direction,
-                ["turnInfo"] = BuildGamePatternJson(),
+                ["turnInfo"] = BuildGamePatternJson(queryPlayer),
                 ["yourID"] = queryPlayer.ingameID
             };
 
