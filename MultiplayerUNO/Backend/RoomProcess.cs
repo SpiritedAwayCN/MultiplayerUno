@@ -98,6 +98,11 @@ namespace MultiplayerUNO.Backend
             if(gainCard.Color == Card.CardColor.Invalid)
             {
                 colorId = (int)jsonData["color"];
+                if(colorId >> 2 != 0)
+                {
+                    SendInvalidIInfo(sendPlayer);
+                    return;
+                }
             }
 
             if(responseID != queryID)
