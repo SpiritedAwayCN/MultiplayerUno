@@ -292,6 +292,9 @@ namespace MultiplayerUNO.Backend
             lastCardInfo = -1; // 仅lastCard为+4/万能时有意义
             queryID = 1; // 重置请求编号计数器
             drawingCardCounter = 0; // +2的摸牌计数器
+            plus4ColorID = -1;
+            plus4Player = null;
+            plus4ResponseCard = null;
 
             currentStatus = GameStatus.Common;  // 进入1号状态
 
