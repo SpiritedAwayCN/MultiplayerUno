@@ -12,10 +12,10 @@ namespace MultiplayerUNO.UI.Animations {
         public const float EPS = 0.001f;
 
         // 状态量
-        public int NowX, NowY;
-        public int DstX, DstY;
+        public float NowX, NowY;
+        public float DstX, DstY;
         public bool Finished;
-        public int Dx, Dy;
+        public float Dx, Dy;
 
         public int StepCost { get; }
         private int StepNow;
@@ -42,7 +42,7 @@ namespace MultiplayerUNO.UI.Animations {
             return true;
         }
 
-        public Translate(int dstX, int dstY) {
+        public Translate(float dstX, float dstY) {
             NowX = NowY = 0;
             DstX = dstX;
             DstY = dstY;
@@ -53,9 +53,11 @@ namespace MultiplayerUNO.UI.Animations {
             float tx = 1.0f * Math.Abs(DstX) / DELTA_PER_FRAME,
                   ty = 1.0f * Math.Abs(DstY) / DELTA_PER_FRAME;
             float t = Math.Max(tx, ty);
+            // special case: t=0
+            if (t == 0) { t = 1f; }
             StepCost = (int)Math.Ceiling(t);
-            Dx = (int)(DstX / t);
-            Dy = (int)(DstY / t);
+            Dx = DstX / t;
+            Dy = DstY / t;
         }
     }
 }

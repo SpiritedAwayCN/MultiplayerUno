@@ -1,4 +1,6 @@
-﻿using MultiplayerUNO.UI.Animations;
+﻿using LitJson;
+using MultiplayerUNO.UI.Animations;
+using MultiplayerUNO.UI.BUtils;
 using MultiplayerUNO.UI.Players;
 using System;
 using System.Collections.Concurrent;
@@ -11,7 +13,15 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using static MultiplayerUNO.Utils.Card;
 
+/// <summary>
+/// 一些设计
+/// 1. 游戏开始流程
+///     (1) 绘制初始场景
+///     (2) 发牌
+///     (3) 游戏开始
+/// </summary>
 namespace MultiplayerUNO.UI {
     /// <summary>
     /// TEST 开头的函数只用于测试
@@ -22,236 +32,177 @@ namespace MultiplayerUNO.UI {
         /// </summary>
         public int REF_HEIGHT, REF_WIDTH;
 
-        
         Random rdm = new Random();
-
-        /// <summary>
-        /// 前后端通信的消息队列
-        /// </summary>
-        public BlockingCollection<BackendFrontInfo> SendQueue, ReceiveQueue;
-
-        /// <summary>
-        /// 用于前后端收发消息的线程, 
-        /// 不需要发消息的线程, 可以在具体执行操作的线程里面去发
-        /// </summary>
-        public Thread ReceiveThread;
 
         /// <summary>
         /// 游戏人数
         /// </summary>
-        //public readonly int PlayersNumber;
+        //public readonly int PlayersNumber; // TODO
         public int PlayersNumber;
         public Player[] Players; // 0 号表示自己
+        public const int ME = 0;
+        public readonly int MyID;
 
         // 牌堆
+        // 为了处理方便, 这两张牌不会在被 MainForm 中去除
         private CardButton[] Piles;
         public const int PILES_NUM = 2;
         public const int PileToDistribute = 0;
         public const int PileDropped = 1;
 
-        public MainForm(int players) {
-            PlayersNumber = players;
-            InitializeComponent();
-        }
-
-        private void MainForm_Load(object sender, EventArgs e) {
-            InitializeVars();
-            FullScreenDisplay();
-            // 前后端通信线程启动
-            // TODO
-            //ReceiveThread.Start();
-        }
-
         /// <summary>
-        /// 初始化参数
+        /// 判断是否无牌可出, true: 无牌可出
         /// </summary>
-        private void InitializeVars() {
-            // TODO 这个初始化不应该在这里进行, 应该是在前后端线程开始的地方
-            ReceiveQueue = new BlockingCollection<BackendFrontInfo>();
-            SendQueue = new BlockingCollection<BackendFrontInfo>();
-            // 前后端通信线程初始化
-            ReceiveThread = new Thread(ListenMsg);
-        }
-
-        /// <summary>
-        /// 监听从后端发过来的消息
-        /// </summary>
-        private void ListenMsg() {
-            while (true) {
-                var msg = ReceiveQueue.Take();
-                // case 0: 发牌(最常见的信息)
-                Task.Run(() => {
-                    DistributeCard();
-                });
-                // case 1: 显示一条消息
-
-                // case 2: 游戏初始化的玩家信息
-                // 一组玩家姓名, 第一个是自己的姓名
-                // 开房
-                string[] tmp = new string[] { "a", "b", "c", "d", "e", "f" };
-                InitializeAllPlayers(tmp);
-            }
-        }
-
-        /// <summary>
-        /// 初始化的时候的发牌动画, 只会在初始化的时候被调用
-        /// </summary>
-        private void DistributeCard() {
-            // TODO
-        }
-
-        /// <summary>
-        /// 初始化所有的玩家, 初始化界面
-        /// </summary>
-        private void InitializeAllPlayers(string[] name) {
-            int w = this.REF_WIDTH,
-                h = this.REF_HEIGHT;
-            Players = new Player[PlayersNumber];
-            // 直接打表好了
-            var posX = Player.posX[PlayersNumber];
-            var posY = Player.posY[PlayersNumber];
-            var isUpDown = Player.isUpDownMap[PlayersNumber];
-            for (int i = 0; i < PlayersNumber; ++i) {
-                Players[i] = new Player(
-                    this,
-                    name[i],
-                    (isUpDown & (1 << i)) != 0,
-                     posX[i], posY[i]
-                );
-            }
-            if (this.InvokeRequired) {
-                this.BeginInvoke(new Action(() => {
-                    DrawOriginScene();
-                }));
-            } else {
-                DrawOriginScene();
-            }
-        }
-
-        private void DrawOriginScene() {
-            DrawPiles();
-            DrawPlayers();
-        }
-
-        /// <summary>
-        /// 绘制玩家位置以及相关信息
-        /// </summary>
-        private void DrawPlayers() {
-            // TODO 这只是简单测试
-            for (int i = 0; i < PlayersNumber; ++i) {
-                int id = rdm.Next(CardButton.TotalCard);
-                CardButton btn = new CardButton(id);
-                float x = Players[i].PosX;
-                float y = Players[i].PosY;
-                btn.Location = new Point(
-                    Players[i].Center.X - btn.Width / 2,
-                    Players[i].Center.Y - btn.Height / 2);
-                this.Controls.Add(btn);
-            }
-        }
-
-        /// <summary>
-        /// 绘制牌堆位置
-        /// </summary>
-        private void DrawPiles() {
-            Piles = new CardButton[2];
-            int x = this.REF_WIDTH / 2,
-                y = this.Height / 2;
-            for (int i = 0; i < PILES_NUM; ++i) {
-                var btn = new CardButton(CardButton.BACK);
-                float xOff = (i == PileToDistribute ? -1 : 1)
-                    * PILE_OFFSET_RATE * this.REF_WIDTH / 2
-                    - btn.Width / 2;
-                float yOff = -btn.Height / 2;
-                btn.Location = new Point(x + (int)xOff, y + (int)yOff);
-                Piles[i] = btn;
-                this.Controls.Add(btn);
-            }
-        }
-
-        private void MainForm_KeyDown(object sender, KeyEventArgs e) {
-            // ECS 退出
-            if (e.KeyCode == Keys.Escape) {
-                this.Close();
-            }
-        }
-
-        /// <summary>
-        /// 全屏显示
-        /// </summary>
-        private void FullScreenDisplay() {
-            bool FullScreen = false;
-            float segs = 1.5f;
-
-            if(FullScreen) {
-                // 隐藏窗口边框
-                this.FormBorderStyle = FormBorderStyle.None;
-                segs = 1f;
-            }
-
-            // 获取屏幕的宽度和高度
-            int w = (int)(SystemInformation.VirtualScreen.Width / segs);
-            int h = (int)(SystemInformation.VirtualScreen.Height / segs);
-            
-            // 设置最大尺寸和最小尺寸
-            this.MaximumSize = new Size(w, h);
-            this.MinimumSize = new Size(w, h);
-            // 设置窗口位置
-            this.Location = new Point(0, 0);
-            // 设置窗口大小
-            this.Width = w;
-            this.Height = h;
-
-            // 置顶显示
-            //this.TopMost = true;
-
-            // 设置一些全局的相对大小信息
-            REF_HEIGHT = this.ClientSize.Height;
-            REF_WIDTH = this.ClientSize.Width;
-            CardButton.ScaleRatio = Math.Min(h / 1152f * 0.8f, w / 2048f * 0.8f);
-        }
-
-        #region 测试函数
-
-        private void MainForm_Click(object sender, EventArgs e) {
-            var emouse = e as MouseEventArgs;
-            if (emouse.Button == MouseButtons.Right) {
-                Test_DifferentPlayers();
-            } else if (emouse.Button == MouseButtons.Left) {
-                Test_DistributeCard();
-            }
-        }
-
-        private void Test_DistributeCard() {
-            
-        }
-
-        private void Test_DifferentPlayers() {
-            PlayersNumber++;
-            if (PlayersNumber > 6) {
-                PlayersNumber = 2;
-            }
-            string[] tmp = new string[] { "a", "b", "c", "d", "e", "f" };
-            List<Control> l = new List<Control>();
-            foreach (Control s in this.Controls) {
-                if (s as CardButton != null) {
-                    l.Add(s);
+        private bool CheckNoCardCanShow() {
+            foreach (var cbtn in Players[ME].BtnsInHand) {
+                if (cbtn.Card.CanResponseTo(
+                    GameControl.CBtnLast.Card, GameControl.ColorLast)) {
+                    return false;
                 }
             }
-            foreach (Control s in l) {
-                this.Controls.Remove(s);
-            }
-            InitializeAllPlayers(tmp);
+            return true;
         }
 
-        #endregion 测试函数
+        public void SetLblChooseCardVisible(bool visible) {
+            this.LblChooseCard.Visible = visible;
+        }
 
-        #region 一些 UI 的常数
+        /// <summary>
+        /// 出牌动画
+        /// </summary>
+        private void ShowCard(CardButton cbtn, Player player) {
+            // 上一张牌修改为现在的牌
+            GameControl.CBtnLast = cbtn;
+            GameControl.ColorLast = cbtn.Card.Color; // TODO Color.Invalid
 
-        // 如下的比例是相对于 [-1,1]*[-1,1] 的
+            Animation anima = new Animation(this, cbtn);
+            var pos = Piles[PileDropped].Location;
+            anima.SetTranslate(pos.X - cbtn.Location.X, pos.Y - cbtn.Location.Y);
+            // 别人出牌需要翻面
+            if (player != Players[ME]) {
+                anima.SetRotate();
+            }
+            UIInvoke(() => {
+                cbtn.BringToFront();
+                Task.Run(async () => {
+                    await anima.Run(); // 动画结束加入弃牌堆
+                    GameControl.AddDroppedCard(cbtn);
+                });
+            });
+            // 移除这张牌
+            player.BtnsInHand.Remove(cbtn);
+            UIInvoke(() => { player.UpdateInfo(); });
 
-        public const float PILE_OFFSET_RATE = 0.1f;
+            if (player == Players[ME]) {
+                cbtn.Click -= cbtn.HighLightCard;
+                // 如果是自己出牌, 同时修正剩余牌的位置
+                ReorganizeMyCardsAsync();
+            }
 
-        #endregion 一些 UI 的常数
+            // TODO 测试
+            this.LblGetCard.Visible = CheckNoCardCanShow();
+        }
+
+        private void LblGetCard_Click(object sender, EventArgs e) {
+            GetCardAsync(Players[ME], 1);
+        }
+
+        /// <summary>
+        /// 摸 n 张牌
+        /// </summary>
+        private async Task GetCardAsync(Player player, int n) {
+            // TODO 暂时就是随机生成一张, 需要大改
+            CardButton cbtn = new CardButton(
+                rdm.Next(CardButton.TotalCard), true, true);
+            cbtn.Location = Piles[PileToDistribute].Location;
+            UIInvokeSync(() => {
+                this.Controls.Add(cbtn);
+                cbtn.BringToFront();
+            });
+
+            // 摸牌动画
+            Animation anima = new Animation(this, cbtn);
+            var pos = player.BtnsInHand[0].Location;
+            anima.SetTranslate(
+                pos.X - cbtn.Location.X
+                    + (int)(INTERVAL_BETWEEN_CARDS_RATIO * CardButton.WIDTH_MODIFIED),
+                pos.Y - cbtn.Location.Y);
+            anima.SetRotate();
+            player.BtnsInHand.Insert(0, cbtn);
+            await anima.Run(); // 同步
+            player.UpdateInfo();
+            ReorganizeMyCardsAsync();
+        }
+
+        /// <summary>
+        /// 控制整个游戏流程
+        ///    1. 检查能否出牌
+        /// </summary>
+        private void TmrControlGame_Tick(object sender, EventArgs e) {
+            // 只有我的回合才可以出牌
+            GameControl.MainForm.SetLblChooseCardVisible(
+                GameControl.TurnID == MyID);
+        }
+
+        /// <summary>
+        /// 出牌按钮点击事件
+        /// </summary>
+        private void LblChooseCard_Click(object sender, EventArgs e) {
+            // 这个问题应该是不会产生的, 但是为了避免出现问题, 还是先设置这个
+            // 可能在消失之前很快的被点了, 压力测试
+            var btn = GameControl.CBtnSelected;
+            if (btn == null) { return; }
+
+            SetMyShowCardAbility(false);
+
+            if(btn.Card.Color == CardColor.Invalid) {
+                // +4/万能牌
+                // TODO 这里的动画
+                GameControl.InvalidCardToChooseColor = CardColor.Invalid;
+                UIInvoke(() => {
+                    this.PnlChooseColor.Visible = true;
+                });
+            } else {
+                SendShowCardJson();
+            }
+        }
+
+        /// <summary>
+        /// 构造出牌的 json
+        /// </summary>
+        private void SendShowCardJson() {
+            var btn = GameControl.CBtnSelected;
+
+            // 构造 json
+            int color = -1; // 不是 万能牌/+4, 设置为 -1
+            if (btn.Card.Color == CardColor.Invalid) {
+                color = (int)GameControl.InvalidCardToChooseColor;
+            }
+            JsonData json = new JsonData() {
+                ["state"] = 1,
+                ["card"] = btn.Card.Number,
+                ["color"] = color,
+                ["queryID"] = GameControl.QueryID
+            };
+            MsgAgency.PlayerAdapter.SendMsg2Server(json.ToJson());
+
+            // 此时需要阻塞, 向服务器寻求验证, 直到服务器反馈之后再出牌
+            // 这里不处理, 认为这个事件处理结束, 可以直接让 Msg 中的收消息线程处理
+
+            // TODO 出牌动画不在这里做了
+            // ShowCard(GameControl.CBtnSelected, Players[ME]);
+            GameControl.CBtnSelected = null;
+        }
+
+        /// <summary>
+        /// 设置自己的牌、出牌按钮、摸牌按钮的可执行性
+        /// </summary>
+        private void SetMyShowCardAbility(bool enable) {
+            this.LblChooseCard.Enabled = enable;
+            this.LblGetCard.Enabled = enable;
+            foreach (var cbtn in Players[ME].BtnsInHand) {
+                cbtn.Enabled = enable;
+            }
+        }
     }
 }

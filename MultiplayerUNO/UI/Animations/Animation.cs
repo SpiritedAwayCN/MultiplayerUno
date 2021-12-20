@@ -19,7 +19,7 @@ namespace MultiplayerUNO.UI.Animations {
         public const int TRANSLATE = 0b1;
         public const int ROTATE = 0b10;
         //public const int SCALE = 0b100;
-        public const int SLEEP_TIME = 20;
+        public const int SLEEP_TIME = 10;
 
         // 可能的状态
         private Translate Trans;
@@ -34,7 +34,7 @@ namespace MultiplayerUNO.UI.Animations {
         /// <summary>
         /// 被控制的组件
         /// </summary>
-        public readonly Control Btn;
+        public readonly List<CardButton> Controls;
 
         /// <summary>
         /// 估计动画迭代轮数
@@ -42,11 +42,16 @@ namespace MultiplayerUNO.UI.Animations {
         private int StepCost;
 
         public Animation(Form form, CardButton ButtonControlled) {
+            Controls = new List<CardButton>();
             Form = form;
-            Btn = ButtonControlled;
             Kind = 0;
             Trans = null;
             Rot = null;
+            Controls.Add(ButtonControlled);
+        }
+
+        public void AddControls(CardButton ButtonControlled) {
+            Controls.Add(ButtonControlled);
         }
 
         public void SetRotate() {
@@ -84,29 +89,32 @@ namespace MultiplayerUNO.UI.Animations {
         /// </summary>
         public Task Run() {
             return Task.Run(() => {
-                int x = Btn.Location.X,
-                    y = Btn.Location.Y;
-                int w = Btn.Width;
+                Point[] pos = new Point[Controls.Count];
+                for (int i = 0; i < Controls.Count; ++i) {
+                    pos[i] = Controls[i].Location; // 值复制
+                }
                 bool first = true;
                 while (UpdateState()) {
                     Form.BeginInvoke(new Action(() => {
-                        // 修改 width 的时候应该是相同对中心进行修改
-                        int offX = 0, offY = 0;
-                        if (Rot != null) {
-                            // 牌翻面
-                            if (first && Rot.FlipOver) {
-                                first = false;
-                                var btn = Btn as CardButton;
-                                if (btn != null) { btn.Flip(); }
+                        for (int i = 0; i < Controls.Count; ++i) {
+                            // 修改 width 的时候应该是相对于中心进行修改
+                            int offX = 0, offY = 0;
+                            var btn = Controls[i];
+                            if (Rot != null) {
+                                // 牌翻面
+                                if (first && Rot.FlipOver) {
+                                    first = false;
+                                    if (btn != null) { btn.Flip(); }
+                                }
+                                btn.Width = (int)(CardButton.WIDTH_MODIFIED * Rot.GetXScale());
+                                offX = (CardButton.WIDTH_MODIFIED - btn.Width) / 2;
                             }
-                            Btn.Width = (int)(w * Rot.GetXScale());
-                            offX = (w - Btn.Width) / 2;
+                            if (Trans != null) {
+                                offX += (int)Trans.NowX;
+                                offY += (int)Trans.NowY;
+                            }
+                            btn.Location = new Point(pos[i].X + offX, pos[i].Y + offY);
                         }
-                        if (Trans != null) {
-                            offX += Trans.NowX;
-                            offY += Trans.NowY;
-                        }
-                        Btn.Location = new Point(x + offX, y + offY);
                     }));
                     Thread.Sleep(SLEEP_TIME);
                 }

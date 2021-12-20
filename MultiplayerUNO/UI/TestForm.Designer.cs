@@ -24,11 +24,16 @@
         /// </summary>
         private void InitializeComponent() {
             this.label1 = new System.Windows.Forms.Label();
-            this.panel1 = new System.Windows.Forms.Panel();
+            this.PnlInfo = new System.Windows.Forms.Panel();
             this.LblInfo = new System.Windows.Forms.Label();
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.button2 = new System.Windows.Forms.Button();
-            this.panel1.SuspendLayout();
+            this.BtnZIndex = new System.Windows.Forms.Button();
+            this.LblTestAlign = new System.Windows.Forms.Label();
+            this.label3 = new System.Windows.Forms.Label();
+            this.button1 = new System.Windows.Forms.Button();
+            this.LblChooseCard = new System.Windows.Forms.Label();
+            this.PnlInfo.SuspendLayout();
             this.SuspendLayout();
             // 
             // label1
@@ -40,15 +45,15 @@
             this.label1.TabIndex = 2;
             this.label1.Text = "请输入 cardid";
             // 
-            // panel1
+            // PnlInfo
             // 
-            this.panel1.Controls.Add(this.LblInfo);
-            this.panel1.Controls.Add(this.label1);
-            this.panel1.Controls.Add(this.textBox1);
-            this.panel1.Location = new System.Drawing.Point(520, 12);
-            this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(387, 211);
-            this.panel1.TabIndex = 3;
+            this.PnlInfo.Controls.Add(this.LblInfo);
+            this.PnlInfo.Controls.Add(this.label1);
+            this.PnlInfo.Controls.Add(this.textBox1);
+            this.PnlInfo.Location = new System.Drawing.Point(520, 12);
+            this.PnlInfo.Name = "PnlInfo";
+            this.PnlInfo.Size = new System.Drawing.Size(387, 211);
+            this.PnlInfo.TabIndex = 3;
             // 
             // LblInfo
             // 
@@ -69,35 +74,96 @@
             // 
             // button2
             // 
-            this.button2.Location = new System.Drawing.Point(684, 364);
+            this.button2.Location = new System.Drawing.Point(684, 320);
             this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(75, 23);
+            this.button2.Size = new System.Drawing.Size(119, 67);
             this.button2.TabIndex = 5;
             this.button2.Text = "加移动";
             this.button2.UseVisualStyleBackColor = true;
             this.button2.Click += new System.EventHandler(this.button2_Click);
+            // 
+            // BtnZIndex
+            // 
+            this.BtnZIndex.Location = new System.Drawing.Point(684, 416);
+            this.BtnZIndex.Name = "BtnZIndex";
+            this.BtnZIndex.Size = new System.Drawing.Size(119, 69);
+            this.BtnZIndex.TabIndex = 6;
+            this.BtnZIndex.Text = "改变层级";
+            this.BtnZIndex.UseVisualStyleBackColor = true;
+            this.BtnZIndex.Click += new System.EventHandler(this.BtnZIndex_Click);
+            // 
+            // LblTestAlign
+            // 
+            this.LblTestAlign.AutoSize = true;
+            this.LblTestAlign.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.LblTestAlign.Location = new System.Drawing.Point(400, 300);
+            this.LblTestAlign.Name = "LblTestAlign";
+            this.LblTestAlign.Size = new System.Drawing.Size(57, 17);
+            this.LblTestAlign.TabIndex = 7;
+            this.LblTestAlign.Text = "label2";
+            // 
+            // label3
+            // 
+            this.label3.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.label3.Font = new System.Drawing.Font("微软雅黑", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.label3.Location = new System.Drawing.Point(400, 300);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(100, 100);
+            this.label3.TabIndex = 8;
+            this.label3.Text = "label3";
+            this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(543, 449);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(112, 66);
+            this.button1.TabIndex = 9;
+            this.button1.Text = "移动 (0,0)";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
+            // 
+            // LblChooseCard
+            // 
+            this.LblChooseCard.AutoSize = true;
+            this.LblChooseCard.Location = new System.Drawing.Point(139, 237);
+            this.LblChooseCard.Name = "LblChooseCard";
+            this.LblChooseCard.Size = new System.Drawing.Size(37, 15);
+            this.LblChooseCard.TabIndex = 10;
+            this.LblChooseCard.Text = "出牌";
             // 
             // TestForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(980, 619);
+            this.Controls.Add(this.LblChooseCard);
+            this.Controls.Add(this.button1);
+            this.Controls.Add(this.LblTestAlign);
+            this.Controls.Add(this.BtnZIndex);
             this.Controls.Add(this.button2);
-            this.Controls.Add(this.panel1);
+            this.Controls.Add(this.PnlInfo);
+            this.Controls.Add(this.label3);
             this.Name = "TestForm";
             this.Text = "TestForm";
             this.Load += new System.EventHandler(this.TestForm_Load);
-            this.panel1.ResumeLayout(false);
-            this.panel1.PerformLayout();
+            this.PnlInfo.ResumeLayout(false);
+            this.PnlInfo.PerformLayout();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
         #endregion
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.Panel panel1;
+        private System.Windows.Forms.Panel PnlInfo;
         private System.Windows.Forms.Label LblInfo;
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.Button BtnZIndex;
+        private System.Windows.Forms.Label LblTestAlign;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Label LblChooseCard;
     }
 }

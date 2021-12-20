@@ -19,11 +19,23 @@ namespace MultiplayerUNO.UI.Animations {
             Animations.Add(anima);
         }
 
-        public void Run() {
-            Task.Run(async () => {
+        public Task Run() {
+            return Task.Run(async () => {
                 foreach (var anima in Animations) {
                     await anima.Run();
                 };
+            });
+        }
+
+        public Task RunAtTheSameTime() {
+            return Task.Run(async () => {
+                List<Task> waitQueue = new List<Task>();
+                foreach (var anima in Animations) {
+                    waitQueue.Add(anima.Run());
+                };
+                foreach (var w in waitQueue) {
+                    await w;
+                }
             });
         }
     }

@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 
 namespace MultiplayerUNO.UI.Animations {
+    // 暂时没有使用
     public class AnimationController {
         public BlockingCollection<Animation> AnimationQueue;
 

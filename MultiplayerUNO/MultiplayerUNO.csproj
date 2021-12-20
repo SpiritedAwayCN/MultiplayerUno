@@ -70,17 +70,39 @@
     <Compile Include="UI\Animations\Rotate.cs" />
     <Compile Include="UI\Animations\Scale.cs" />
     <Compile Include="UI\Animations\Translate.cs" />
-    <Compile Include="UI\Backend2Front.cs" />
+    <Compile Include="UI\BUtils\MsgAgency.cs" />
+    <Compile Include="UI\BUtils\SCSelect.cs" />
     <Compile Include="UI\CardButton.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="UI\GameControl.cs" />
     <Compile Include="UI\MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="UI\MainForm.Designer.cs">
       <DependentUpon>MainForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="UI\MainForm.discard.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\MainForm.initialize.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\MainForm.utils.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\MainForm.test.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\OtherForm\LoginForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\OtherForm\LoginForm.Designer.cs">
+      <DependentUpon>LoginForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UI\OtherForm\PlayerState.cs" />
     <Compile Include="UI\Players\Player.cs" />
+    <Compile Include="UI\Players\PlayerKind.cs" />
     <Compile Include="UI\TestForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -92,6 +114,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>UIImage.resx</DependentUpon>
     </Compile>
+    <Compile Include="UI\BUtils\BUtil.cs" />
     <Compile Include="Utils\Card.cs" />
     <Compile Include="Utils\GameCardPile.cs" />
     <Compile Include="Utils\LocalPlayerAdapter.cs" />
@@ -108,9 +131,13 @@
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
     </Compile>
     <EmbeddedResource Include="UI\MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\OtherForm\LoginForm.resx">
+      <DependentUpon>LoginForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\TestForm.resx">
       <DependentUpon>TestForm.cs</DependentUpon>
@@ -249,6 +276,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Images\UI\bg_select_players.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Images\UI\clockwise.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Images\UI\counterclockwise.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

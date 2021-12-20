@@ -12,6 +12,8 @@ using System.Windows.Forms;
 
 namespace MultiplayerUNO.UI {
     public partial class TestForm : Form {
+        CardButton CBtn = null;
+
         public TestForm() {
             InitializeComponent();
         }
@@ -21,33 +23,39 @@ namespace MultiplayerUNO.UI {
             TextBox txt = sender as TextBox;
             int cardid;
             if (Int32.TryParse(txt.Text, out cardid)) {
-                foreach (var s in this.Controls) {
-                    if (s as CardButton != null) {
-                        this.Controls.Remove((CardButton)s);
-                        break;
-                    }
+                if (CBtn != null) {
+                    this.Controls.Remove(CBtn);
                 }
-                CardButton btn = new CardButton(cardid);
-                btn.Location = new Point(0, 0);
-                this.Controls.Add(btn);
+                CBtn = new CardButton(cardid);
+                CBtn.Location = new Point(0, 0);
+                this.Controls.Add(CBtn);
                 this.LblInfo.Text =
-                    "Number: " + btn.Card.Number
-                    + "\nColor: " + btn.Card.Color;
+                    "Number: " + CBtn.Card.Number
+                    + "\nColor: " + CBtn.Card.Color;
                 ;
+                this.LblTestAlign.Text = this.LblInfo.Text;
+                this.LblTestAlign.Location = new Point(
+                        this.label3.Location.X - this.LblTestAlign.Width / 2,
+                        this.label3.Location.Y
+                        );
             } else {
                 txt.Text = "Invalid";
             }
         }
 
-        private void textBox1_TextChanged(object sender, EventArgs e) {
-        }
 
         private void TestForm_Load(object sender, EventArgs e) {
+            // 设置一些全局的相对大小信息
+            int h = this.ClientSize.Height;
+            int w = this.ClientSize.Width;
+            CardButton.ScaleRatio = Math.Min(h / 1152f * 0.8f, w / 2048f * 0.8f);
+
             this.textBox1.Text = "11";
             textBox1_KeyDown(this.textBox1, new KeyEventArgs(Keys.Enter));
         }
 
-        private void button2_Click(object sender, EventArgs e) { 
+        private void button2_Click(object sender, EventArgs e) {
+            this.button2.Click -= this.button1_Click;
             CardButton btn = null;
             foreach (var s in this.Controls) {
                 if (s as CardButton != null) {
@@ -66,6 +74,27 @@ namespace MultiplayerUNO.UI {
             animaSeq.AddAnimation(anima);
             animaSeq.AddAnimation(anima2);
             animaSeq.Run();
+        }
+
+
+        private bool BtnTop = false;
+        private void BtnZIndex_Click(object sender, EventArgs e) {
+            if (CBtn == null) {
+                return;
+            }
+            BtnTop = !BtnTop;
+            if(BtnTop) {
+                CBtn.BringToFront();
+            } else {
+                this.PnlInfo.BringToFront();
+            }
+        }
+
+        private void button1_Click(object sender, EventArgs e) {
+            if (CBtn == null) { return; }
+            Animation anima = new Animation(this, CBtn);
+            anima.SetTranslate(0, 0);
+            anima.Run();
         }
     }
 }
