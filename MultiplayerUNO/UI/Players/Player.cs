@@ -18,7 +18,8 @@ namespace MultiplayerUNO.UI.Players {
         public List<int> CardsOrigin = null;  // 别人的牌我们不知道, 设置为 null
                                               // 只会在初始化被用到, 之后都使用 BtnsInHand
 
-        public List<CardButton> BtnsInHand = null; // 别人的牌我们不知道, 设置为 null
+        public List<CardButton> BtnsInHand; // 别人的牌我们不知道, 只有一张背面的牌
+                                            // Count=1, 而不是null
 
         /// <summary>
         /// 用于显示一些信息: 用户昵称 + 剩余牌张数
@@ -52,8 +53,8 @@ namespace MultiplayerUNO.UI.Players {
             IsUpDown = isUpDown;
             if (isMe) {
                 CardsOrigin = new List<int>();
-                BtnsInHand = new List<CardButton>();
             }
+            BtnsInHand = new List<CardButton>();
             PosX = posX;
             PosY = posY;
             // center 计算
@@ -63,6 +64,17 @@ namespace MultiplayerUNO.UI.Players {
             PlayerID = playerID;
             CardsCount = cardsCount;
             IsRobot = isRobot;
+        }
+
+        public void UpdateInfo() {
+            LblInfo.Text = Name + " (" + CardsCount + ")";
+        }
+
+        /// <summary>
+        /// 出一张牌, 如果是最后一张返回 true
+        /// </summary>
+        public bool ShowOneCard() {
+            return --CardsCount == 0;
         }
 
         #region 一些 UI 的常数
@@ -109,11 +121,6 @@ namespace MultiplayerUNO.UI.Players {
             new float[5]{1f,   0, -1f, -1f, 0},
             new float[6]{1f,   0, -1f, -1f, -1f, 0},
         };
-
-        public void UpdateInfo() {
-            LblInfo.Text = Name + " (" + this.BtnsInHand.Count + ")";
-        }
-
         #endregion 位置编码方式
     }
 }

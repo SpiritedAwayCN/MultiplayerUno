@@ -7,12 +7,14 @@ using System.Collections;
 using System.Windows.Forms;
 using MultiplayerUNO.UI.Players;
 using static MultiplayerUNO.Utils.Card;
+using MultiplayerUNO.Utils;
 
 namespace MultiplayerUNO.UI {
     /// <summary>
     /// 一些参数用于控制游戏(全局变量)
     /// </summary>
     public static class GameControl {
+
         /// <summary>
         /// 当出的牌是 +4/万能牌 的时候需要选择颜色
         /// </summary>
@@ -55,24 +57,18 @@ namespace MultiplayerUNO.UI {
         /// <summary>
         /// 一轮游戏参数
         /// </summary>
-        public static volatile int
-            State, QueryID, LastCard, IntInfo, TurnID, TimeForYou = -1;
+        public static volatile int QueryID, LastCardID, TurnID, TimeForYou = -1;
         public static volatile CardColor LastColor = CardColor.Invalid;
-
+        public static volatile Card LastCard = null;
         /// <summary>
-        /// 上一张牌的颜色 (主要是功能牌需要指定颜色)
+        /// 上一个人是否打牌
         /// </summary>
-        public static Utils.Card.CardColor ColorLast;
-        /// <summary>
-        /// 上一张出的牌
-        /// </summary>
-        public static CardButton CBtnLast = null;
+        public static bool CardChange;
 
         /// <summary>
         /// 当前自己选中的牌
         /// </summary>
         public static CardButton CBtnSelected = null;
-
 
         /// <summary>
         /// 弃牌堆, 保证只有一张弃牌 (线程安全的)
@@ -109,7 +105,7 @@ namespace MultiplayerUNO.UI {
         /// 开局第一次出牌
         /// </summary>
         public static bool FirstTurn() {
-            return LastCard == -1;
+            return LastCardID == -1;
         }
     }
 }

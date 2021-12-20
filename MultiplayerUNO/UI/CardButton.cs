@@ -87,7 +87,7 @@ namespace MultiplayerUNO.UI {
             if (!GameControl.GameInitialized) { return; }
             // 是否能够响应
             if (!GameControl.FirstTurn()
-                && !Card.CanResponseTo(GameControl.CBtnLast.Card, GameControl.ColorLast)) {
+                && !Card.CanResponseTo(GameControl.LastCard, GameControl.LastColor)) {
                 return;
             }
             int dy = (int)(HighLightRatio * WIDTH_MODIFIED);

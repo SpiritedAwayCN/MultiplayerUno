@@ -116,7 +116,7 @@ namespace MultiplayerUNO.UI.OtherForm {
         /// </summary>
         private void BtnJoinGame_Click(object sender, EventArgs e) {
             SetAllControlsEnable(false);
-            Task.Run(()=> { InitializeAdapter(); });
+            Task.Run(() => { InitializeAdapter(); });
         }
 
         /// <summary>
@@ -226,7 +226,7 @@ namespace MultiplayerUNO.UI.OtherForm {
         /// 设置控件的 Enable
         /// </summary>
         private void SetAllControlsEnable(bool enable) {
-            foreach(Control c in this.Controls) {
+            foreach (Control c in this.Controls) {
                 c.Enabled = enable;
             }
         }
@@ -263,6 +263,12 @@ namespace MultiplayerUNO.UI.OtherForm {
             };
             MsgAgency.PlayerAdapter.SendMsg2Server(msg.ToJson());
             SetReadyBtnsEnable(true);
+        }
+
+
+        // For DEBUG
+        public string GetUserName() {
+            return this.TxtUserName.Text;
         }
     }
 }

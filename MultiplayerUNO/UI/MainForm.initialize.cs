@@ -20,6 +20,7 @@ namespace MultiplayerUNO.UI {
 
         public MainForm(JsonData jsonMsg) {
             GameControl.MainForm = this;
+            MsgAgency.MainForm = this;
             // readonly MyID
             MyID = (int)jsonMsg["yourID"];
             InitJsonMsg = jsonMsg;
@@ -57,9 +58,7 @@ namespace MultiplayerUNO.UI {
                     p == ME
                 );
                 btn.Location = Piles[PileToDistribute].Location;
-                if (p == ME) {
-                    player.BtnsInHand.Add(btn);
-                }
+                player.BtnsInHand.Add(btn);
                 add2FormControl.Add(btn);
                 Animation anima = new Animation(this, btn);
                 anima.SetTranslate(
@@ -128,13 +127,7 @@ namespace MultiplayerUNO.UI {
             int direction = (int)jsonMsg["direction"];
             GameControl.SetGameDirection(direction);
 
-            JsonData turnInfo = jsonMsg["turnInfo"];
-            GameControl.State = (int)turnInfo["state"];
-            GameControl.QueryID = (int)turnInfo["state"];
-            GameControl.LastCard = (int)turnInfo["lastCard"];
-            GameControl.TurnID = (int)turnInfo["turnID"];
-            GameControl.IntInfo = (int)turnInfo["intInfo"];
-            GameControl.TimeForYou = (int)turnInfo["time"];
+            TurnInfo turnInfo = new TurnInfo(jsonMsg["turnInfo"]);
 
             JsonData playerMap = jsonMsg["playerMap"];
             PlayersNumber = playerMap.Count;
@@ -185,13 +178,16 @@ namespace MultiplayerUNO.UI {
         private void InitializeComponentOnce() {
             List<Control> lst = new List<Control>();
 
-            lst.Add(this.LblChooseCard);
+            lst.Add(this.LblShowCard);
             lst.Add(this.LblGetCard);
             lst.Add(this.LblLeftTime);
             lst.Add(this.LblDirection);
             lst.Add(this.LblColor);
             lst.Add(this.LblFirstShowCard);
             lst.Add(this.PnlChooseColor);
+            lst.Add(this.LblRefuseToShowCardWhenGet);
+            lst.Add(this.PnlQuestion);
+
 
             foreach (var c in lst) {
                 this.Controls.Remove(c);
@@ -329,6 +325,8 @@ namespace MultiplayerUNO.UI {
                 lbldir.BackgroundImageLayout = ImageLayout.Stretch;
                 // color
                 UpdateLblColor();
+                lblcolor.BackgroundImageLayout = ImageLayout.Stretch;
+
                 this.LblDirection.Visible = true;
                 this.LblLeftTime.Visible = true;
                 this.LblColor.Visible = true;
@@ -409,7 +407,7 @@ namespace MultiplayerUNO.UI {
 
             // 出牌 label, LblChooseCard
             var pos = Piles[PileDropped].Location;
-            Label lbl = this.LblChooseCard;
+            Label lbl = this.LblShowCard;
             lbl.Location = new Point(
                 pos.X + pos.X - Piles[PileToDistribute].Location.X,
                 pos.Y + (CardButton.HEIGHT_MODIFIED - lbl.Height) / 2);
@@ -419,6 +417,13 @@ namespace MultiplayerUNO.UI {
             lbl.Location = new Point(
                 pos.X + 2 * (pos.X - Piles[PileToDistribute].Location.X),
                 pos.Y + (CardButton.HEIGHT_MODIFIED - lbl.Height) / 2);
+
+            // 不出牌 lable(只在摸牌后显示), LblRefuseToShowCardWhenGet
+            lbl = this.LblRefuseToShowCardWhenGet;
+            lbl.Location = new Point(
+                this.LblGetCard.Location.X,
+                this.LblGetCard.Location.Y + this.LblGetCard.Size.Height + 10 // TODO
+            );
 
             // 倒计时 label, LblLeftTime
             lbl = this.LblLeftTime;
@@ -438,7 +443,12 @@ namespace MultiplayerUNO.UI {
 
             // 选择颜色的 panel, PnlChooseColor
             Panel pnl = this.PnlChooseColor;
-            pnl.Location = new Point(20, 100);
+            pnl.Location = new Point(20, 100);// TODO
+            pnl.Visible = false;
+
+            // 质疑 panel, PnlQuestion
+            pnl = this.PnlQuestion;
+            pnl.Location = this.PnlChooseColor.Location;// TODO
             pnl.Visible = false;
         }
     }
