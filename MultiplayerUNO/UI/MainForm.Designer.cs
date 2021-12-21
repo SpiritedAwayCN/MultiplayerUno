@@ -37,7 +37,17 @@
             this.LblQuestion = new System.Windows.Forms.Label();
             this.PnlQuestion = new System.Windows.Forms.Panel();
             this.LblNoQuestion = new System.Windows.Forms.Label();
+            this.PnlDisplayCard = new System.Windows.Forms.Panel();
+            this.LblDisplayCardsPlayerName = new System.Windows.Forms.Label();
+            this.TmrDisplayCard = new System.Windows.Forms.Timer(this.components);
+            this.LblGameOver = new System.Windows.Forms.Label();
+            this.PnlPlus2 = new System.Windows.Forms.Panel();
+            this.LblPlus2Total = new System.Windows.Forms.Label();
+            this.LblDonotPlayPlus2 = new System.Windows.Forms.Label();
+            this.LblPlayPlus2 = new System.Windows.Forms.Label();
             this.PnlQuestion.SuspendLayout();
+            this.PnlDisplayCard.SuspendLayout();
+            this.PnlPlus2.SuspendLayout();
             this.SuspendLayout();
             // 
             // LblShowCard
@@ -168,14 +178,14 @@
             this.LblQuestion.TabIndex = 20;
             this.LblQuestion.Text = "质疑";
             this.LblQuestion.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.LblQuestion.Visible = false;
+            this.LblQuestion.Click += new System.EventHandler(this.LblQuestion_Click);
             // 
             // PnlQuestion
             // 
             this.PnlQuestion.BackColor = System.Drawing.Color.OliveDrab;
             this.PnlQuestion.Controls.Add(this.LblNoQuestion);
             this.PnlQuestion.Controls.Add(this.LblQuestion);
-            this.PnlQuestion.Location = new System.Drawing.Point(402, 208);
+            this.PnlQuestion.Location = new System.Drawing.Point(577, 87);
             this.PnlQuestion.Name = "PnlQuestion";
             this.PnlQuestion.Size = new System.Drawing.Size(319, 101);
             this.PnlQuestion.TabIndex = 21;
@@ -188,18 +198,116 @@
             this.LblNoQuestion.Location = new System.Drawing.Point(195, 31);
             this.LblNoQuestion.Name = "LblNoQuestion";
             this.LblNoQuestion.Padding = new System.Windows.Forms.Padding(5);
-            this.LblNoQuestion.Size = new System.Drawing.Size(72, 41);
+            this.LblNoQuestion.Size = new System.Drawing.Size(96, 41);
             this.LblNoQuestion.TabIndex = 21;
-            this.LblNoQuestion.Text = "质疑";
+            this.LblNoQuestion.Text = "不质疑";
             this.LblNoQuestion.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.LblNoQuestion.Visible = false;
+            this.LblNoQuestion.Click += new System.EventHandler(this.LblNoQuestion_Click);
+            // 
+            // PnlDisplayCard
+            // 
+            this.PnlDisplayCard.AutoSize = true;
+            this.PnlDisplayCard.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.PnlDisplayCard.BackColor = System.Drawing.Color.DodgerBlue;
+            this.PnlDisplayCard.Controls.Add(this.LblDisplayCardsPlayerName);
+            this.PnlDisplayCard.Location = new System.Drawing.Point(59, 232);
+            this.PnlDisplayCard.Name = "PnlDisplayCard";
+            this.PnlDisplayCard.Size = new System.Drawing.Size(172, 20);
+            this.PnlDisplayCard.TabIndex = 22;
+            this.PnlDisplayCard.VisibleChanged += new System.EventHandler(this.PnlDisplayCard_VisibleChanged);
+            // 
+            // LblDisplayCardsPlayerName
+            // 
+            this.LblDisplayCardsPlayerName.AutoSize = true;
+            this.LblDisplayCardsPlayerName.BackColor = System.Drawing.Color.GhostWhite;
+            this.LblDisplayCardsPlayerName.Font = new System.Drawing.Font("宋体", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.LblDisplayCardsPlayerName.Location = new System.Drawing.Point(0, 0);
+            this.LblDisplayCardsPlayerName.Name = "LblDisplayCardsPlayerName";
+            this.LblDisplayCardsPlayerName.Size = new System.Drawing.Size(169, 20);
+            this.LblDisplayCardsPlayerName.TabIndex = 0;
+            this.LblDisplayCardsPlayerName.Text = "展示牌的玩家姓名";
+            this.LblDisplayCardsPlayerName.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // TmrDisplayCard
+            // 
+            this.TmrDisplayCard.Interval = 5000;
+            this.TmrDisplayCard.Tick += new System.EventHandler(this.TmrDisplayCard_Tick);
+            // 
+            // LblGameOver
+            // 
+            this.LblGameOver.AutoSize = true;
+            this.LblGameOver.BackColor = System.Drawing.Color.LightCyan;
+            this.LblGameOver.Font = new System.Drawing.Font("微软雅黑", 13.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.LblGameOver.Location = new System.Drawing.Point(386, 211);
+            this.LblGameOver.Name = "LblGameOver";
+            this.LblGameOver.Padding = new System.Windows.Forms.Padding(5);
+            this.LblGameOver.Size = new System.Drawing.Size(240, 41);
+            this.LblGameOver.TabIndex = 22;
+            this.LblGameOver.Text = "游戏结束，获胜者是";
+            this.LblGameOver.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // PnlPlus2
+            // 
+            this.PnlPlus2.AutoSize = true;
+            this.PnlPlus2.BackColor = System.Drawing.Color.OliveDrab;
+            this.PnlPlus2.Controls.Add(this.LblPlus2Total);
+            this.PnlPlus2.Controls.Add(this.LblDonotPlayPlus2);
+            this.PnlPlus2.Controls.Add(this.LblPlayPlus2);
+            this.PnlPlus2.Location = new System.Drawing.Point(210, 277);
+            this.PnlPlus2.Name = "PnlPlus2";
+            this.PnlPlus2.Size = new System.Drawing.Size(360, 143);
+            this.PnlPlus2.TabIndex = 22;
+            // 
+            // LblPlus2Total
+            // 
+            this.LblPlus2Total.AutoSize = true;
+            this.LblPlus2Total.BackColor = System.Drawing.Color.LightCyan;
+            this.LblPlus2Total.Font = new System.Drawing.Font("微软雅黑", 13.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.LblPlus2Total.Location = new System.Drawing.Point(40, 9);
+            this.LblPlus2Total.Name = "LblPlus2Total";
+            this.LblPlus2Total.Padding = new System.Windows.Forms.Padding(5);
+            this.LblPlus2Total.Size = new System.Drawing.Size(200, 41);
+            this.LblPlus2Total.TabIndex = 22;
+            this.LblPlus2Total.Text = "当前+2累计张数";
+            this.LblPlus2Total.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // LblDonotPlayPlus2
+            // 
+            this.LblDonotPlayPlus2.AutoSize = true;
+            this.LblDonotPlayPlus2.BackColor = System.Drawing.Color.LightCyan;
+            this.LblDonotPlayPlus2.Font = new System.Drawing.Font("微软雅黑", 13.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.LblDonotPlayPlus2.Location = new System.Drawing.Point(208, 72);
+            this.LblDonotPlayPlus2.Name = "LblDonotPlayPlus2";
+            this.LblDonotPlayPlus2.Padding = new System.Windows.Forms.Padding(5);
+            this.LblDonotPlayPlus2.Size = new System.Drawing.Size(128, 41);
+            this.LblDonotPlayPlus2.TabIndex = 21;
+            this.LblDonotPlayPlus2.Text = "不打出+2";
+            this.LblDonotPlayPlus2.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.LblDonotPlayPlus2.Click += new System.EventHandler(this.LblDonotPlayPlus2_Click);
+            // 
+            // LblPlayPlus2
+            // 
+            this.LblPlayPlus2.AutoSize = true;
+            this.LblPlayPlus2.BackColor = System.Drawing.Color.LightCyan;
+            this.LblPlayPlus2.Font = new System.Drawing.Font("微软雅黑", 13.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.LblPlayPlus2.Location = new System.Drawing.Point(23, 72);
+            this.LblPlayPlus2.Name = "LblPlayPlus2";
+            this.LblPlayPlus2.Padding = new System.Windows.Forms.Padding(5);
+            this.LblPlayPlus2.Size = new System.Drawing.Size(104, 41);
+            this.LblPlayPlus2.TabIndex = 20;
+            this.LblPlayPlus2.Text = "打出+2";
+            this.LblPlayPlus2.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.LblPlayPlus2.Click += new System.EventHandler(this.LblPlayPlus2_Click);
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.DimGray;
-            this.ClientSize = new System.Drawing.Size(811, 335);
+            this.ClientSize = new System.Drawing.Size(972, 432);
+            this.Controls.Add(this.PnlPlus2);
+            this.Controls.Add(this.LblGameOver);
+            this.Controls.Add(this.PnlDisplayCard);
             this.Controls.Add(this.PnlQuestion);
             this.Controls.Add(this.LblRefuseToShowCardWhenGet);
             this.Controls.Add(this.PnlChooseColor);
@@ -218,6 +326,10 @@
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.MainForm_KeyDown);
             this.PnlQuestion.ResumeLayout(false);
             this.PnlQuestion.PerformLayout();
+            this.PnlDisplayCard.ResumeLayout(false);
+            this.PnlDisplayCard.PerformLayout();
+            this.PnlPlus2.ResumeLayout(false);
+            this.PnlPlus2.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -238,5 +350,13 @@
         private System.Windows.Forms.Label LblQuestion;
         private System.Windows.Forms.Panel PnlQuestion;
         private System.Windows.Forms.Label LblNoQuestion;
+        private System.Windows.Forms.Panel PnlDisplayCard;
+        private System.Windows.Forms.Label LblDisplayCardsPlayerName;
+        private System.Windows.Forms.Timer TmrDisplayCard;
+        private System.Windows.Forms.Label LblGameOver;
+        private System.Windows.Forms.Panel PnlPlus2;
+        private System.Windows.Forms.Label LblDonotPlayPlus2;
+        private System.Windows.Forms.Label LblPlayPlus2;
+        private System.Windows.Forms.Label LblPlus2Total;
     }
 }

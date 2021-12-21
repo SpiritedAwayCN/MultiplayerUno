@@ -187,7 +187,9 @@ namespace MultiplayerUNO.UI {
             lst.Add(this.PnlChooseColor);
             lst.Add(this.LblRefuseToShowCardWhenGet);
             lst.Add(this.PnlQuestion);
-
+            lst.Add(this.PnlDisplayCard);
+            lst.Add(this.LblGameOver);
+            lst.Add(this.PnlPlus2);
 
             foreach (var c in lst) {
                 this.Controls.Remove(c);
@@ -449,6 +451,21 @@ namespace MultiplayerUNO.UI {
             // 质疑 panel, PnlQuestion
             pnl = this.PnlQuestion;
             pnl.Location = this.PnlChooseColor.Location;// TODO
+            pnl.Visible = false;
+
+            // 展示牌 pnl, PnlDisplayCard
+            pnl = this.PnlDisplayCard;
+            pnl.Location = this.PnlChooseColor.Location;// TODO
+            pnl.Visible = false;
+
+            // 游戏结束 lbl, LblGameOver
+            lbl = this.LblGameOver;
+            lbl.Location = this.PnlChooseColor.Location; // TODO
+            lbl.Visible = false;
+
+            // +2 展示 pnl, PnlPlus2
+            pnl = this.PnlPlus2;
+            pnl.Location = this.PnlChooseColor.Location; // TODO
             pnl.Visible = false;
         }
     }

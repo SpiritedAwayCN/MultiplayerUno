@@ -54,5 +54,9 @@ namespace MultiplayerUNO.Utils
         {
             return CardId >= 104;
         }
+
+        public bool IsPlus2() {
+            return (CardId >> 3) == 11;
+        }
     }
 }

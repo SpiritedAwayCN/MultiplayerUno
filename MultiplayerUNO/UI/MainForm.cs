@@ -4,6 +4,8 @@ using MultiplayerUNO.UI.BUtils;
 using MultiplayerUNO.UI.Players;
 using MultiplayerUNO.Utils;
 using System;
+using System.Collections.Generic;
+using System.Drawing;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using static MultiplayerUNO.Utils.Card;
@@ -113,6 +115,34 @@ namespace MultiplayerUNO.UI {
         }
 
         /// <summary>
+        /// 游戏结束
+        /// 1. 显示谁胜利了
+        /// 2. 展示手牌
+        /// </summary>
+        internal void GameOver(TurnInfo turnInfo) {
+            // 显示胜利
+            string playerName = Players[
+                GameControl.PlayerId2PlayerIndex[turnInfo.GetPlayerID()]
+            ].Name;
+            UIInvoke(() => {
+                this.LblGameOver.Text = "游戏结束, 胜利者是: " + playerName;
+                this.LblGameOver.Visible = true;
+            });
+            // 展示手牌 TODO
+        }
+
+        /// <summary>
+        /// 回应 +4
+        ///   1. 响应 panel 显示出来 
+        /// </summary>
+        internal void RespondToPlus4(TurnInfo turnInfo) {
+            UIInvokeSync(() => {
+                this.PnlQuestion.Visible = true;
+                // TODO 其他功能键不能响应
+            });
+        }
+
+        /// <summary>
         /// 某人摸了好几张牌, 这里只需要构造动画即可
         /// </summary>
         public void GetManyCards(TurnInfo turnInfo) {
@@ -155,7 +185,7 @@ namespace MultiplayerUNO.UI {
                 ["queryID"] = GameControl.QueryID
             };
             MsgAgency.PlayerAdapter.SendMsg2Server(json.ToJson());
-            if(GameControl.CBtnSelected != null) {
+            if (GameControl.CBtnSelected != null) {
                 var anima = new Animation(this, GameControl.CBtnSelected);
                 GameControl.CBtnSelected = null;
             }
@@ -170,7 +200,7 @@ namespace MultiplayerUNO.UI {
         /// <summary>
         /// 别人摸 num 张牌
         /// </summary>
-        public void GetCardForOtherOne(TurnInfo turnInfo, int num=1) {
+        public void GetCardForOtherOne(TurnInfo turnInfo, int num = 1) {
             int playerIdx = GameControl.PlayerId2PlayerIndex[turnInfo.TurnID];
             Animation anima = GetACardAnima(playerIdx, turnInfo.LastCardID);
             var w = anima.Run();
@@ -255,7 +285,7 @@ namespace MultiplayerUNO.UI {
             // 别人摸牌, 不需要翻开, 直接叠在一起即可
             // 自己摸牌, 需要翻开, 还需要插入手牌
             if (isMe) {
-                pos.X += 
+                pos.X +=
                     (int)(INTERVAL_BETWEEN_CARDS_RATIO * CardButton.WIDTH_MODIFIED);
             }
             anima.SetTranslate(pos.X - cbtn.Location.X,
@@ -264,7 +294,7 @@ namespace MultiplayerUNO.UI {
                 anima.SetRotate();
             }
             // 注意这里即使不是自己, 我们也把牌加进去了(await 动画结束后删除)
-            Players[ME].BtnsInHand.Insert(0, cbtn); 
+            Players[ME].BtnsInHand.Insert(0, cbtn);
             return anima;
         }
 
@@ -299,7 +329,7 @@ namespace MultiplayerUNO.UI {
             // 此时不能够出牌也不能够按按钮
             CannotShowCardCannotChooseButton();
 
-            if(btn.Card.Color == CardColor.Invalid) {
+            if (btn.Card.Color == CardColor.Invalid) {
                 // +4/万能牌
                 // TODO 这里的动画
                 GameControl.InvalidCardToChooseColor = CardColor.Invalid;
@@ -363,6 +393,122 @@ namespace MultiplayerUNO.UI {
                 SetCardButtonEnable(true);
             });
         }
+
+        /// <summary>
+        /// 质疑按钮点击事件发生
+        /// </summary>
+        private void LblQuestion_Click(object sender, EventArgs e) {
+            SendMsgRespondToPlus4(6);
+            this.PnlQuestion.Visible = false;
+        }
+
+        /// <summary>
+        /// 不质疑按钮点击事件发生
+        /// </summary>
+        private void LblNoQuestion_Click(object sender, EventArgs e) {
+            SendMsgRespondToPlus4(6);
+            this.PnlQuestion.Visible = false;
+        }
+
+        /// <summary>
+        /// 发送响应 +4 的 json
+        /// </summary>
+        private void SendMsgRespondToPlus4(int state) {
+            JsonData json = new JsonData() {
+                ["state"] = state,
+                ["queryID"] = GameControl.QueryID
+            };
+            MsgAgency.PlayerAdapter.SendMsg2Server(json.ToJson());
+        }
+
+
+        /// <summary>
+        /// 某人展示手牌
+        /// </summary>
+        public void DisplayOnesCard(TurnInfo turnInfo) {
+            List<CardButton> lst = new List<CardButton>();
+            foreach (int i in turnInfo.PlayerCards) {
+                lst.Add(new CardButton(i, false, false));
+            }
+            string playerName = Players[
+                GameControl.PlayerId2PlayerIndex[turnInfo.GetPlayerID()]
+            ].Name;
+            Panel pnl = this.PnlDisplayCard;
+            Label lbl = this.LblDisplayCardsPlayerName;
+            UIInvoke(() => {
+                lbl.Text = playerName;
+                int h = lbl.Height;
+                for (int i = 0; i < lst.Count; ++i) {
+                    var cbtn = lst[i];
+                    pnl.Controls.Add(cbtn);
+                    cbtn.Location = new Point(CardButton.WIDTH_MODIFIED * i, h);
+                }
+                lbl.Width = pnl.Width;
+                pnl.Visible = true;
+            });
+        }
+
+        /// <summary>
+        /// 可见性发生修改的时候, 事件发生
+        ///   1.变为不可见的时候去掉其中的所有按钮并释放资源
+        ///   2. 变为可见的时候, 计时器启动, 5 秒之后展示牌结束
+        /// </summary>
+        private void PnlDisplayCard_VisibleChanged(object sender, EventArgs e) {
+            if (this.PnlDisplayCard.Visible) {
+                this.TmrDisplayCard.Interval = 5000;
+                this.TmrDisplayCard.Start();
+                return;
+            }
+            Panel pnl = this.PnlDisplayCard;
+
+            // 去除按钮, 释放资源
+            List<CardButton> lst = new List<CardButton>();
+            foreach (var c in pnl.Controls) {
+                var cbtn = c as CardButton;
+                if (cbtn != null) {
+                    lst.Add(cbtn);
+                }
+            }
+            UIInvoke(() => {
+                foreach (var c in lst) {
+                    pnl.Controls.Remove(c);
+                    c.Dispose();
+                }
+            });
+        }
+
+        private void TmrDisplayCard_Tick(object sender, EventArgs e) {
+            this.TmrDisplayCard.Stop();
+            this.PnlDisplayCard.Visible = false;
+        }
+
+        /// <summary>
+        /// 打出 +2
+        /// </summary>
+        private void LblPlayPlus2_Click(object sender, EventArgs e) {
+            CardButton cbtn = GameControl.CBtnSelected;
+            // TODO 选中的牌一定是 +2
+            if (cbtn == null || !cbtn.Card.IsPlus2()) { return; }
+
+            JsonData json = new JsonData() {
+                ["state"] = 3,
+                ["card"] = cbtn.Card.CardId,
+                ["queryID"] = GameControl.QueryID
+            };
+            MsgAgency.PlayerAdapter.SendMsg2Server(json.ToJson());
+        }
+
+        /// <summary>
+        /// 不打出 +2
+        /// </summary>
+        private void LblDonotPlayPlus2_Click(object sender, EventArgs e) {
+            JsonData json = new JsonData() {
+                ["state"] = 4,
+                ["queryID"] = GameControl.QueryID
+            };
+            MsgAgency.PlayerAdapter.SendMsg2Server(json.ToJson());
+        }
+
 
         public void SetCardButtonEnable(bool enable) {
             foreach (var cbtn in Players[ME].BtnsInHand) {

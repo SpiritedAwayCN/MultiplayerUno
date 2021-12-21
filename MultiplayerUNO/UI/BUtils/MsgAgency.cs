@@ -44,7 +44,7 @@ namespace MultiplayerUNO.UI.BUtils {
             Console.WriteLine(msg2Show);
             int state = (int)json["state"];
             if(state == -1) {
-                // TODO 特判
+                // TODO 某个玩家退出了游戏, 变成机器人
                 return;
             }
             TurnInfo turnInfo = new TurnInfo(json);
@@ -53,6 +53,7 @@ namespace MultiplayerUNO.UI.BUtils {
                 case 1: // 某人打出了某张牌
                         // 不一定, 可能上一个人没有出牌(GameControl.CardChange 来判断)
                         // TODO 功能牌
+                        // ban, reverse
                     if (GameControl.CardChange) {
                         SomeBodyShowCard(turnInfo);
                     }
@@ -60,18 +61,46 @@ namespace MultiplayerUNO.UI.BUtils {
                 case 2: // 某人摸了一张牌(可能还可以出这张牌)
                     GetACard(turnInfo);
                     break;
-                case 3: break;
+                case 3: // +2 累加
+                    break;
                 case 4: // 某人摸了若干张牌(摸牌之后结束了)
                     SomebodyGetSomeCards(turnInfo);
                     break;
                 case 5: // 回应 +4(TODO 一定是自己回应)
-
+                    ResponedToPlus4(turnInfo);
                     break;
-                case 6: break;
-                case 7: break;
+                case 6: // 质疑结果展示
+                    ShowCardAfterPlus4(turnInfo);
+                    break;
+                case 7: // 游戏结束, 展示所有人手牌
+                    GameOver(turnInfo);
+                    break;
                 default: break;
             }
             return;
+        }
+
+        /// <summary>
+        /// 游戏结束
+        /// 1. 显示谁胜利了
+        /// 2. 展示手牌
+        /// </summary>
+        private static void GameOver(TurnInfo turnInfo) {
+            MainForm.GameOver(turnInfo);
+        }
+
+        /// <summary>
+        /// 质疑结果展现, 只需要展示手牌
+        /// </summary>
+        private static void ShowCardAfterPlus4(TurnInfo turnInfo) {
+            MainForm.DisplayOnesCard(turnInfo);
+        }
+
+        /// <summary>
+        /// 回应 +4, 将含有质疑的两个按钮的 panel 可见即可
+        /// </summary>
+        private static void ResponedToPlus4(TurnInfo turnInfo) {
+            MainForm.RespondToPlus4(turnInfo);
         }
 
         /// <summary>
@@ -128,5 +157,5 @@ namespace MultiplayerUNO.UI.BUtils {
     }
 }
 
-/// 连出+2
-/// 开始就摸牌
+/// 连出 +2
+/// 开始就摸牌  v(自动可以解决)
