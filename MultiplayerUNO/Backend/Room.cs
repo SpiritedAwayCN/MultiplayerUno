@@ -199,7 +199,7 @@ namespace MultiplayerUNO.Backend
                     JsonData json = new JsonData
                     {
                         ["turnID"] = e.player.ingameID,
-                        ["card"] = lastCard.CardId,
+                        ["lastCard"] = lastCard.CardId,
                         ["intInfo"] = lastCardInfo
                     };
                     GameEndProcess(json);

@@ -24,7 +24,7 @@ namespace MultiplayerUNO.UI {
         /// <summary>
         /// 封装了复杂的 BeginInvoke(同步)
         /// </summary>
-        private void UIInvokeSync(Action fun) {
+        public void UIInvokeSync(Action fun) {
             if (this.InvokeRequired) {
                 var tmp = this.BeginInvoke(new Action(() => { fun(); }));
                 this.EndInvoke(tmp);

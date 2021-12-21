@@ -190,6 +190,7 @@ namespace MultiplayerUNO.UI {
             lst.Add(this.PnlDisplayCard);
             lst.Add(this.LblGameOver);
             lst.Add(this.PnlPlus2);
+            lst.Add(this.TxtDebug);
 
             foreach (var c in lst) {
                 this.Controls.Remove(c);
@@ -409,7 +410,7 @@ namespace MultiplayerUNO.UI {
 
             // 出牌 label, LblChooseCard
             var pos = Piles[PileDropped].Location;
-            Label lbl = this.LblShowCard;
+            Control lbl = this.LblShowCard;
             lbl.Location = new Point(
                 pos.X + pos.X - Piles[PileToDistribute].Location.X,
                 pos.Y + (CardButton.HEIGHT_MODIFIED - lbl.Height) / 2);
@@ -444,19 +445,19 @@ namespace MultiplayerUNO.UI {
             lbl.Location = new Point(260, 20); // TODO
 
             // 选择颜色的 panel, PnlChooseColor
-            Panel pnl = this.PnlChooseColor;
-            pnl.Location = new Point(20, 100);// TODO
-            pnl.Visible = false;
+            lbl = this.PnlChooseColor;
+            lbl.Location = new Point(20, 100);// TODO
+            lbl.Visible = false;
 
             // 质疑 panel, PnlQuestion
-            pnl = this.PnlQuestion;
-            pnl.Location = this.PnlChooseColor.Location;// TODO
-            pnl.Visible = false;
+            lbl = this.PnlQuestion;
+            lbl.Location = this.PnlChooseColor.Location;// TODO
+            lbl.Visible = false;
 
             // 展示牌 pnl, PnlDisplayCard
-            pnl = this.PnlDisplayCard;
-            pnl.Location = this.PnlChooseColor.Location;// TODO
-            pnl.Visible = false;
+            lbl = this.PnlDisplayCard;
+            lbl.Location = this.PnlChooseColor.Location;// TODO
+            lbl.Visible = false;
 
             // 游戏结束 lbl, LblGameOver
             lbl = this.LblGameOver;
@@ -464,9 +465,14 @@ namespace MultiplayerUNO.UI {
             lbl.Visible = false;
 
             // +2 展示 pnl, PnlPlus2
-            pnl = this.PnlPlus2;
-            pnl.Location = this.PnlChooseColor.Location; // TODO
-            pnl.Visible = false;
+            lbl = this.PnlPlus2;
+            lbl.Location = this.PnlChooseColor.Location; // TODO
+            lbl.Visible = false;
+
+            // DEBUG
+            lbl = this.TxtDebug;
+            lbl.Location = new Point(20, 110 + this.PnlChooseColor.Location.Y);
+            lbl.SendToBack();
         }
     }
 }

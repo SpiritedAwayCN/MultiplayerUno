@@ -35,13 +35,10 @@ namespace MultiplayerUNO.UI.BUtils {
         /// 处理 state 的信息(游戏开始之后从服务端发来的消息)
         /// </summary>
         private static void DealWithMsgAfterGameStart(JsonData json) {
-            // For DEBUG
-            string msg2Show =
-                "UI(state)\r\n" +
-                "\tI am " + LoginForm.GetUserName() + "!\r\n"
-                + "\t" + json.ToJson() + "\r\n";
-            //MessageBox.Show(msg2Show);
-            Console.WriteLine(msg2Show);
+            // DEBUG
+            MainForm.UIInvokeSync(() => { MainForm.DebugLog(json.ToJson()); });
+            // DEBUG
+
             int state = (int)json["state"];
             if(state == -1) {
                 // TODO 某个玩家退出了游戏, 变成机器人
@@ -66,7 +63,7 @@ namespace MultiplayerUNO.UI.BUtils {
                 case 4: // 某人摸了若干张牌(摸牌之后结束了)
                     SomebodyGetSomeCards(turnInfo);
                     break;
-                case 5: // 回应 +4(TODO 一定是自己回应)
+                case 5: // 回应 +4
                     ResponedToPlus4(turnInfo);
                     break;
                 case 6: // 质疑结果展示
@@ -100,6 +97,10 @@ namespace MultiplayerUNO.UI.BUtils {
         /// 回应 +4, 将含有质疑的两个按钮的 panel 可见即可
         /// </summary>
         private static void ResponedToPlus4(TurnInfo turnInfo) {
+            // 首先展示出牌动画
+            MainForm.ShowCard(turnInfo);
+            // 每个人都会收到 +4 的消息, 只有下家可以质疑
+            if (turnInfo.TurnID != MainForm.MyID) { return; }
             MainForm.RespondToPlus4(turnInfo);
         }
 

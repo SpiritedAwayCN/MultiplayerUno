@@ -15,24 +15,25 @@ namespace MultiplayerUNO.UI.BUtils {
         /// <summary>
         /// 在构造函数内部可能会对一些 GameControl 中有意义的值进行赋值
         /// </summary>
-        /// <param name="json"></param>
         public TurnInfo(JsonData json) {
             State = (int)json["state"];
             // 注意, 无意义字段可能缺失
             // 有意义也不一定是指定的意义, 需要小心设置, DEBUG 需要谨慎
 
             LastCardID = (int)json["lastCard"];
-            if (State == 1 || State == 3 || State == 5) {
+            if (State == 1 || State == 3 || State == 5 || State == 7) {
                 GameControl.CardChange = (GameControl.LastCardID != LastCardID);
                 GameControl.LastCardID = LastCardID;
                 GameControl.LastCard = new Utils.Card(LastCardID);
             }
 
-            if (!(State == 6 || (State == 1 && LastCardID == -1))) {
+            // TODO State=4 没有 intInfo
+            if (!(State == 6 || State == 4 || (State == 1 && LastCardID == -1))) {
                 IntInfo = (int)json["intInfo"];
             }
 
-            if (State >= 1 && State <= 5) {
+            // TODO State=4 没有 time
+            if (State >= 1 && State <= 5 && State !=4) {
                 Time = (int)json["time"];
                 GameControl.TimeForYou = Time;
             }
@@ -55,7 +56,12 @@ namespace MultiplayerUNO.UI.BUtils {
             }
 
             if (State == 1 || State == 5 || State == 7) {
-                GameControl.LastColor = (CardColor)(IntInfo & 0b11);
+                if (GameControl.LastCard.Color == CardColor.Invalid) {
+                    GameControl.LastColor = (CardColor)(IntInfo & 0b11);
+                } else {
+                    // State=7 时可能为 -1 TODO
+                    GameControl.LastColor = GameControl.LastCard.Color;
+                }
             }
         }
 

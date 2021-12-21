@@ -38,6 +38,7 @@ namespace MultiplayerUNO.UI {
         public const int ME = 0;
         public readonly int MyID;
 
+
         // 牌堆
         // 为了处理方便, 这两张牌不会在被 MainForm 中去除
         private CardButton[] Piles;
@@ -155,6 +156,7 @@ namespace MultiplayerUNO.UI {
             // 自己, 需要摸好几张牌
             AnimationSeq animaseq = new AnimationSeq();
             var pos = Players[ME].BtnsInHand[0].Location;
+            pos.Y = Players[ME].Center.Y - CardButton.HEIGHT_MODIFIED / 2;
             for (int i = 0; i < num; ++i) {
                 int cardID = turnInfo.PlayerCards[i];
                 CardButton cbtn = new CardButton(cardID, true, true);
@@ -171,9 +173,13 @@ namespace MultiplayerUNO.UI {
                                    pos.Y - cbtn.Location.Y);
                 anima.SetRotate();
                 Players[ME].BtnsInHand.Insert(0, cbtn);
+                animaseq.AddAnimation(anima);
             }
+            var w = animaseq.Run();
             Task.Run(async () => {
-                await animaseq.Run(); // 同步
+                await w; // 同步
+                Players[ME].CardsCount += num; // 更新卡牌数量
+                Players[ME].UpdateInfo();
                 _ = ReorganizeMyCardsAsync();
             });
         }
@@ -241,9 +247,11 @@ namespace MultiplayerUNO.UI {
             Task.Run(async () => {
                 // (2)
                 await t; // 同步
+                Players[ME].CardsCount++; // 更新牌
                 cbtn.PerformClick();
                 // (3)
                 UIInvokeSync(() => {
+                    Players[ME].UpdateInfo();
                     SetCardButtonEnable(false);
                     this.LblShowCard.Visible = true;
                     this.LblRefuseToShowCardWhenGet.Visible = true;
@@ -487,7 +495,6 @@ namespace MultiplayerUNO.UI {
         /// </summary>
         private void LblPlayPlus2_Click(object sender, EventArgs e) {
             CardButton cbtn = GameControl.CBtnSelected;
-            // TODO 选中的牌一定是 +2
             if (cbtn == null || !cbtn.Card.IsPlus2()) { return; }
 
             JsonData json = new JsonData() {
@@ -509,11 +516,32 @@ namespace MultiplayerUNO.UI {
             MsgAgency.PlayerAdapter.SendMsg2Server(json.ToJson());
         }
 
-
         public void SetCardButtonEnable(bool enable) {
             foreach (var cbtn in Players[ME].BtnsInHand) {
                 cbtn.Enabled = enable;
             }
+        }
+
+
+
+
+
+
+
+        // DEBUG
+
+        private bool TxtDebugIsFront = false;
+        private void TxtDebug_Click(object sender, EventArgs e) {
+            TxtDebugIsFront = !TxtDebugIsFront;
+            if (TxtDebugIsFront) {
+                this.TxtDebug.BringToFront();
+            } else {
+                this.TxtDebug.SendToBack();
+            }
+        }
+
+        public void DebugLog(string v) {
+            this.TxtDebug.Text += v + "\r\n";
         }
     }
 }

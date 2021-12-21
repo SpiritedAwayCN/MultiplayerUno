@@ -45,6 +45,7 @@
             this.LblPlus2Total = new System.Windows.Forms.Label();
             this.LblDonotPlayPlus2 = new System.Windows.Forms.Label();
             this.LblPlayPlus2 = new System.Windows.Forms.Label();
+            this.TxtDebug = new System.Windows.Forms.TextBox();
             this.PnlQuestion.SuspendLayout();
             this.PnlDisplayCard.SuspendLayout();
             this.PnlPlus2.SuspendLayout();
@@ -185,7 +186,7 @@
             this.PnlQuestion.BackColor = System.Drawing.Color.OliveDrab;
             this.PnlQuestion.Controls.Add(this.LblNoQuestion);
             this.PnlQuestion.Controls.Add(this.LblQuestion);
-            this.PnlQuestion.Location = new System.Drawing.Point(577, 87);
+            this.PnlQuestion.Location = new System.Drawing.Point(779, 20);
             this.PnlQuestion.Name = "PnlQuestion";
             this.PnlQuestion.Size = new System.Drawing.Size(319, 101);
             this.PnlQuestion.TabIndex = 21;
@@ -210,7 +211,7 @@
             this.PnlDisplayCard.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.PnlDisplayCard.BackColor = System.Drawing.Color.DodgerBlue;
             this.PnlDisplayCard.Controls.Add(this.LblDisplayCardsPlayerName);
-            this.PnlDisplayCard.Location = new System.Drawing.Point(59, 232);
+            this.PnlDisplayCard.Location = new System.Drawing.Point(26, 395);
             this.PnlDisplayCard.Name = "PnlDisplayCard";
             this.PnlDisplayCard.Size = new System.Drawing.Size(172, 20);
             this.PnlDisplayCard.TabIndex = 22;
@@ -238,7 +239,7 @@
             this.LblGameOver.AutoSize = true;
             this.LblGameOver.BackColor = System.Drawing.Color.LightCyan;
             this.LblGameOver.Font = new System.Drawing.Font("微软雅黑", 13.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.LblGameOver.Location = new System.Drawing.Point(386, 211);
+            this.LblGameOver.Location = new System.Drawing.Point(518, 100);
             this.LblGameOver.Name = "LblGameOver";
             this.LblGameOver.Padding = new System.Windows.Forms.Padding(5);
             this.LblGameOver.Size = new System.Drawing.Size(240, 41);
@@ -253,7 +254,7 @@
             this.PnlPlus2.Controls.Add(this.LblPlus2Total);
             this.PnlPlus2.Controls.Add(this.LblDonotPlayPlus2);
             this.PnlPlus2.Controls.Add(this.LblPlayPlus2);
-            this.PnlPlus2.Location = new System.Drawing.Point(210, 277);
+            this.PnlPlus2.Location = new System.Drawing.Point(30, 213);
             this.PnlPlus2.Name = "PnlPlus2";
             this.PnlPlus2.Size = new System.Drawing.Size(360, 143);
             this.PnlPlus2.TabIndex = 22;
@@ -299,12 +300,25 @@
             this.LblPlayPlus2.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.LblPlayPlus2.Click += new System.EventHandler(this.LblPlayPlus2_Click);
             // 
+            // TxtDebug
+            // 
+            this.TxtDebug.Location = new System.Drawing.Point(467, 159);
+            this.TxtDebug.Multiline = true;
+            this.TxtDebug.Name = "TxtDebug";
+            this.TxtDebug.ReadOnly = true;
+            this.TxtDebug.ScrollBars = System.Windows.Forms.ScrollBars.Both;
+            this.TxtDebug.Size = new System.Drawing.Size(515, 256);
+            this.TxtDebug.TabIndex = 24;
+            this.TxtDebug.WordWrap = false;
+            this.TxtDebug.Click += new System.EventHandler(this.TxtDebug_Click);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.DimGray;
-            this.ClientSize = new System.Drawing.Size(972, 432);
+            this.ClientSize = new System.Drawing.Size(1110, 474);
+            this.Controls.Add(this.TxtDebug);
             this.Controls.Add(this.PnlPlus2);
             this.Controls.Add(this.LblGameOver);
             this.Controls.Add(this.PnlDisplayCard);
@@ -358,5 +372,6 @@
         private System.Windows.Forms.Label LblDonotPlayPlus2;
         private System.Windows.Forms.Label LblPlayPlus2;
         private System.Windows.Forms.Label LblPlus2Total;
+        private System.Windows.Forms.TextBox TxtDebug;
     }
 }

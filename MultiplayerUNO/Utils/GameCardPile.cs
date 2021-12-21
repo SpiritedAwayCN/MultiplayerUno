@@ -25,6 +25,28 @@ namespace MultiplayerUNO.Utils
         public void ShuffleCards()
         {
             CardPile = new LinkedList<Card>(CardPile.Concat(DiscardPile).OrderBy(p => Guid.NewGuid().ToString()));
+            // TODO 
+            // 用于 UI 调试, 定制手牌 START
+            //int[] cardID = new int[] {
+            //    104,0,8,9,10,11,16,
+            //    12,13,14,15,20,24,28
+            //};
+            //for (int i = 0; i < cardID.Length; ++i) {
+            //    Card rec = null;
+            //    int skip = i; // 忽略前几张牌
+            //    foreach (var c in CardPile) {
+            //        if (--skip >= 0) { continue; }
+            //        if (c.CardId == cardID[i]) {
+            //            rec = c;
+            //            break;
+            //        }
+            //    }
+            //    if (rec != null) {
+            //        CardPile.Remove(rec);
+            //        CardPile.AddFirst(rec);
+            //    }
+            //}
+            // 用于 UI 调试, 定制手牌 END
             DiscardPile.Clear();
         }
 
