@@ -46,15 +46,6 @@ namespace MultiplayerUNO.UI {
         public const int PileToDistribute = 0;
         public const int PileDropped = 1;
 
-
-        /// <summary>
-        /// 设置摸牌、出牌 label 的可见性
-        /// </summary>
-        public void SetCanShowCardVisible(bool visible) {
-            this.LblShowCard.Visible = visible;
-            this.LblGetCard.Visible = visible;
-        }
-
         /// <summary>
         /// 出牌动画
         /// </summary>
@@ -115,6 +106,17 @@ namespace MultiplayerUNO.UI {
                 // 如果是自己出牌, 同时修正剩余牌的位置
                 ReorganizeMyCardsAsync();
             }
+        }
+
+        /// <summary>
+        /// 上家出了+2之后, 选择出不出牌
+        /// </summary>
+        internal void ShowOrGetAfterPlus2(TurnInfo turnInfo) {
+            int num = turnInfo.IntInfo;
+            UIInvoke(() => {
+                this.LblPlus2Total.Text = "需要摸牌数: " + num;
+                this.PnlPlus2.Visible = true;
+            });
         }
 
         /// <summary>
@@ -181,8 +183,17 @@ namespace MultiplayerUNO.UI {
             Task.Run(async () => {
                 await w; // 同步
                 Players[ME].CardsCount += num; // 更新卡牌数量
-                Players[ME].UpdateInfo();
+                UIInvoke(() => { Players[ME].UpdateInfo(); });
                 _ = ReorganizeMyCardsAsync();
+            });
+        }
+
+        /// <summary>
+        /// 能够正常出牌
+        /// </summary>
+        internal void ShowOrGetNormal(TurnInfo turnInfo) {
+            UIInvoke(() => {
+                this.PnlNormalShowCardorNot.Visible = true;
             });
         }
 
@@ -194,15 +205,16 @@ namespace MultiplayerUNO.UI {
             };
             MsgAgency.PlayerAdapter.SendMsg2Server(json.ToJson());
             if (GameControl.CBtnSelected != null) {
-                var anima = new Animation(this, GameControl.CBtnSelected);
+                // 选牌归位
+                GameControl.CBtnSelected.PerformClick();
                 GameControl.CBtnSelected = null;
             }
+            this.PnlNormalShowCardorNot.Visible = false;
         }
 
 
         public void SetShowOrNotVisibility(bool visible) {
             this.LblShowCard.Visible = visible;
-            this.LblRefuseToShowCardWhenGet.Visible = visible;
         }
 
         /// <summary>
@@ -256,13 +268,13 @@ namespace MultiplayerUNO.UI {
                     Players[ME].UpdateInfo();
                     SetCardButtonEnable(false);
                     this.LblShowCard.Visible = true;
-                    this.LblRefuseToShowCardWhenGet.Visible = true;
                     this.LblGetCard.Visible = false; // TODO
                 });
                 // (4) 是否准备打牌
                 UIInvoke(() => {
                     // 设置卡牌按钮都无法响应
                     SetShowOrNotVisibility(true);
+                    this.PnlAfterGetOne.Visible = true;
                 });
             });
         }
@@ -292,6 +304,7 @@ namespace MultiplayerUNO.UI {
             // (1)
             Animation anima = new Animation(this, cbtn);
             var pos = Players[playerIdx].BtnsInHand[0].Location; // 第 0 张牌是最右边的
+            pos.Y = Players[playerIdx].Center.Y - CardButton.HEIGHT_MODIFIED / 2;
             // 别人摸牌, 不需要翻开, 直接叠在一起即可
             // 自己摸牌, 需要翻开, 还需要插入手牌
             if (isMe) {
@@ -318,8 +331,6 @@ namespace MultiplayerUNO.UI {
             bool myturn = (GameControl.TurnID == MyID);
             bool ff = GameControl.FirstTurnFirstShow();
             UIInvoke(() => {
-                // 只有我的回合才可以出牌、摸牌
-                SetCanShowCardVisible(myturn);
                 // 更新颜色
                 UpdateLblColor();
                 // 第一次出第一张牌随便出
@@ -336,9 +347,6 @@ namespace MultiplayerUNO.UI {
             var btn = GameControl.CBtnSelected;
             if (btn == null) { return; }
 
-            // 此时不能够出牌也不能够按按钮
-            CannotShowCardCannotChooseButton();
-
             if (btn.Card.Color == CardColor.Invalid) {
                 // +4/万能牌
                 // TODO 这里的动画
@@ -349,6 +357,7 @@ namespace MultiplayerUNO.UI {
             } else {
                 SendShowCardJson();
             }
+            this.PnlNormalShowCardorNot.Visible = false;
         }
 
         /// <summary>
@@ -375,33 +384,6 @@ namespace MultiplayerUNO.UI {
             // 出牌动画不在这里做了
             // ShowCard(GameControl.CBtnSelected, Players[ME]);
             GameControl.CBtnSelected = null;
-        }
-
-        /// <summary>
-        /// 不能够出牌和按按钮
-        /// </summary>
-        private void CannotShowCardCannotChooseButton() {
-            // 隐藏摸牌、出牌的 label
-            SetCanShowCardVisible(false);
-
-            // 按钮不能按
-            SetCardButtonEnable(false);
-        }
-
-
-        /// <summary>
-        /// 不出牌的按钮点击事件
-        /// </summary>
-        private void LblRefuseToShowCardWhenGet_Click(object sender, EventArgs e) {
-            // 不出牌
-            DonotShowCardAfterGetJson();
-            // UI 恢复
-            UIInvoke(() => {
-                this.LblGetCard.Visible = false;
-                this.LblShowCard.Visible = false;
-                this.LblRefuseToShowCardWhenGet.Visible = false;
-                SetCardButtonEnable(true);
-            });
         }
 
         /// <summary>
@@ -540,6 +522,25 @@ namespace MultiplayerUNO.UI {
             } else {
                 this.TxtDebug.SendToBack();
             }
+        }
+
+        /// <summary>
+        /// 打出摸牌指令之后摸到的牌
+        /// </summary>
+        private void LblShowAfterGetOne_Click(object sender, EventArgs e) {
+            SendShowCardJson();
+            UIInvoke(() => {
+                this.PnlAfterGetOne.Visible = false;
+            });
+        }
+
+        private void LblDonotShowAfterGetOne_Click(object sender, EventArgs e) {
+            // 不出牌
+            DonotShowCardAfterGetJson();
+            // UI 恢复
+            UIInvoke(() => {
+                SetCardButtonEnable(true);
+            });
         }
 
         public void DebugLog(string v) {

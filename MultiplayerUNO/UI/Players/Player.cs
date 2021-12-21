@@ -68,7 +68,7 @@ namespace MultiplayerUNO.UI.Players {
 
         public void UpdateInfo() {
             LblInfo.Text =
-                (IsRobot ? "(AI)" : "")
+                (IsRobot ? "(AI) " : "")
                 + Name + " (" + CardsCount + ")";
         }
 

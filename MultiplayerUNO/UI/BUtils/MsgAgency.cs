@@ -36,7 +36,9 @@ namespace MultiplayerUNO.UI.BUtils {
         /// </summary>
         private static void DealWithMsgAfterGameStart(JsonData json) {
             // DEBUG
-            MainForm.UIInvokeSync(() => { MainForm.DebugLog(json.ToJson()); });
+            MainForm.UIInvokeSync(() => {
+                MainForm.DebugLog("MyID: " + MainForm.MyID + "\r\n" + json.ToJson());
+            });
             // DEBUG
 
             int state = (int)json["state"];
@@ -48,17 +50,13 @@ namespace MultiplayerUNO.UI.BUtils {
 
             switch (state) {
                 case 1: // 某人打出了某张牌
-                        // 不一定, 可能上一个人没有出牌(GameControl.CardChange 来判断)
-                        // TODO 功能牌
-                        // ban, reverse
-                    if (GameControl.CardChange) {
                         SomeBodyShowCard(turnInfo);
-                    }
                     break;
                 case 2: // 某人摸了一张牌(可能还可以出这张牌)
                     GetACard(turnInfo);
                     break;
                 case 3: // +2 累加
+                    ResponedToPlus2(turnInfo);
                     break;
                 case 4: // 某人摸了若干张牌(摸牌之后结束了)
                     SomebodyGetSomeCards(turnInfo);
@@ -75,6 +73,12 @@ namespace MultiplayerUNO.UI.BUtils {
                 default: break;
             }
             return;
+        }
+
+        private static void ResponedToPlus2(TurnInfo turnInfo) {
+            // 每个人都会收到 +2 的消息, 只有下家需要回复
+            if (turnInfo.TurnID != MainForm.MyID) { return; }
+            MainForm.ShowOrGetAfterPlus2(turnInfo);
         }
 
         /// <summary>
@@ -140,22 +144,29 @@ namespace MultiplayerUNO.UI.BUtils {
         /// <summary>
         /// 某人打出了某张牌
         ///   1. 游戏动画
-        ///   2. 其他状态
-        ///     (1) 如果是自己打出的牌, 设置 CardButton 的 enable = true
-        ///     (2) 如果是别人打出的牌, 而且下家不是自己, 结束响应(无事发生)
-        ///     (3) 如果是别人打出的牌, 而且下家是自己, 准备出牌(无事发生)
+        ///   2. 其他状态(设置按钮可按 enable = true)
+        ///     (1) 如果是自己打出的牌
+        ///     (2) 如果是别人打出的牌, 而且下家不是自己, 结束响应
+        ///     (3) 如果是别人打出的牌, 而且下家是自己, 准备出牌
         /// </summary>
         private static void SomeBodyShowCard(TurnInfo turnInfo) {
+            // TODO 功能牌效果展示
+            // ban, reverse
+
             // 1
-            MainForm.ShowCard(turnInfo);
-            // 2
-            if (turnInfo.GetPlayerIndex() == MainForm.ME) {
-                // (1)
-                MainFormUIInvoke(() => {
-                    MainForm.SetCardButtonEnable(true);
-                });
+            if (GameControl.CardChange) {
+                // 不一定, 可能上一个人没有出牌(GameControl.CardChange 来判断)
+                MainForm.ShowCard(turnInfo);
             }
-            // (2), (3) 无事发生
+            // 2
+            // (1), (2), (3)
+            MainFormUIInvoke(() => {
+                MainForm.SetCardButtonEnable(true);
+            });
+            // (3)
+            if (turnInfo.TurnID == MainForm.MyID) {
+                MainForm.ShowOrGetNormal(turnInfo);
+            }
         }
 
         /// <summary>

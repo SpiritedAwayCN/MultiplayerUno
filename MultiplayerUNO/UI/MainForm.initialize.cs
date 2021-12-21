@@ -178,19 +178,18 @@ namespace MultiplayerUNO.UI {
         private void InitializeComponentOnce() {
             List<Control> lst = new List<Control>();
 
-            lst.Add(this.LblShowCard);
-            lst.Add(this.LblGetCard);
             lst.Add(this.LblLeftTime);
             lst.Add(this.LblDirection);
             lst.Add(this.LblColor);
             lst.Add(this.LblFirstShowCard);
             lst.Add(this.PnlChooseColor);
-            lst.Add(this.LblRefuseToShowCardWhenGet);
             lst.Add(this.PnlQuestion);
             lst.Add(this.PnlDisplayCard);
             lst.Add(this.LblGameOver);
             lst.Add(this.PnlPlus2);
             lst.Add(this.TxtDebug);
+            lst.Add(this.PnlAfterGetOne);
+            lst.Add(this.PnlNormalShowCardorNot);
 
             foreach (var c in lst) {
                 this.Controls.Remove(c);
@@ -408,25 +407,8 @@ namespace MultiplayerUNO.UI {
         private void DrawControlsDesignedByDesigner() {
             GameControl.AddControlsNeededAtGameStart();
 
-            // 出牌 label, LblChooseCard
             var pos = Piles[PileDropped].Location;
-            Control lbl = this.LblShowCard;
-            lbl.Location = new Point(
-                pos.X + pos.X - Piles[PileToDistribute].Location.X,
-                pos.Y + (CardButton.HEIGHT_MODIFIED - lbl.Height) / 2);
-
-            // 摸牌 label, LblGetCard
-            lbl = this.LblGetCard;
-            lbl.Location = new Point(
-                pos.X + 2 * (pos.X - Piles[PileToDistribute].Location.X),
-                pos.Y + (CardButton.HEIGHT_MODIFIED - lbl.Height) / 2);
-
-            // 不出牌 lable(只在摸牌后显示), LblRefuseToShowCardWhenGet
-            lbl = this.LblRefuseToShowCardWhenGet;
-            lbl.Location = new Point(
-                this.LblGetCard.Location.X,
-                this.LblGetCard.Location.Y + this.LblGetCard.Size.Height + 10 // TODO
-            );
+            Control lbl = null;
 
             // 倒计时 label, LblLeftTime
             lbl = this.LblLeftTime;
@@ -468,6 +450,17 @@ namespace MultiplayerUNO.UI {
             lbl = this.PnlPlus2;
             lbl.Location = this.PnlChooseColor.Location; // TODO
             lbl.Visible = false;
+
+            // 摸完一张牌之后是否决定出牌的 panel, PnlAfterGetOne
+            lbl = this.PnlAfterGetOne;
+            lbl.Location = this.PnlChooseColor.Location; // TODO
+            lbl.Visible = false;
+
+            // 常规的出牌、摸牌 panel
+            lbl = this.PnlNormalShowCardorNot;
+            lbl.Location = this.PnlChooseColor.Location; // TODO
+            // 看看是不是轮到自己打牌
+            lbl.Visible = (GameControl.TurnID == MyID);
 
             // DEBUG
             lbl = this.TxtDebug;

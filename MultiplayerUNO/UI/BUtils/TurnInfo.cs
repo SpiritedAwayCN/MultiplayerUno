@@ -19,7 +19,7 @@ namespace MultiplayerUNO.UI.BUtils {
             State = (int)json["state"];
             // 注意, 无意义字段可能缺失
             // 有意义也不一定是指定的意义, 需要小心设置, DEBUG 需要谨慎
-
+        
             LastCardID = (int)json["lastCard"];
             if (State == 1 || State == 3 || State == 5 || State == 7) {
                 GameControl.CardChange = (GameControl.LastCardID != LastCardID);

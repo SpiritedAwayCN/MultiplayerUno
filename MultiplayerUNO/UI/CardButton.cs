@@ -47,7 +47,7 @@ namespace MultiplayerUNO.UI {
 
         // 高亮
         public bool IsHighlighted;
-        public float HighLightRatio = 0.3f;
+        public const float HighLightRatio = 0.3f;
 
         /// <summary>
         /// 构造函数
@@ -180,5 +180,10 @@ namespace MultiplayerUNO.UI {
             IsFlipped = !IsFlipped;
             SetBackGroundImage();
         }
+
+        public static int GetHighlightTranslateY() {
+            return (int)(HighLightRatio * HEIGHT_MODIFIED);
+        }
+
     }
 }
