@@ -19,7 +19,7 @@ namespace MultiplayerUNO.UI.BUtils {
             State = (int)json["state"];
             // 注意, 无意义字段可能缺失
             // 有意义也不一定是指定的意义, 需要小心设置, DEBUG 需要谨慎
-        
+
             LastCardID = (int)json["lastCard"];
             if (State == 1 || State == 3 || State == 5 || State == 7) {
                 GameControl.CardChange = (GameControl.LastCardID != LastCardID);
@@ -33,7 +33,7 @@ namespace MultiplayerUNO.UI.BUtils {
             }
 
             // TODO State=4 没有 time
-            if (State >= 1 && State <= 5 && State !=4) {
+            if (State >= 1 && State <= 5 && State != 4) {
                 Time = (int)json["time"];
                 GameControl.TimeForYou = Time;
             }
@@ -48,7 +48,7 @@ namespace MultiplayerUNO.UI.BUtils {
                 for (int i = 0; i < jsa.Count; ++i) {
                     PlayerCards[i] = (int)jsa[i];
                 }
-            } else if(State == 7) {
+            } else if (State == 7) {
                 // PlayerMap TODO
             }
 

@@ -113,7 +113,7 @@ namespace MultiplayerUNO.UI {
             // 3. 展开自己的牌
             await ReorganizeMyCardsAsync();
 
-            // 4. TODO 需要随机初始化一张牌吗? 不需要
+            // 4. 需要随机初始化一张牌吗? 不需要
 
             // 5. 游戏开始
             GameControl.GameInitialized = true;
@@ -234,7 +234,8 @@ namespace MultiplayerUNO.UI {
                         (CardColor)(((Label)sender).Tag);
                     // TODO 消失动画
                     this.PnlChooseColor.Visible = false;
-                    SendShowCardJson();
+                    SendShowCardJson(
+                        GameControl.ChooseColorIsTriggerAfterGetOneCard);
                 };
             }
         }

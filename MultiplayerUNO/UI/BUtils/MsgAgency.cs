@@ -42,7 +42,7 @@ namespace MultiplayerUNO.UI.BUtils {
             // DEBUG
 
             int state = (int)json["state"];
-            if(state == -1) {
+            if (state == -1) {
                 ToBeAI((int)json["playerID"]);
                 return;
             }
@@ -50,12 +50,12 @@ namespace MultiplayerUNO.UI.BUtils {
 
             switch (state) {
                 case 1: // 某人打出了某张牌
-                        SomeBodyShowCard(turnInfo);
+                    SomeBodyShowCard(turnInfo);
                     break;
                 case 2: // 某人摸了一张牌(可能还可以出这张牌)
                     GetACard(turnInfo);
                     break;
-                case 3: // +2 累加
+                case 3: // +2 累加, 需要有出牌动画
                     ResponedToPlus2(turnInfo);
                     break;
                 case 4: // 某人摸了若干张牌(摸牌之后结束了)
@@ -77,6 +77,10 @@ namespace MultiplayerUNO.UI.BUtils {
 
         private static void ResponedToPlus2(TurnInfo turnInfo) {
             // 每个人都会收到 +2 的消息, 只有下家需要回复
+            // TODO 动画大家都有(取决于新的协议)
+            //   1.如果之后马上发一条state =1, 则这里没有动画, 而且 +2 的 lastCard 不影响全局更新
+            //   2. 如果直接加上一个 playerId, 则这里有动画, 而且 +2 的 lastCard 影响全局更新(现状)
+            //  MainForm.ShowCard(turnInfo);
             if (turnInfo.TurnID != MainForm.MyID) { return; }
             MainForm.ShowOrGetAfterPlus2(turnInfo);
         }
@@ -87,7 +91,7 @@ namespace MultiplayerUNO.UI.BUtils {
         private static void ToBeAI(int playerID) {
             int playerIdx = GameControl.PlayerId2PlayerIndex[playerID];
             MainForm.Players[playerIdx].IsRobot = true;
-            MainFormUIInvoke(()=> {
+            MainFormUIInvoke(() => {
                 MainForm.Players[playerIdx].UpdateInfo();
             });
         }
@@ -133,7 +137,7 @@ namespace MultiplayerUNO.UI.BUtils {
             // TODO 平局不响应?如何实现, 什么意思?
 
             // 别人摸牌
-            if(turnInfo.TurnID != MainForm.MyID) {
+            if (turnInfo.TurnID != MainForm.MyID) {
                 MainForm.GetCardForOtherOne(turnInfo);
                 return;
             }
@@ -180,4 +184,4 @@ namespace MultiplayerUNO.UI.BUtils {
     }
 }
 
-/// 连出 +2
+/// +2 出牌效果

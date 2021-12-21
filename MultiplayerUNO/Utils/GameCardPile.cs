@@ -28,12 +28,19 @@ namespace MultiplayerUNO.Utils
             // TODO 
             // 用于 UI 调试, 定制手牌 START
             //int[] cardID = new int[] {
+            //    // +4
             //    104,0,8,9,10,11,16,
-            //    12,13,14,15,20,24,28
+            //    12,13,14,15,20,24,28,
+            //    1,2,3,4,
+                
+            //    // +2
+            //    //104,0,88,89,10,11,16,
+            //    //92,93,14,15,20,24,28,
+            //    //1,2,3,4,
             //};
-            //for (int i = 0; i < cardID.Length; ++i) {
+            //for (int i = cardID.Length - 1; i >= 0; --i) {
             //    Card rec = null;
-            //    int skip = i; // 忽略前几张牌
+            //    int skip = cardID.Length - 1 - i; // 忽略前几张牌
             //    foreach (var c in CardPile) {
             //        if (--skip >= 0) { continue; }
             //        if (c.CardId == cardID[i]) {

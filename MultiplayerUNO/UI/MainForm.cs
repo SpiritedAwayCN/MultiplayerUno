@@ -212,11 +212,6 @@ namespace MultiplayerUNO.UI {
             this.PnlNormalShowCardorNot.Visible = false;
         }
 
-
-        public void SetShowOrNotVisibility(bool visible) {
-            this.LblShowCard.Visible = visible;
-        }
-
         /// <summary>
         /// 别人摸 num 张牌
         /// </summary>
@@ -253,28 +248,24 @@ namespace MultiplayerUNO.UI {
             Card c = new Card(turnInfo.LastCardID);
             bool canResponed = c.CanResponseTo(
                 GameControl.LastCard, GameControl.LastColor);
-            if (!canResponed) {
-                // 不能响应直接回复不出牌
-                DonotShowCardAfterGetJson();
-                return;
-            }
             Task.Run(async () => {
                 // (2)
                 await t; // 同步
                 Players[ME].CardsCount++; // 更新牌
-                // (3)
-                UIInvokeSync(() => {
-                    cbtn.PerformClick();
-                    Players[ME].UpdateInfo();
-                    SetCardButtonEnable(false);
-                    this.LblShowCard.Visible = true;
-                    this.LblGetCard.Visible = false; // TODO
-                });
-                // (4) 是否准备打牌
+                // (3) 是否准备打牌
                 UIInvoke(() => {
-                    // 设置卡牌按钮都无法响应
-                    SetShowOrNotVisibility(true);
-                    this.PnlAfterGetOne.Visible = true;
+                    if (canResponed) {
+                        // 可以响应, 选择是否出牌
+                        cbtn.PerformClick();
+                        // 设置卡牌按钮都无法响应
+                        SetCardButtonEnable(false);
+                        this.PnlAfterGetOne.Visible = true;
+                    } else {
+                        // 不能响应直接回复不出牌
+                        DonotShowCardAfterGetJson();
+                        // 更新 info
+                    }
+                    Players[ME].UpdateInfo();
                 });
             });
         }
@@ -284,6 +275,7 @@ namespace MultiplayerUNO.UI {
             JsonData json = new JsonData() {
                 ["state"] = 1,
                 ["action"] = 0,
+                ["color"] = 0, // 缺了这个好像后端会报错 TODO
                 ["queryID"] = GameControl.QueryID
             };
             MsgAgency.PlayerAdapter.SendMsg2Server(json.ToJson());
@@ -352,6 +344,7 @@ namespace MultiplayerUNO.UI {
                 // TODO 这里的动画
                 GameControl.InvalidCardToChooseColor = CardColor.Invalid;
                 UIInvoke(() => {
+                    GameControl.ChooseColorIsTriggerAfterGetOneCard = false;
                     this.PnlChooseColor.Visible = true;
                 });
             } else {
@@ -363,19 +356,28 @@ namespace MultiplayerUNO.UI {
         /// <summary>
         /// 构造出牌的 json
         /// </summary>
-        private void SendShowCardJson() {
+        /// <param name="afterGetOne">
+        /// true 表示是摸到一张牌之后出的, false 表示正常出牌
+        /// </param>
+        private void SendShowCardJson(bool afterGetOne=false) {
             var btn = GameControl.CBtnSelected;
             // 构造 json
-            int color = -1; // 不是 万能牌/+4, 设置为 -1
+            // state=2: 这个字段无意义
+            // state=1: 不是 万能牌/+4, 设置为 -1
+            int color = -1;
             if (btn.Card.Color == CardColor.Invalid) {
                 color = (int)GameControl.InvalidCardToChooseColor;
             }
             JsonData json = new JsonData() {
                 ["state"] = 1,
-                ["card"] = btn.Card.CardId,
                 ["color"] = color,
                 ["queryID"] = GameControl.QueryID
             };
+            if (afterGetOne) {
+                json["action"] = 1;
+            } else {
+                json["card"] = btn.Card.CardId;
+            }
             MsgAgency.PlayerAdapter.SendMsg2Server(json.ToJson());
 
             // 此时需要阻塞, 向服务器寻求验证, 直到服务器反馈之后再出牌
@@ -487,6 +489,7 @@ namespace MultiplayerUNO.UI {
                 ["queryID"] = GameControl.QueryID
             };
             MsgAgency.PlayerAdapter.SendMsg2Server(json.ToJson());
+            this.PnlPlus2.Visible = false;
         }
 
         /// <summary>
@@ -498,12 +501,43 @@ namespace MultiplayerUNO.UI {
                 ["queryID"] = GameControl.QueryID
             };
             MsgAgency.PlayerAdapter.SendMsg2Server(json.ToJson());
+            this.PnlPlus2.Visible = false;
         }
 
         public void SetCardButtonEnable(bool enable) {
             foreach (var cbtn in Players[ME].BtnsInHand) {
                 cbtn.Enabled = enable;
             }
+        }
+
+        /// <summary>
+        /// 打出摸牌指令之后摸到的牌
+        /// </summary>
+        private void LblShowAfterGetOne_Click(object sender, EventArgs e) {
+            var btn = GameControl.CBtnSelected;
+            if (btn.Card.Color == CardColor.Invalid) {
+                // +4/万能牌
+                GameControl.InvalidCardToChooseColor = CardColor.Invalid;
+                UIInvoke(() => {
+                    GameControl.ChooseColorIsTriggerAfterGetOneCard = true;
+                    this.PnlChooseColor.Visible = true;
+                });
+            } else {
+                SendShowCardJson(true);
+            }
+            UIInvoke(() => {
+                this.PnlAfterGetOne.Visible = false;
+            });
+        }
+
+        private void LblDonotShowAfterGetOne_Click(object sender, EventArgs e) {
+            // 不出牌
+            DonotShowCardAfterGetJson();
+            // UI 恢复
+            UIInvoke(() => {
+                SetCardButtonEnable(true);
+                this.PnlAfterGetOne.Visible = false;
+            });
         }
 
 
@@ -522,25 +556,6 @@ namespace MultiplayerUNO.UI {
             } else {
                 this.TxtDebug.SendToBack();
             }
-        }
-
-        /// <summary>
-        /// 打出摸牌指令之后摸到的牌
-        /// </summary>
-        private void LblShowAfterGetOne_Click(object sender, EventArgs e) {
-            SendShowCardJson();
-            UIInvoke(() => {
-                this.PnlAfterGetOne.Visible = false;
-            });
-        }
-
-        private void LblDonotShowAfterGetOne_Click(object sender, EventArgs e) {
-            // 不出牌
-            DonotShowCardAfterGetJson();
-            // UI 恢复
-            UIInvoke(() => {
-                SetCardButtonEnable(true);
-            });
         }
 
         public void DebugLog(string v) {

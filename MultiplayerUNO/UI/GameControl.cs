@@ -14,6 +14,11 @@ namespace MultiplayerUNO.UI {
     /// 一些参数用于控制游戏(全局变量)
     /// </summary>
     public static class GameControl {
+        /// <summary>
+        /// true: 选择颜色这个事件是由摸 1 张牌之后出牌触发的
+        /// false: 选择颜色这个事件是由正常出牌触发的
+        /// </summary>
+        public static volatile bool ChooseColorIsTriggerAfterGetOneCard = false;
 
         /// <summary>
         /// 当出的牌是 +4/万能牌 的时候需要选择颜色

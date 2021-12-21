@@ -63,7 +63,9 @@ namespace MultiplayerUNO.UI {
                 var btn = myBtns[i];
                 Animation anima = new Animation(this, btn);
                 int offX = (int)(firstX - dx * i - btn.Location.X);
-                anima.SetTranslate(offX, 0);
+                int offY = Players[ME].Center.Y - CardButton.HEIGHT_MODIFIED / 2
+                    - btn.Location.Y;
+                anima.SetTranslate(offX, offY); // 移动的时候不小心点了的修正
                 animaseq2.AddAnimation(anima);
             }
             await animaseq2.RunAtTheSameTime();

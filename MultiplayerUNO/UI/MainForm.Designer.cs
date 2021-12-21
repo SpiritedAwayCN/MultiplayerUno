@@ -368,6 +368,7 @@
             this.Controls.Add(this.LblColor);
             this.Controls.Add(this.LblDirection);
             this.Controls.Add(this.LblLeftTime);
+            this.DoubleBuffered = true;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "MainForm";
