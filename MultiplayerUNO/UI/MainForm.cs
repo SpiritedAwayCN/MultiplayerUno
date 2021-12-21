@@ -101,7 +101,9 @@ namespace MultiplayerUNO.UI {
                 cbtn.BringToFront();
                 Task.Run(async () => {
                     await anima.Run(); // 动画结束加入弃牌堆
-                    GameControl.AddDroppedCard(cbtn);
+                    UIInvoke(() => {
+                        GameControl.AddDroppedCard(cbtn);
+                    });
                 });
             });
 
@@ -216,7 +218,7 @@ namespace MultiplayerUNO.UI {
                 UIInvoke(() => {
                     Players[playerIdx].UpdateInfo();
                     // 去除多余卡牌
-                    while (Players[playerIdx].BtnsInHand.Count >= 1) {
+                    while (Players[playerIdx].BtnsInHand.Count > 1) {
                         var cbtn = Players[playerIdx].BtnsInHand[0];
                         this.Controls.Remove(cbtn);
                         Players[playerIdx].BtnsInHand.RemoveAt(0); // 加头去头
@@ -248,9 +250,9 @@ namespace MultiplayerUNO.UI {
                 // (2)
                 await t; // 同步
                 Players[ME].CardsCount++; // 更新牌
-                cbtn.PerformClick();
                 // (3)
                 UIInvokeSync(() => {
+                    cbtn.PerformClick();
                     Players[ME].UpdateInfo();
                     SetCardButtonEnable(false);
                     this.LblShowCard.Visible = true;
@@ -302,7 +304,7 @@ namespace MultiplayerUNO.UI {
                 anima.SetRotate();
             }
             // 注意这里即使不是自己, 我们也把牌加进去了(await 动画结束后删除)
-            Players[ME].BtnsInHand.Insert(0, cbtn);
+            Players[playerIdx].BtnsInHand.Insert(0, cbtn);
             return anima;
         }
 

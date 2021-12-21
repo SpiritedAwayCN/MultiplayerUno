@@ -41,7 +41,7 @@ namespace MultiplayerUNO.UI.BUtils {
 
             int state = (int)json["state"];
             if(state == -1) {
-                // TODO 某个玩家退出了游戏, 变成机器人
+                ToBeAI((int)json["playerID"]);
                 return;
             }
             TurnInfo turnInfo = new TurnInfo(json);
@@ -75,6 +75,17 @@ namespace MultiplayerUNO.UI.BUtils {
                 default: break;
             }
             return;
+        }
+
+        /// <summary>
+        /// 某个玩家掉线, AI 接管
+        /// </summary>
+        private static void ToBeAI(int playerID) {
+            int playerIdx = GameControl.PlayerId2PlayerIndex[playerID];
+            MainForm.Players[playerIdx].IsRobot = true;
+            MainFormUIInvoke(()=> {
+                MainForm.Players[playerIdx].UpdateInfo();
+            });
         }
 
         /// <summary>
@@ -159,4 +170,3 @@ namespace MultiplayerUNO.UI.BUtils {
 }
 
 /// 连出 +2
-/// 开始就摸牌  v(自动可以解决)

@@ -42,12 +42,14 @@ namespace MultiplayerUNO.UI.BUtils {
             GameControl.TurnID = TurnID;
 
             if ((State == 4 && TurnID == GameControl.MainForm.MyID)
-                || State == 6 || State == 7) {
+                || State == 6) {
                 var jsa = json["playerCards"];
                 PlayerCards = new int[jsa.Count];
                 for (int i = 0; i < jsa.Count; ++i) {
                     PlayerCards[i] = (int)jsa[i];
                 }
+            } else if(State == 7) {
+                // PlayerMap TODO
             }
 
             if (State == 1 || State == 2 || State == 3 || State == 5) {
