@@ -24,12 +24,9 @@
         /// </summary>
         private void InitializeComponent() {
             this.components = new System.ComponentModel.Container();
-            this.LblShowCard = new System.Windows.Forms.Label();
             this.LblGetCard = new System.Windows.Forms.Label();
             this.TmrCheckLeftTime = new System.Windows.Forms.Timer(this.components);
             this.LblLeftTime = new System.Windows.Forms.Label();
-            this.LblDirection = new System.Windows.Forms.Label();
-            this.LblColor = new System.Windows.Forms.Label();
             this.TmrControlGame = new System.Windows.Forms.Timer(this.components);
             this.LblFirstShowCard = new System.Windows.Forms.Label();
             this.PnlChooseColor = new System.Windows.Forms.Panel();
@@ -49,27 +46,16 @@
             this.LblDonotShowAfterGetOne = new System.Windows.Forms.Label();
             this.LblShowAfterGetOne = new System.Windows.Forms.Label();
             this.PnlNormalShowCardorNot = new System.Windows.Forms.Panel();
+            this.LblShowCard = new System.Windows.Forms.Label();
             this.PnlShowResultWhenGameOver = new System.Windows.Forms.Panel();
+            this.LblColor = new System.Windows.Forms.Label();
+            this.LblDirection = new System.Windows.Forms.Label();
             this.PnlQuestion.SuspendLayout();
             this.PnlDisplayCard.SuspendLayout();
             this.PnlPlus2.SuspendLayout();
             this.PnlAfterGetOne.SuspendLayout();
             this.PnlNormalShowCardorNot.SuspendLayout();
             this.SuspendLayout();
-            // 
-            // LblShowCard
-            // 
-            this.LblShowCard.AutoSize = true;
-            this.LblShowCard.BackColor = System.Drawing.Color.LightCyan;
-            this.LblShowCard.Font = new System.Drawing.Font("微软雅黑", 13.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.LblShowCard.Location = new System.Drawing.Point(51, 51);
-            this.LblShowCard.Name = "LblShowCard";
-            this.LblShowCard.Padding = new System.Windows.Forms.Padding(5);
-            this.LblShowCard.Size = new System.Drawing.Size(72, 41);
-            this.LblShowCard.TabIndex = 11;
-            this.LblShowCard.Text = "出牌";
-            this.LblShowCard.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.LblShowCard.Click += new System.EventHandler(this.LblShowCard_Click);
             // 
             // LblGetCard
             // 
@@ -102,32 +88,6 @@
             this.LblLeftTime.Text = "60";
             this.LblLeftTime.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.LblLeftTime.Visible = false;
-            // 
-            // LblDirection
-            // 
-            this.LblDirection.BackColor = System.Drawing.Color.LightGoldenrodYellow;
-            this.LblDirection.Font = new System.Drawing.Font("微软雅黑", 13.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.LblDirection.Image = global::MultiplayerUNO.Properties.Resources.clockwise;
-            this.LblDirection.Location = new System.Drawing.Point(98, 20);
-            this.LblDirection.Name = "LblDirection";
-            this.LblDirection.Padding = new System.Windows.Forms.Padding(5);
-            this.LblDirection.Size = new System.Drawing.Size(60, 60);
-            this.LblDirection.TabIndex = 15;
-            this.LblDirection.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.LblDirection.Visible = false;
-            // 
-            // LblColor
-            // 
-            this.LblColor.BackColor = System.Drawing.Color.Black;
-            this.LblColor.Font = new System.Drawing.Font("微软雅黑", 13.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.LblColor.Image = global::MultiplayerUNO.Properties.Resources.clockwise;
-            this.LblColor.Location = new System.Drawing.Point(175, 20);
-            this.LblColor.Name = "LblColor";
-            this.LblColor.Padding = new System.Windows.Forms.Padding(5);
-            this.LblColor.Size = new System.Drawing.Size(60, 60);
-            this.LblColor.TabIndex = 16;
-            this.LblColor.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.LblColor.Visible = false;
             // 
             // TmrControlGame
             // 
@@ -343,13 +303,28 @@
             // PnlNormalShowCardorNot
             // 
             this.PnlNormalShowCardorNot.AutoSize = true;
-            this.PnlNormalShowCardorNot.BackColor = System.Drawing.Color.OliveDrab;
+            this.PnlNormalShowCardorNot.BackColor = System.Drawing.SystemColors.HotTrack;
             this.PnlNormalShowCardorNot.Controls.Add(this.LblShowCard);
             this.PnlNormalShowCardorNot.Controls.Add(this.LblGetCard);
             this.PnlNormalShowCardorNot.Location = new System.Drawing.Point(606, 167);
             this.PnlNormalShowCardorNot.Name = "PnlNormalShowCardorNot";
             this.PnlNormalShowCardorNot.Size = new System.Drawing.Size(360, 143);
             this.PnlNormalShowCardorNot.TabIndex = 26;
+            // 
+            // LblShowCard
+            // 
+            this.LblShowCard.AutoSize = true;
+            this.LblShowCard.BackColor = System.Drawing.Color.LightCyan;
+            this.LblShowCard.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.LblShowCard.Font = new System.Drawing.Font("微软雅黑", 13.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.LblShowCard.Location = new System.Drawing.Point(63, 51);
+            this.LblShowCard.Name = "LblShowCard";
+            this.LblShowCard.Padding = new System.Windows.Forms.Padding(5);
+            this.LblShowCard.Size = new System.Drawing.Size(72, 41);
+            this.LblShowCard.TabIndex = 11;
+            this.LblShowCard.Text = "出牌";
+            this.LblShowCard.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.LblShowCard.Click += new System.EventHandler(this.LblShowCard_Click);
             // 
             // PnlShowResultWhenGameOver
             // 
@@ -358,6 +333,30 @@
             this.PnlShowResultWhenGameOver.Name = "PnlShowResultWhenGameOver";
             this.PnlShowResultWhenGameOver.Size = new System.Drawing.Size(473, 162);
             this.PnlShowResultWhenGameOver.TabIndex = 27;
+            // 
+            // LblColor
+            // 
+            this.LblColor.BackColor = System.Drawing.Color.Black;
+            this.LblColor.Font = new System.Drawing.Font("微软雅黑", 13.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.LblColor.Location = new System.Drawing.Point(175, 20);
+            this.LblColor.Name = "LblColor";
+            this.LblColor.Padding = new System.Windows.Forms.Padding(5);
+            this.LblColor.Size = new System.Drawing.Size(60, 60);
+            this.LblColor.TabIndex = 16;
+            this.LblColor.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.LblColor.Visible = false;
+            // 
+            // LblDirection
+            // 
+            this.LblDirection.BackColor = System.Drawing.Color.LightGoldenrodYellow;
+            this.LblDirection.Font = new System.Drawing.Font("微软雅黑", 13.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.LblDirection.Location = new System.Drawing.Point(98, 20);
+            this.LblDirection.Name = "LblDirection";
+            this.LblDirection.Padding = new System.Windows.Forms.Padding(5);
+            this.LblDirection.Size = new System.Drawing.Size(60, 60);
+            this.LblDirection.TabIndex = 15;
+            this.LblDirection.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.LblDirection.Visible = false;
             // 
             // MainForm
             // 

@@ -21,7 +21,7 @@ namespace MultiplayerUNO.UI.BUtils {
         ///   (1) 在刚进入房间的时候, 服务器会给客户端发送两条信息 {type=0,type=3};
         ///   (2) 在主动请求房间信息的时候, 服务器只会发一条信息 {type=0};
         /// </summary>
-        private static bool WhenFirstEnterTheRoom = true;
+        public static bool WhenFirstEnterTheRoom = true;
 
         private static void DealWithMsgBeforeGameStart(JsonData json) {
             //Console.WriteLine("UI: " + json.ToJson());

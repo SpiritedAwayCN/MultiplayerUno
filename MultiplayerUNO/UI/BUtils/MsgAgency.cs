@@ -84,9 +84,10 @@ namespace MultiplayerUNO.UI.BUtils {
         private static void ResponedToPlus2(TurnInfo turnInfo) {
             // 每个人都会收到 +2 的消息, 只有下家需要回复
             // TODO 动画大家都有(取决于新的协议)
-            //   1.如果之后马上发一条state =1, 则这里没有动画, 而且 +2 的 lastCard 不影响全局更新
+            //   1. 如果之后马上发一条state =1, 则这里没有动画, 而且 +2 的 lastCard 不影响全局更新
             //   2. 如果直接加上一个 playerId, 则这里有动画, 而且 +2 的 lastCard 影响全局更新(现状)
-            //  MainForm.ShowCard(turnInfo);
+            int playerID = (int)turnInfo.JsonMsg["playerID"];
+            MainForm.ShowCard(GameControl.PlayerId2PlayerIndex[playerID], turnInfo.LastCardID);
             if (turnInfo.TurnID != MainForm.MyID) { return; }
             MainForm.ShowOrGetAfterPlus2(turnInfo);
         }

@@ -172,17 +172,17 @@ namespace MultiplayerUNO.UI.Login {
                 this.BtnCancelReady.Enabled = false;
             });
             // 此时应该还要发送自己的信息
-
-            // TODO 等后端调 BUG, 为什么自己发消息会导致 keynotfound
-
-            JsonData msg = new JsonData();
-            msg["version"] = MsgAgency.ProtocolVersion;
-            msg["name"] = SCSelect.UserName;
-            MsgAgency.PlayerAdapter.SendMsg2Server(msg.ToJson());
-            // TODO 
+            // 服务器的客户端不需要发, 只有远程的客户端需要发
+            if (SCSelect.PlayerKind == PlayerKind.Client) {
+                JsonData msg = new JsonData();
+                msg["version"] = MsgAgency.ProtocolVersion;
+                msg["name"] = SCSelect.UserName;
+                MsgAgency.PlayerAdapter.SendMsg2Server(msg.ToJson());
+            }
             // 我看服务器端开始的时候不会给自己发自己的消息
             // 所以这里如下处理
             if (SCSelect.PlayerKind == PlayerKind.Server) {
+                MsgAgency.WhenFirstEnterTheRoom = false; // 服务端不存在初始的 { type=0 } 信息
                 SeatID = 0;
                 SetPlayerState(0, PlayerState.WAIT);
                 UpdateReadyInfo();

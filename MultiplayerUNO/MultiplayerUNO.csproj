@@ -100,6 +100,11 @@
       <DependentUpon>LoginForm.cs</DependentUpon>
     </Compile>
     <Compile Include="UI\Login\PlayerState.cs" />
+    <Compile Include="UI\NetImage.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>NetImage.resx</DependentUpon>
+    </Compile>
     <Compile Include="UI\Players\Player.cs" />
     <Compile Include="UI\Players\PlayerKind.cs" />
     <Compile Include="UI\TestForm.cs">
@@ -137,6 +142,10 @@
     </EmbeddedResource>
     <EmbeddedResource Include="UI\Login\LoginForm.resx">
       <DependentUpon>LoginForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\NetImage.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>NetImage.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\TestForm.resx">
       <DependentUpon>TestForm.cs</DependentUpon>
@@ -281,6 +290,15 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Images\UI\counterclockwise.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Images\UI2\btn.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Images\UI2\ButtonBlankBlueIcon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Images\UI2\RoundedRectangle.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

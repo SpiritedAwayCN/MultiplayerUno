@@ -135,7 +135,7 @@ namespace MultiplayerUNO.UI {
         internal void GameOver(TurnInfo turnInfo) {
             // 1. 打牌动画
             int playerIdx = turnInfo.GetPlayerIndex();
-            ShowCard(playerIdx, turnInfo.LastCardID);
+            ShowCard(playerIdx, turnInfo.LastCardID); // TODO lastcard 可能不是上一张牌(平局)
             
             // 2. 显示谁胜利了
             string msgGameOver = "";
