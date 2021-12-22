@@ -33,7 +33,7 @@ namespace MultiplayerUNO.Backend.Player
         {
             get { return isReady; }
             set {
-                IsReady = value;
+                isReady = value;
                 playerJsonCache = null; // 缓存失效
             }
         }
@@ -56,7 +56,7 @@ namespace MultiplayerUNO.Backend.Player
 
         public void StartGameReset()
         {
-            isReady = false;
+            IsReady = false;
             handCards.Clear();
         }
 
