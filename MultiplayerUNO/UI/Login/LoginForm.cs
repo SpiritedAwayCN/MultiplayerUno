@@ -15,11 +15,11 @@ using LitJson;
 using System.Collections;
 using System.Runtime.CompilerServices;
 
-namespace MultiplayerUNO.UI.OtherForm {
+namespace MultiplayerUNO.UI.Login {
     public partial class LoginForm : Form {
         private Random rdm = new Random();
         private ArrayList Players = ArrayList.Synchronized(new ArrayList());
-        public volatile int SeatID = 0;
+        public volatile int SeatID = -1;
 
         public LoginForm() {
             InitializeComponent();
@@ -84,6 +84,13 @@ namespace MultiplayerUNO.UI.OtherForm {
             if (this.InvokeRequired) {
                 this.BeginInvoke(new Action(() => { fun(); }));
             } else { fun(); }
+        }
+
+        /// <summary>
+        /// 清空所有的 players 状态
+        /// </summary>
+        public void ResetPlayerState() {
+            Players.Clear();
         }
 
         /// <summary>
@@ -165,6 +172,9 @@ namespace MultiplayerUNO.UI.OtherForm {
                 this.BtnCancelReady.Enabled = false;
             });
             // 此时应该还要发送自己的信息
+
+            // TODO 等后端调 BUG, 为什么自己发消息会导致 keynotfound
+
             JsonData msg = new JsonData();
             msg["version"] = MsgAgency.ProtocolVersion;
             msg["name"] = SCSelect.UserName;
@@ -210,6 +220,12 @@ namespace MultiplayerUNO.UI.OtherForm {
                     (total >= Backend.Room.MinPlayerNumber
                         && total <= Backend.Room.MaxPlayerNumber);
                 this.BtnStart.Enabled = enable;
+                // 看看自己是否准备好了
+                if (SeatID != -1) {
+                    bool imReady = (PlayerState)Players[SeatID] == PlayerState.READY;
+                    this.BtnCancelReady.Enabled = imReady;
+                    this.BtnReady.Enabled = !imReady;
+                }
             });
         }
 

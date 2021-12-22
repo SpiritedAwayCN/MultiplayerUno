@@ -41,7 +41,7 @@ namespace MultiplayerUNO.UI.BUtils {
             TurnID = (int)json["turnID"];
             GameControl.TurnID = TurnID;
 
-            if ((State == 4 && TurnID == GameControl.MainForm.MyID)
+            if ((State == 4 && TurnID == MsgAgency.MainForm.MyID)
                 || State == 6) {
                 var jsa = json["playerCards"];
                 PlayerCards = new int[jsa.Count];
@@ -72,10 +72,19 @@ namespace MultiplayerUNO.UI.BUtils {
         // 否则可能出现奇怪的 BUG 或者是奇怪的结果       //
         ////////////////////////////////////////////////
 
+        /// <summary>
+        /// 通过 intInfo 获取 playerID
+        /// (state = 1,7)
+        /// </summary>
         public int GetPlayerID() {
             return IntInfo >> 2;
         }
 
+        /// <summary>
+        /// 调用 GetPlayerID() 实现, 使用条件受到其限制
+        /// (state = 1,7)
+        /// </summary>
+        /// <returns></returns>
         public int GetPlayerIndex() {
             return GameControl.PlayerId2PlayerIndex[GetPlayerID()];
         }

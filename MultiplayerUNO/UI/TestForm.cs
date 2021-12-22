@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -52,6 +53,12 @@ namespace MultiplayerUNO.UI {
 
             this.textBox1.Text = "11";
             textBox1_KeyDown(this.textBox1, new KeyEventArgs(Keys.Enter));
+
+            // 透明度动画 label
+            Control c = this.LblAlpha;
+            c.Tag = new Bitmap[2] { UIImage.clockwise, UIImage.counterclockwise };
+            c.BackgroundImage = UIImage.clockwise;
+            c.BackgroundImageLayout = ImageLayout.Stretch;
         }
 
         private void button2_Click(object sender, EventArgs e) {
@@ -95,6 +102,15 @@ namespace MultiplayerUNO.UI {
             Animation anima = new Animation(this, CBtn);
             anima.SetTranslate(0, 0);
             anima.Run();
+        }
+
+        private bool zero2One = true;
+        private void BtnAddAlpha_Click(object sender, EventArgs e) {
+            AnimationHighLight anima = new AnimationHighLight(this, this.LblAlpha);
+            anima.SetDirection(zero2One);
+            anima.SetSteps(100);
+            anima.Run();
+            zero2One = !zero2One;
         }
     }
 }

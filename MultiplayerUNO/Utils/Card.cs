@@ -58,5 +58,9 @@ namespace MultiplayerUNO.Utils
         public bool IsPlus2() {
             return (CardId >> 3) == 11;
         }
+
+        public bool IsReverse() {
+            return (CardId >> 3) == 12;
+        }
     }
 }

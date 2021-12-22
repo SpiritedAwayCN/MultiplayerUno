@@ -1,5 +1,5 @@
 ﻿using LitJson;
-using MultiplayerUNO.UI.OtherForm;
+using MultiplayerUNO.UI.Login;
 using MultiplayerUNO.Utils;
 using System;
 using System.Collections.Generic;
@@ -14,12 +14,16 @@ namespace MultiplayerUNO.UI.BUtils {
     /// 前后端通信类
     /// </summary>
     public static partial class MsgAgency {
-        public static MainForm MainForm = null;
+        /// <summary>
+        /// 游戏运行的 MainForm 主窗口, 在构造函数中设置, 在 Close 的时候设置为 null
+        /// </summary>
+        public static volatile MainForm MainForm = null;
 
         /// <summary>
         /// 初始化参数, 打开新界面
         /// </summary>
         private static void InitializeGame(JsonData json) {
+            GC.Collect(); // 开局垃圾回收
             // 解析 Json 构造 MainForm
             MainForm mainForm = new MainForm(json);
 
@@ -35,11 +39,13 @@ namespace MultiplayerUNO.UI.BUtils {
         /// 处理 state 的信息(游戏开始之后从服务端发来的消息)
         /// </summary>
         private static void DealWithMsgAfterGameStart(JsonData json) {
-            // DEBUG
+            if (MainForm == null) { return; }
+
+            // DEBUG START
             MainForm.UIInvokeSync(() => {
                 MainForm.DebugLog("MyID: " + MainForm.MyID + "\r\n" + json.ToJson());
             });
-            // DEBUG
+            // DEBUG END
 
             int state = (int)json["state"];
             if (state == -1) {
@@ -98,8 +104,9 @@ namespace MultiplayerUNO.UI.BUtils {
 
         /// <summary>
         /// 游戏结束
-        /// 1. 显示谁胜利了
-        /// 2. 展示手牌
+        /// 1. 打牌动画
+        /// 2. 显示谁胜利了
+        /// 3. 展示手牌
         /// </summary>
         private static void GameOver(TurnInfo turnInfo) {
             MainForm.GameOver(turnInfo);
@@ -117,7 +124,7 @@ namespace MultiplayerUNO.UI.BUtils {
         /// </summary>
         private static void ResponedToPlus4(TurnInfo turnInfo) {
             // 首先展示出牌动画
-            MainForm.ShowCard(turnInfo);
+            MainForm.ShowCard(turnInfo.GetPlayerIndex(), turnInfo.LastCardID);
             // 每个人都会收到 +4 的消息, 只有下家可以质疑
             if (turnInfo.TurnID != MainForm.MyID) { return; }
             MainForm.RespondToPlus4(turnInfo);
@@ -154,13 +161,10 @@ namespace MultiplayerUNO.UI.BUtils {
         ///     (3) 如果是别人打出的牌, 而且下家是自己, 准备出牌
         /// </summary>
         private static void SomeBodyShowCard(TurnInfo turnInfo) {
-            // TODO 功能牌效果展示
-            // ban, reverse
-
             // 1
             if (GameControl.CardChange) {
                 // 不一定, 可能上一个人没有出牌(GameControl.CardChange 来判断)
-                MainForm.ShowCard(turnInfo);
+                MainForm.ShowCard(turnInfo.GetPlayerIndex(), turnInfo.LastCardID);
             }
             // 2
             // (1), (2), (3)

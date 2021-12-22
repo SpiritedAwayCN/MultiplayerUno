@@ -1,4 +1,5 @@
-﻿using MultiplayerUNO.UI.Animations;
+﻿using LitJson;
+using MultiplayerUNO.UI.Animations;
 using MultiplayerUNO.UI.BUtils;
 using System;
 using System.Collections.Generic;
@@ -15,7 +16,7 @@ namespace MultiplayerUNO.UI {
         /// <summary>
         /// 封装了复杂的 BeginInvoke(异步)
         /// </summary>
-        private void UIInvoke(Action fun) {
+        public void UIInvoke(Action fun) {
             if (this.InvokeRequired) {
                 this.BeginInvoke(new Action(() => { fun(); }));
             } else { fun(); }
@@ -35,9 +36,11 @@ namespace MultiplayerUNO.UI {
         /// 关闭窗口的时候返回到原始的连接界面
         /// </summary>
         private void MainForm_FormClosed(object sender, FormClosedEventArgs e) {
-            // TODO
-            if (MsgAgency.LoginForm != null)
+            MsgAgency.MainForm = null;
+            if (MsgAgency.LoginForm != null) {
+                MsgAgency.SendMsgToQueryRoomStateWhenLogin();
                 MsgAgency.LoginForm.Show();
+            }
         }
 
         /// <summary>
@@ -61,6 +64,7 @@ namespace MultiplayerUNO.UI {
             float firstX = this.REF_WIDTH * 0.5f + (totalWidth / 2) - CardButton.WIDTH_MODIFIED;
             for (int i = 0; i < myBtns.Count; ++i) {
                 var btn = myBtns[i];
+                btn.IsHighlighted = false; // 所有的按钮都变为非高亮状态
                 Animation anima = new Animation(this, btn);
                 int offX = (int)(firstX - dx * i - btn.Location.X);
                 int offY = Players[ME].Center.Y - CardButton.HEIGHT_MODIFIED / 2
@@ -72,16 +76,24 @@ namespace MultiplayerUNO.UI {
         }
 
         /// <summary>
+        /// 每调用一次, 更新一次旋转方向
+        /// </summary>
+        public void UpdateLblDirection() {
+            bool clockwise = !GameControl.DirectionIsClockwise;
+            AnimationHighLight anima = new AnimationHighLight(this, this.LblDirection);
+            anima.SetDirection(!clockwise);
+            anima.Run();
+            GameControl.DirectionIsClockwise = clockwise;
+        }
+
+        /// <summary>
         /// 根据 GameControl.LastColor 更新标识颜色的 label
         /// </summary>
         private void UpdateLblColor() {
             var c = GameControl.LastColor;
             Bitmap bmp = null;
             // TODO 不够精致
-            if (c == CardColor.Blue) { bmp = UIImage._oButBlue; } 
-            else if (c == CardColor.Green) { bmp = UIImage._oButGreen; } 
-            else if (c == CardColor.Red) { bmp = UIImage._oButRed; } 
-            else if (c == CardColor.Yellow) { bmp = UIImage._oButYellow; };
+            if (c == CardColor.Blue) { bmp = UIImage._oButBlue; } else if (c == CardColor.Green) { bmp = UIImage._oButGreen; } else if (c == CardColor.Red) { bmp = UIImage._oButRed; } else if (c == CardColor.Yellow) { bmp = UIImage._oButYellow; };
             var lbl = this.LblColor as Control;
             UIInvoke(() => {
                 lbl.BackgroundImage = bmp;

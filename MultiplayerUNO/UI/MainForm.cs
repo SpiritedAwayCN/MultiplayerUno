@@ -47,17 +47,24 @@ namespace MultiplayerUNO.UI {
         public const int PileDropped = 1;
 
         /// <summary>
-        /// 出牌动画
+        /// 出牌动画, 某人出什么牌
         /// </summary>
-        public void ShowCard(TurnInfo turnInfo) {
+        /// <param name="playerIdx">
+        /// 注意这里是用于UI控制的 playerIdx, 而不是 playerID 
+        /// </param>
+        public void ShowCard(int playerIdx, int lastCardID) {
+            // 功能牌, 反转方向
+            if (GameControl.LastCard.IsReverse()) {
+                // 透明度动画
+                UpdateLblDirection();
+            }
             CardButton cbtn = null;
-            int playerIdx = turnInfo.GetPlayerIndex();
             bool win = Players[playerIdx].ShowOneCard(); // 出牌之后更新一些属性
             if (ME == playerIdx) {
                 // 如果是自己出牌, 则在牌堆中找到这张牌
                 // 认为所有的牌都有不一样的编号(其实一样也没事, 问题不大)
                 foreach (var c in Players[ME].BtnsInHand) {
-                    if (c.Card.CardId == turnInfo.LastCardID) {
+                    if (c.Card.CardId == lastCardID) {
                         cbtn = c;
                         break;
                     }
@@ -66,7 +73,7 @@ namespace MultiplayerUNO.UI {
                 Players[playerIdx].BtnsInHand.Remove(cbtn);
             } else {
                 // 如果是别人的牌则需要 new 一张牌
-                cbtn = new CardButton(turnInfo.LastCardID, true, false);
+                cbtn = new CardButton(lastCardID, true, false);
                 CardButton cbtnBack = Players[playerIdx].BtnsInHand[0];
                 // 必须同步, 这里的 Location 设置会影响后面的发牌动作
                 UIInvokeSync(() => {
@@ -75,8 +82,7 @@ namespace MultiplayerUNO.UI {
                     cbtn.BringToFront();
                     // 注意如果是最后一张牌的话, 我们需要把底牌抹去
                     if (win) {
-                        Players[playerIdx].BtnsInHand.Clear();
-                        this.Controls.Remove(cbtn);
+                        this.Controls.Remove(Players[playerIdx].BtnsInHand[0]);
                     }
                 });
             }
@@ -121,19 +127,34 @@ namespace MultiplayerUNO.UI {
 
         /// <summary>
         /// 游戏结束
-        /// 1. 显示谁胜利了
-        /// 2. 展示手牌
+        /// 1. 打牌动画
+        /// 2. 显示谁胜利了
+        /// 3. 展示手牌
         /// </summary>
         internal void GameOver(TurnInfo turnInfo) {
-            // 显示胜利
-            string playerName = Players[
-                GameControl.PlayerId2PlayerIndex[turnInfo.GetPlayerID()]
-            ].Name;
-            UIInvoke(() => {
-                this.LblGameOver.Text = "游戏结束, 胜利者是: " + playerName;
+            // 1. 打牌动画
+            int playerIdx = turnInfo.GetPlayerIndex();
+            ShowCard(playerIdx, turnInfo.LastCardID);
+            
+            // 2. 显示谁胜利了
+            string msgGameOver = "";
+            int winnerID = turnInfo.TurnID;
+            if (winnerID != 0) {
+                // 某人获胜
+                string playerName = Players[
+                    GameControl.PlayerId2PlayerIndex[winnerID]
+                ].Name;
+                msgGameOver = "游戏结束, 胜利者是: " + playerName;
+            } else {
+                // 平局
+                msgGameOver = "游戏平局";
+            }
+            UIInvokeSync(() => {
+                this.LblGameOver.Text = msgGameOver;
                 this.LblGameOver.Visible = true;
             });
-            // 展示手牌 TODO
+            
+            // 3. 展示手牌 TODO
         }
 
         /// <summary>
@@ -246,8 +267,8 @@ namespace MultiplayerUNO.UI {
             var t = anima.Run();
             var cbtn = Players[ME].BtnsInHand[0];
             Card c = new Card(turnInfo.LastCardID);
-            bool canResponed = c.CanResponseTo(
-                GameControl.LastCard, GameControl.LastColor);
+            bool canResponed = GameControl.FirstTurn() ||
+                  c.CanResponseTo(GameControl.LastCard, GameControl.LastColor);
             Task.Run(async () => {
                 // (2)
                 await t; // 同步

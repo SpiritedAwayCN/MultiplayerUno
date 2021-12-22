@@ -33,6 +33,8 @@
             this.label3 = new System.Windows.Forms.Label();
             this.button1 = new System.Windows.Forms.Button();
             this.LblChooseCard = new System.Windows.Forms.Label();
+            this.BtnAddAlpha = new System.Windows.Forms.Button();
+            this.LblAlpha = new System.Windows.Forms.Label();
             this.PnlInfo.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -74,7 +76,7 @@
             // 
             // button2
             // 
-            this.button2.Location = new System.Drawing.Point(684, 320);
+            this.button2.Location = new System.Drawing.Point(702, 262);
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(119, 67);
             this.button2.TabIndex = 5;
@@ -84,7 +86,7 @@
             // 
             // BtnZIndex
             // 
-            this.BtnZIndex.Location = new System.Drawing.Point(684, 416);
+            this.BtnZIndex.Location = new System.Drawing.Point(849, 262);
             this.BtnZIndex.Name = "BtnZIndex";
             this.BtnZIndex.Size = new System.Drawing.Size(119, 69);
             this.BtnZIndex.TabIndex = 6;
@@ -132,11 +134,31 @@
             this.LblChooseCard.TabIndex = 10;
             this.LblChooseCard.Text = "出牌";
             // 
+            // BtnAddAlpha
+            // 
+            this.BtnAddAlpha.Location = new System.Drawing.Point(702, 369);
+            this.BtnAddAlpha.Name = "BtnAddAlpha";
+            this.BtnAddAlpha.Size = new System.Drawing.Size(119, 67);
+            this.BtnAddAlpha.TabIndex = 11;
+            this.BtnAddAlpha.Text = "加透明度变化";
+            this.BtnAddAlpha.UseVisualStyleBackColor = true;
+            this.BtnAddAlpha.Click += new System.EventHandler(this.BtnAddAlpha_Click);
+            // 
+            // LblAlpha
+            // 
+            this.LblAlpha.BackColor = System.Drawing.SystemColors.ActiveCaption;
+            this.LblAlpha.Location = new System.Drawing.Point(80, 384);
+            this.LblAlpha.Name = "LblAlpha";
+            this.LblAlpha.Size = new System.Drawing.Size(100, 100);
+            this.LblAlpha.TabIndex = 12;
+            // 
             // TestForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(980, 619);
+            this.Controls.Add(this.LblAlpha);
+            this.Controls.Add(this.BtnAddAlpha);
             this.Controls.Add(this.LblChooseCard);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.LblTestAlign);
@@ -165,5 +187,7 @@
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.Label LblChooseCard;
+        private System.Windows.Forms.Button BtnAddAlpha;
+        private System.Windows.Forms.Label LblAlpha;
     }
 }

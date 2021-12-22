@@ -13,6 +13,8 @@ namespace MultiplayerUNO.UI.Animations {
     /// 动画, 如果一个动画有多种类型, 计算迭代轮次使其同步.
     /// 时间优先级: Translate > Rotate,
     /// trick: 先设置 Rotate, 再设置 Translate(用于控制时间)
+    /// 这个动画还是具有很多问题, 没有泛化性, 没抽象好
+    ///     (1) Rotate 只能应用于 CardButton(因为需要调用 Flip() 翻面的函数)
     /// </summary>
     public class Animation {
         // 动画可能的种类
@@ -34,15 +36,15 @@ namespace MultiplayerUNO.UI.Animations {
         /// <summary>
         /// 被控制的组件
         /// </summary>
-        public readonly List<CardButton> Controls;
+        public readonly List<Control> Controls;
 
         /// <summary>
         /// 估计动画迭代轮数
         /// </summary>
         private int StepCost;
 
-        public Animation(Form form, CardButton ButtonControlled) {
-            Controls = new List<CardButton>();
+        public Animation(Form form, Control ButtonControlled) {
+            Controls = new List<Control>();
             Form = form;
             Kind = 0;
             Trans = null;
@@ -50,7 +52,7 @@ namespace MultiplayerUNO.UI.Animations {
             Controls.Add(ButtonControlled);
         }
 
-        public void AddControls(CardButton ButtonControlled) {
+        public void AddControls(Control ButtonControlled) {
             Controls.Add(ButtonControlled);
         }
 
@@ -104,7 +106,9 @@ namespace MultiplayerUNO.UI.Animations {
                                 // 牌翻面
                                 if (first && Rot.FlipOver) {
                                     first = false;
-                                    if (btn != null) { btn.Flip(); }
+                                    if (btn != null && btn is CardButton) {
+                                        ((CardButton)btn).Flip();
+                                    }
                                 }
                                 btn.Width = (int)(CardButton.WIDTH_MODIFIED * Rot.GetXScale());
                                 offX = (CardButton.WIDTH_MODIFIED - btn.Width) / 2;

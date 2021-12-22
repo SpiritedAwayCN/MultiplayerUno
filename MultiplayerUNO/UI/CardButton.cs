@@ -1,5 +1,6 @@
 ﻿using MultiplayerUNO.UI.Animations;
 using MultiplayerUNO.Utils;
+using MultiplayerUNO.UI.BUtils;
 using System;
 using System.Drawing;
 using System.Drawing.Imaging;
@@ -12,7 +13,7 @@ namespace MultiplayerUNO.UI {
         // 静态常量
         private static Bitmap[] IMAGES = null;
         private static float scaleRatio = 0.8f;
-        
+
         /// <summary>
         /// 修正后的长宽, 随着 ScaleRatio 的修改跟着修改
         /// </summary>
@@ -30,7 +31,9 @@ namespace MultiplayerUNO.UI {
         public static readonly int ORI_WIDTH = IMG_SPRITE.Width / 13;
         public static readonly double WIDTH_HEIGHT_RATIO = 1.0 * ORI_WIDTH / ORI_HEIGHT;
 
-        public Card Card { get; }
+        public Card Card {
+            get;
+        }
         public static float ScaleRatio {
             get => scaleRatio;
             set {
@@ -91,7 +94,7 @@ namespace MultiplayerUNO.UI {
                 return;
             }
             int dy = (int)(HighLightRatio * WIDTH_MODIFIED);
-            Animation anima = new Animation(GameControl.MainForm, this);
+            Animation anima = new Animation(MsgAgency.MainForm, this);
 
             // 是否出现这样子的情况, 先高亮了某一张牌, 然后去高亮另外一张牌
             // 这个时候需要将原来的牌的高亮状态取消
@@ -135,8 +138,7 @@ namespace MultiplayerUNO.UI {
                 //  id: cannot +2      reverse
                 // img: cannot reverse +2
                 int startx = i >> 3;
-                if (startx == 11) { startx = 12; }
-                else if (startx == 12) { startx = 11; }
+                if (startx == 11) { startx = 12; } else if (startx == 12) { startx = 11; }
                 // color: R Y G B
                 //   img: R G B Y
                 int starty = i & 0x3;
@@ -184,6 +186,5 @@ namespace MultiplayerUNO.UI {
         public static int GetHighlightTranslateY() {
             return (int)(HighLightRatio * HEIGHT_MODIFIED);
         }
-
     }
 }

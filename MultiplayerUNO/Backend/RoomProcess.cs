@@ -306,7 +306,11 @@ namespace MultiplayerUNO.Backend
             foreach (Player.Player p in ingamePlayers)
             {
                 p.StartGameReset();
-                p.GainCard(cardPile.DrawCards(7)); // 每个玩家发初始7张牌
+                // TODO
+                // UI 调试 START
+                p.GainCard(cardPile.DrawCards(2));
+                // UI 调试 END
+                //p.GainCard(cardPile.DrawCards(7)); // 每个玩家发初始7张牌
             }
             currentPlayerNode = ingamePlayers.First;    // 第一个玩家首个行动
 

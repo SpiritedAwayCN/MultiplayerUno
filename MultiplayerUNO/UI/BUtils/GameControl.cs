@@ -9,7 +9,7 @@ using MultiplayerUNO.UI.Players;
 using static MultiplayerUNO.Utils.Card;
 using MultiplayerUNO.Utils;
 
-namespace MultiplayerUNO.UI {
+namespace MultiplayerUNO.UI.BUtils {
     /// <summary>
     /// 一些参数用于控制游戏(全局变量)
     /// </summary>
@@ -23,17 +23,17 @@ namespace MultiplayerUNO.UI {
         /// <summary>
         /// 当出的牌是 +4/万能牌 的时候需要选择颜色
         /// </summary>
-        public static CardColor InvalidCardToChooseColor = CardColor.Invalid;
+        public static volatile CardColor InvalidCardToChooseColor = CardColor.Invalid;
 
         /// <summary>
         /// 标识发牌动画(可等待)
         /// </summary>
-        public static Task FinishDistributeCard = null;
+        public static volatile Task FinishDistributeCard = null;
 
         /// <summary>
         /// 从 player 映射到 UI 上面的玩家编码
         /// </summary>
-        public static Dictionary<int, int> PlayerId2PlayerIndex;
+        public static volatile Dictionary<int, int> PlayerId2PlayerIndex;
 
         /// <summary>
         /// 标识游戏是否初始化完成
@@ -41,14 +41,9 @@ namespace MultiplayerUNO.UI {
         public static volatile bool GameInitialized = false;
 
         /// <summary>
-        /// 游戏运行的 MainForm 主窗口
-        /// </summary>
-        public static MainForm MainForm = null;
-
-        /// <summary>
         /// 顺时针进行游戏
         /// </summary>
-        public static bool DirectionIsClockwise;
+        public static volatile bool DirectionIsClockwise;
         public static void SetGameDirection(int direction) {
             // UI 方向编码:
             //      1(顺时针)
@@ -68,42 +63,34 @@ namespace MultiplayerUNO.UI {
         /// <summary>
         /// 上一个人是否打牌
         /// </summary>
-        public static bool CardChange;
+        public static volatile bool CardChange;
 
         /// <summary>
         /// 当前自己选中的牌
         /// </summary>
-        public static CardButton CBtnSelected = null;
+        public static volatile CardButton CBtnSelected = null;
 
         /// <summary>
         /// 弃牌堆, 保证只有一张弃牌 (线程安全的)
         /// </summary>
-        private static ArrayList CardsDropped = ArrayList.Synchronized(new ArrayList());
+        public static volatile ArrayList CardsDropped;
+
         /// <summary>
         /// 注意只有动画结束才能添加到弃牌堆中
         /// </summary>
         public static void AddDroppedCard(CardButton cbtn) {
             CardsDropped.Add(cbtn);
             while (CardsDropped.Count > 1) {
-                MainForm.Controls.Remove((CardButton)CardsDropped[0]);
+                MsgAgency.MainForm.Controls.Remove((CardButton)CardsDropped[0]);
                 CardsDropped.RemoveAt(0);
             }
-        }
-
-        /// <summary>
-        /// 一些游戏控件只会被生成一次(在构造函数中生成), 在清除整个桌面的时候需要被保留
-        /// </summary>
-        public static List<Control> ControlsNeededAtGameStart = new List<Control>();
-
-        public static void AddControlsNeededAtGameStart() {
-            MainForm.Controls.AddRange(ControlsNeededAtGameStart.ToArray());
         }
 
         /// <summary>
         /// 我是开局第一个出牌的
         /// </summary>
         public static bool FirstTurnFirstShow() {
-            return FirstTurn() && TurnID == MainForm.MyID;
+            return FirstTurn() && TurnID == MsgAgency.MainForm.MyID;
         }
 
         /// <summary>

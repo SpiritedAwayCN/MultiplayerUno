@@ -3,6 +3,7 @@ using MultiplayerUNO.UI.Animations;
 using MultiplayerUNO.UI.BUtils;
 using MultiplayerUNO.UI.Players;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -16,17 +17,25 @@ namespace MultiplayerUNO.UI {
         /// <summary>
         /// 用于初始化的 json 文本
         /// </summary>
-        public readonly JsonData InitJsonMsg;
+        private readonly JsonData InitJsonMsg;
 
         public MainForm(JsonData jsonMsg) {
-            GameControl.MainForm = this;
-            MsgAgency.MainForm = this;
-            // readonly MyID
+            InitializeGlobalControl(); // 必须放在第一句
+            // MyID is readonly
             MyID = (int)jsonMsg["yourID"];
             InitJsonMsg = jsonMsg;
-
             InitializeComponent();
-            InitializeComponentOnce();
+        }
+
+        /// <summary>
+        /// 设置一些全局变量, 主要是 MsgAgency 以及 GameControl 中的量
+        /// </summary>
+        private void InitializeGlobalControl() {
+            MsgAgency.MainForm = this;
+            GameControl.PlayerId2PlayerIndex = new Dictionary<int, int>();
+            GameControl.GameInitialized = false;
+            GameControl.CBtnSelected = null;
+            GameControl.CardsDropped = ArrayList.Synchronized(new ArrayList());
         }
 
         /// <summary>
@@ -131,7 +140,6 @@ namespace MultiplayerUNO.UI {
 
             JsonData playerMap = jsonMsg["playerMap"];
             PlayersNumber = playerMap.Count;
-            GameControl.PlayerId2PlayerIndex = new Dictionary<int, int>();
 
             // 找到自己是第几个
             int idxME;
@@ -167,36 +175,6 @@ namespace MultiplayerUNO.UI {
             for (int i = 0; i < piles.Count; ++i) {
                 Players[ME].CardsOrigin.Add((int)piles[i]);
             }
-        }
-
-        /// <summary>
-        /// 初始化一些 GUI, 这些 GUI 只会被绘制一次(可视化界面设计),
-        /// 为了保持一致性 (初始 MainForm.Controls 为空),
-        /// 在这里会将他们从 MainForm.Controls 中去除,
-        /// 然后在游戏开始的绘制界面中添加进去
-        /// </summary>
-        private void InitializeComponentOnce() {
-            List<Control> lst = new List<Control>();
-
-            lst.Add(this.LblLeftTime);
-            lst.Add(this.LblDirection);
-            lst.Add(this.LblColor);
-            lst.Add(this.LblFirstShowCard);
-            lst.Add(this.PnlChooseColor);
-            lst.Add(this.PnlQuestion);
-            lst.Add(this.PnlDisplayCard);
-            lst.Add(this.LblGameOver);
-            lst.Add(this.PnlPlus2);
-            lst.Add(this.TxtDebug);
-            lst.Add(this.PnlAfterGetOne);
-            lst.Add(this.PnlNormalShowCardorNot);
-
-            foreach (var c in lst) {
-                this.Controls.Remove(c);
-                GameControl.ControlsNeededAtGameStart.Add(c);
-            }
-
-            ConstructPnlChooseColor();
         }
 
         /// <summary>
@@ -333,9 +311,10 @@ namespace MultiplayerUNO.UI {
                 this.LblDirection.Visible = true;
                 this.LblLeftTime.Visible = true;
                 this.LblColor.Visible = true;
-                // 开局第一个出才显示随便出牌
+                // 开局第一个出才显示谁先出牌
                 this.LblFirstShowCard.Visible = GameControl.FirstTurnFirstShow();
-                   
+                this.PnlNormalShowCardorNot.Visible = (GameControl.TurnID == MyID);
+
                 this.TmrCheckLeftTime.Start();
                 this.TmrControlGame.Start();
             });
@@ -403,10 +382,11 @@ namespace MultiplayerUNO.UI {
         }
 
         /// <summary>
-        /// 设定一些使用可视化界面设计的一些组件
+        /// 设定一些使用可视化界面设计的一些组件(大小、位置、可见性属性)
+        /// 初始全部都设置为不可见
         /// </summary>
         private void DrawControlsDesignedByDesigner() {
-            GameControl.AddControlsNeededAtGameStart();
+            ConstructPnlChooseColor();
 
             var pos = Piles[PileDropped].Location;
             Control lbl = null;
@@ -417,6 +397,8 @@ namespace MultiplayerUNO.UI {
 
             // 打牌方向 label, LblDirection
             lbl = this.LblDirection;
+            // tag 上保存了两张背景图, 0->顺时针, 1->逆时针
+            lbl.Tag = new Bitmap[2] { UIImage.clockwise, UIImage.counterclockwise };
             lbl.Location = new Point(100, 20); // TODO
 
             // 打牌颜色 label
@@ -460,8 +442,8 @@ namespace MultiplayerUNO.UI {
             // 常规的出牌、摸牌 panel
             lbl = this.PnlNormalShowCardorNot;
             lbl.Location = this.PnlChooseColor.Location; // TODO
-            // 看看是不是轮到自己打牌
-            lbl.Visible = (GameControl.TurnID == MyID);
+            // 看看是不是轮到自己打牌(发牌动画结束之后设置)
+            lbl.Visible = false;
 
             // DEBUG
             lbl = this.TxtDebug;

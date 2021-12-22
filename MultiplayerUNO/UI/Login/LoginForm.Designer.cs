@@ -1,4 +1,4 @@
-﻿namespace MultiplayerUNO.UI.OtherForm {
+﻿namespace MultiplayerUNO.UI.Login {
     partial class LoginForm {
         /// <summary>
         /// Required designer variable.

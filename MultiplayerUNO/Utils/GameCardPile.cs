@@ -22,37 +22,39 @@ namespace MultiplayerUNO.Utils
                 CardPile.AddLast(new Card(i));
         }
 
-        public void ShuffleCards()
-        {
+        public void ShuffleCards() {
             CardPile = new LinkedList<Card>(CardPile.Concat(DiscardPile).OrderBy(p => Guid.NewGuid().ToString()));
             // TODO 
             // 用于 UI 调试, 定制手牌 START
-            //int[] cardID = new int[] {
-            //    // +4
-            //    104,0,8,9,10,11,16,
-            //    12,13,14,15,20,24,28,
-            //    1,2,3,4,
+            int[] cardID = new int[] {
+                //// +4
+                //104,0,8,9,10,11,16,
+                //12,13,14,15,20,24,28,
+                //1,2,3,4,
                 
-            //    // +2
-            //    //104,0,88,89,10,11,16,
-            //    //92,93,14,15,20,24,28,
-            //    //1,2,3,4,
-            //};
-            //for (int i = cardID.Length - 1; i >= 0; --i) {
-            //    Card rec = null;
-            //    int skip = cardID.Length - 1 - i; // 忽略前几张牌
-            //    foreach (var c in CardPile) {
-            //        if (--skip >= 0) { continue; }
-            //        if (c.CardId == cardID[i]) {
-            //            rec = c;
-            //            break;
-            //        }
-            //    }
-            //    if (rec != null) {
-            //        CardPile.Remove(rec);
-            //        CardPile.AddFirst(rec);
-            //    }
-            //}
+                //// +2
+                //104,0,88,89,10,11,16,
+                //92,93,14,15,20,24,28,
+                //1,2,3,4,
+
+                //// 转
+                96,97,1,2
+            };
+            for (int i = cardID.Length - 1; i >= 0; --i) {
+                Card rec = null;
+                int skip = cardID.Length - 1 - i; // 忽略前几张牌
+                foreach (var c in CardPile) {
+                    if (--skip >= 0) { continue; }
+                    if (c.CardId == cardID[i]) {
+                        rec = c;
+                        break;
+                    }
+                }
+                if (rec != null) {
+                    CardPile.Remove(rec);
+                    CardPile.AddFirst(rec);
+                }
+            }
             // 用于 UI 调试, 定制手牌 END
             DiscardPile.Clear();
         }

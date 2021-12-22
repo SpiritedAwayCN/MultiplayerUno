@@ -1,5 +1,5 @@
 ﻿using LitJson;
-using MultiplayerUNO.UI.OtherForm;
+using MultiplayerUNO.UI.Login;
 using MultiplayerUNO.Utils;
 using System;
 using System.Collections.Generic;
@@ -12,16 +12,17 @@ using System.Windows.Forms;
 namespace MultiplayerUNO.UI.BUtils {
     public static partial class MsgAgency {
         /// <summary>
-        /// 和后端通信的适配器
+        /// 协议版本号
+        /// </summary>
+        public const string ProtocolVersion = "0.0.1";
+
+        /// <summary>
+        /// 和后端通信的适配器(只会被设置一次)
         /// </summary>
         public static PlayerAdapter PlayerAdapter = null;
 
         /// <summary>
-        /// 协议版本号
-        /// </summary>
-        public const string ProtocolVersion = "0.0.1";
-        /// <summary>
-        /// 专门收 server 消息的线程
+        /// 专门收 server 消息的线程(只会被设置一次)
         /// </summary>
         public static Thread ShowInfoThread = null;
 
@@ -54,6 +55,7 @@ namespace MultiplayerUNO.UI.BUtils {
         /// 处理消息
         /// </summary>
         private static void DealWithMsg(string msg) {
+            Console.WriteLine("GET: " + msg);
             JsonData json = JsonMapper.ToObject(msg);
             if (json.Keys.Contains("state")) {
                 // 游戏开始后的信息
