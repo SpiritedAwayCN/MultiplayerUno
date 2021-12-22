@@ -38,7 +38,7 @@ namespace MultiplayerUNO.Utils
             //    //1,2,3,4,
 
             //    //// 转
-            //    96,97,1,2
+            //    96,97,11,21
             //};
             //for (int i = cardID.Length - 1; i >= 0; --i) {
             //    Card rec = null;

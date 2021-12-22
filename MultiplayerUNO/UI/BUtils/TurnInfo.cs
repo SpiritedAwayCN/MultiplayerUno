@@ -11,11 +11,13 @@ namespace MultiplayerUNO.UI.BUtils {
         // 一些初始字段(详见 excel)
         public readonly int State, LastCardID, IntInfo, Time, TurnID, QueryID;
         public readonly int[] PlayerCards;
+        public readonly JsonData JsonMsg;
 
         /// <summary>
         /// 在构造函数内部可能会对一些 GameControl 中有意义的值进行赋值
         /// </summary>
         public TurnInfo(JsonData json) {
+            JsonMsg = json;
             State = (int)json["state"];
             // 注意, 无意义字段可能缺失
             // 有意义也不一定是指定的意义, 需要小心设置, DEBUG 需要谨慎

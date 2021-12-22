@@ -112,5 +112,18 @@ namespace MultiplayerUNO.UI {
             anima.Run();
             zero2One = !zero2One;
         }
+
+        private void btnTest_Click(object sender, EventArgs e) {
+            this.Controls.Remove(this.PnlTest);
+            string a = "";
+            var lbl = this.LblTest;
+            lbl.Text = "你好\r\n";
+            a += lbl.Size.ToString();
+            lbl.Text = "你太好了好\r\n";
+            a += lbl.Size.ToString();
+            a += lbl.Size.ToString();
+            lbl.Text = a;
+            this.Controls.Add(this.PnlTest);
+        }
     }
 }

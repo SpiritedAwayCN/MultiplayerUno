@@ -445,6 +445,12 @@ namespace MultiplayerUNO.UI {
             // 看看是不是轮到自己打牌(发牌动画结束之后设置)
             lbl.Visible = false;
 
+            // 展示最终的出牌结果的 panel,
+            lbl = this.PnlShowResultWhenGameOver;
+            lbl.Location = this.PnlChooseColor.Location; // TODO
+            // 看看是不是轮到自己打牌(发牌动画结束之后设置)
+            lbl.Visible = false;
+
             // DEBUG
             lbl = this.TxtDebug;
             lbl.Location = new Point(20, 110 + this.PnlChooseColor.Location.Y);

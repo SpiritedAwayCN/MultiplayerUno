@@ -6,6 +6,7 @@ using MultiplayerUNO.Utils;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using static MultiplayerUNO.Utils.Card;
@@ -153,8 +154,141 @@ namespace MultiplayerUNO.UI {
                 this.LblGameOver.Text = msgGameOver;
                 this.LblGameOver.Visible = true;
             });
-            
-            // 3. 展示手牌 TODO
+
+            // 3. 展示手牌
+            ShowCardsWhenGameOver(turnInfo);
+        }
+
+        private void ShowCardsWhenGameOver(TurnInfo turnInfo) {
+            Panel pnl = this.PnlShowResultWhenGameOver;
+            // (1) 获取玩家和牌的列表
+            JsonData playerCards = turnInfo.JsonMsg["playerCards"];
+            int cnt = playerCards.Count;
+            string[] name = new string[cnt];
+            CardButton[][] cards = new CardButton[cnt][];
+            for (int i = 0; i < cnt; ++i) {
+                JsonData p = playerCards[i];
+                name[i] = (string)p["name"]
+                          + ((int)p["isRobot"] == 1 ? "[AI 托管]" : "");
+                p = p["handcards"];
+                cards[i] = new CardButton[p.Count];
+                for (int j = 0; j < p.Count; ++j) {
+                    cards[i][j] = new CardButton((int)p[j]);
+                }
+                name[i] += " (" + p.Count + ")";
+            }
+
+            // (2) 构建 Label 和 CardButton
+            Label[] lbls = new Label[cnt];
+            Size lblSize = new Size(0, 0); // 最大的 label 大小
+            for (int i = 0; i < cnt; ++i) {
+                Label lbl = new Label();
+                lbl.AutoSize = true;
+                lbl.Text = name[i];
+                lbl.BackColor = Color.Transparent;
+                lbl.Font = new Font("微软雅黑", 13.8F,
+                    FontStyle.Regular, GraphicsUnit.Point, 134);
+                lbls[i] = lbl;
+            }
+            float ratio = 0.9f;
+            UIInvokeSync(() => {
+                pnl.Size = new Size(
+                    (int)(this.REF_WIDTH * ratio), (int)(this.REF_HEIGHT * ratio));
+                pnl.Location = new Point(
+                    (int)(this.REF_WIDTH * (1 - ratio) / 2),
+                    (int)(this.REF_HEIGHT * (1 - ratio) / 2));
+                for (int i = 0; i < cnt; ++i) {
+                    Label lbl = lbls[i];
+                    pnl.Controls.Add(lbl);
+                    lblSize.Width = Math.Max(lbl.Size.Width, lblSize.Width);
+                }
+            });
+            lblSize.Height = lbls[0].Height;
+
+            // (3) 放置到 panel 中
+            //   [1] 如果是 >3 个人, 则需要分为两列
+            //   [2] 如果剩余牌的数目实在太多, 我们就不完全展开
+            int padding = 10;
+            int startx = padding * 2 + lblSize.Width;
+            Point[] startPoint = new Point[cnt];
+            Point[] endPoint = new Point[cnt];
+            int lengthPerPlayer = pnl.Size.Width - startx- CardButton.WIDTH_MODIFIED; // 每个人的牌堆大小(取整)
+            lengthPerPlayer = (lengthPerPlayer / CardButton.WIDTH_MODIFIED)
+                                * CardButton.WIDTH_MODIFIED;
+            if (cnt <= 3) {
+                // 一列
+                lengthPerPlayer += pnl.Width / 2;
+                for (int i = 0; i < cnt; ++i) {
+                    startPoint[i] = new Point(startx,
+                        (int)((i + 1) / (cnt + 1.0f) * pnl.Size.Height));
+                    endPoint[i] = new Point(startPoint[i].X + lengthPerPlayer,
+                        startPoint[i].Y);
+                }
+            } else {
+                // 分两列
+                int mod = (cnt + 1) / 2; // [4]=>2, [5,6]=>3
+                for (int i = 0; i < cnt; ++i) {
+                    startPoint[i] = new Point(
+                        (int)(startx + (i / mod) * pnl.Size.Width / 2),
+                        (int)(((i + 1) % mod) / (mod + 1.0f) * pnl.Size.Height));
+                    endPoint[i] = new Point(startPoint[i].X + lengthPerPlayer,
+                        startPoint[i].Y);
+                }
+            }
+
+            // (4) 计算 label 位置, panel 可见
+            UIInvokeSync(() => {
+                for (int i = 0; i < cnt; ++i) {
+                    var lbl = lbls[i];
+                    int x = startPoint[i].X,
+                        y = startPoint[i].Y;
+                    lbl.Location = new Point(
+                        x - (lbl.Width + lblSize.Width) / 2,
+                        y - lbl.Height / 2);
+                    foreach (var btn in cards[i]) {
+                        pnl.Controls.Add(btn);
+                        btn.Location = new Point(x, y - btn.Height / 2);
+                    }
+                }
+                pnl.BringToFront();
+                pnl.Visible = true;
+            });
+
+            // (5) 动画序列
+            List<Animation> lst = new List<Animation>();
+            bool notok = true;
+            int idx = 0;
+            while (notok) {
+                Animation anima = null;
+                notok = false;
+                // 计算卡牌位置
+                for (int i = 0; i < cnt; ++i) {
+                    var p = cards[i];
+                    if (idx + 1 < p.Length) { notok = true; }
+                    if (idx >= p.Length) { continue; }
+                    if (anima == null) {
+                        anima = new Animation(this, p[idx]);
+                        int x = CardButton.WIDTH_MODIFIED / 2 * (3 + idx);
+                        if (x > endPoint[i].X) { x = endPoint[i].X; }
+                        anima.SetTranslate(x, 0);
+                    } else {
+                        anima.AddControls(p[idx]);
+                    }
+                }
+                ++idx;
+                lst.Add(anima);
+            }
+            // 动画跑起来
+            Task.Run(async () => {
+                foreach (var anima in lst) { 
+                    UIInvokeSync(() => {
+                        foreach (var c in anima.Controls) {
+                            c.BringToFront();
+                        }
+                    });
+                    await anima.Run();
+                }
+            });
         }
 
         /// <summary>

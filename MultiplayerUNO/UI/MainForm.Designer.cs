@@ -49,6 +49,7 @@
             this.LblDonotShowAfterGetOne = new System.Windows.Forms.Label();
             this.LblShowAfterGetOne = new System.Windows.Forms.Label();
             this.PnlNormalShowCardorNot = new System.Windows.Forms.Panel();
+            this.PnlShowResultWhenGameOver = new System.Windows.Forms.Panel();
             this.PnlQuestion.SuspendLayout();
             this.PnlDisplayCard.SuspendLayout();
             this.PnlPlus2.SuspendLayout();
@@ -345,10 +346,18 @@
             this.PnlNormalShowCardorNot.BackColor = System.Drawing.Color.OliveDrab;
             this.PnlNormalShowCardorNot.Controls.Add(this.LblShowCard);
             this.PnlNormalShowCardorNot.Controls.Add(this.LblGetCard);
-            this.PnlNormalShowCardorNot.Location = new System.Drawing.Point(586, 248);
+            this.PnlNormalShowCardorNot.Location = new System.Drawing.Point(606, 167);
             this.PnlNormalShowCardorNot.Name = "PnlNormalShowCardorNot";
             this.PnlNormalShowCardorNot.Size = new System.Drawing.Size(360, 143);
             this.PnlNormalShowCardorNot.TabIndex = 26;
+            // 
+            // PnlShowResultWhenGameOver
+            // 
+            this.PnlShowResultWhenGameOver.BackColor = System.Drawing.Color.ForestGreen;
+            this.PnlShowResultWhenGameOver.Location = new System.Drawing.Point(470, 366);
+            this.PnlShowResultWhenGameOver.Name = "PnlShowResultWhenGameOver";
+            this.PnlShowResultWhenGameOver.Size = new System.Drawing.Size(473, 162);
+            this.PnlShowResultWhenGameOver.TabIndex = 27;
             // 
             // MainForm
             // 
@@ -356,6 +365,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.DimGray;
             this.ClientSize = new System.Drawing.Size(1692, 578);
+            this.Controls.Add(this.PnlShowResultWhenGameOver);
             this.Controls.Add(this.PnlNormalShowCardorNot);
             this.Controls.Add(this.PnlAfterGetOne);
             this.Controls.Add(this.TxtDebug);
@@ -418,5 +428,6 @@
         private System.Windows.Forms.Label LblDonotShowAfterGetOne;
         private System.Windows.Forms.Label LblShowAfterGetOne;
         private System.Windows.Forms.Panel PnlNormalShowCardorNot;
+        private System.Windows.Forms.Panel PnlShowResultWhenGameOver;
     }
 }

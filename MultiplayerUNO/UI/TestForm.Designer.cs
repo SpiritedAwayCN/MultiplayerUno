@@ -35,7 +35,11 @@
             this.LblChooseCard = new System.Windows.Forms.Label();
             this.BtnAddAlpha = new System.Windows.Forms.Button();
             this.LblAlpha = new System.Windows.Forms.Label();
+            this.LblTest = new System.Windows.Forms.Label();
+            this.btnTest = new System.Windows.Forms.Button();
+            this.PnlTest = new System.Windows.Forms.Panel();
             this.PnlInfo.SuspendLayout();
+            this.PnlTest.SuspendLayout();
             this.SuspendLayout();
             // 
             // label1
@@ -152,11 +156,40 @@
             this.LblAlpha.Size = new System.Drawing.Size(100, 100);
             this.LblAlpha.TabIndex = 12;
             // 
+            // LblTest
+            // 
+            this.LblTest.AutoSize = true;
+            this.LblTest.Location = new System.Drawing.Point(35, 30);
+            this.LblTest.Name = "LblTest";
+            this.LblTest.Size = new System.Drawing.Size(37, 15);
+            this.LblTest.TabIndex = 13;
+            this.LblTest.Text = "测试";
+            // 
+            // btnTest
+            // 
+            this.btnTest.Location = new System.Drawing.Point(288, 449);
+            this.btnTest.Name = "btnTest";
+            this.btnTest.Size = new System.Drawing.Size(149, 89);
+            this.btnTest.TabIndex = 14;
+            this.btnTest.Text = "显示测试结果";
+            this.btnTest.UseVisualStyleBackColor = true;
+            this.btnTest.Click += new System.EventHandler(this.btnTest_Click);
+            // 
+            // PnlTest
+            // 
+            this.PnlTest.Controls.Add(this.LblTest);
+            this.PnlTest.Location = new System.Drawing.Point(12, 549);
+            this.PnlTest.Name = "PnlTest";
+            this.PnlTest.Size = new System.Drawing.Size(924, 58);
+            this.PnlTest.TabIndex = 15;
+            // 
             // TestForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(980, 619);
+            this.Controls.Add(this.PnlTest);
+            this.Controls.Add(this.btnTest);
             this.Controls.Add(this.LblAlpha);
             this.Controls.Add(this.BtnAddAlpha);
             this.Controls.Add(this.LblChooseCard);
@@ -171,6 +204,8 @@
             this.Load += new System.EventHandler(this.TestForm_Load);
             this.PnlInfo.ResumeLayout(false);
             this.PnlInfo.PerformLayout();
+            this.PnlTest.ResumeLayout(false);
+            this.PnlTest.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -189,5 +224,8 @@
         private System.Windows.Forms.Label LblChooseCard;
         private System.Windows.Forms.Button BtnAddAlpha;
         private System.Windows.Forms.Label LblAlpha;
+        private System.Windows.Forms.Label LblTest;
+        private System.Windows.Forms.Button btnTest;
+        private System.Windows.Forms.Panel PnlTest;
     }
 }
