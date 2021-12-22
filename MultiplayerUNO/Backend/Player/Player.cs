@@ -33,7 +33,7 @@ namespace MultiplayerUNO.Backend.Player
         {
             get { return isReady; }
             set {
-                isReady = value;
+                IsReady = value;
                 playerJsonCache = null; // 缓存失效
             }
         }

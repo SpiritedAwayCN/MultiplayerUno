@@ -40,7 +40,7 @@ namespace MultiplayerUNO.Backend
                 if (plus4Player.CanHandoutPlus4(plus4ResponseCard, plus4ColorID & 3))
                     DrawCardBack2Common(6, sendPlayer); // 质疑失败
                 else
-                    DrawCardBack2Common(4, plus4Player); // 质疑成功
+                    DrawCardBack2Common(4, plus4Player, false); // 质疑成功
 
             }
         }
@@ -371,7 +371,7 @@ namespace MultiplayerUNO.Backend
             return null;
         }
 
-        protected void DrawCardBack2Common(int cardCount, Player.Player drawnPlayer)
+        protected void DrawCardBack2Common(int cardCount, Player.Player drawnPlayer, bool toNext = true)
         {
             Card[] drawnCards = cardPile.DrawCards(cardCount);
             drawnPlayer.GainCard(drawnCards); // 摸牌
@@ -398,7 +398,7 @@ namespace MultiplayerUNO.Backend
             }
             // 摸牌结束，回到1号状态
 
-            Change2NextTurnPlayerNode(); // 跳到下一名玩家，lastCard不变
+            if(toNext) Change2NextTurnPlayerNode(); // 跳到下一名玩家，lastCard不变
             currentStatus = GameStatus.Common; // 切换至一号状态，lastCard等属性不变
 
             TimerStart(new MsgArgs
