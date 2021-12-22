@@ -555,7 +555,7 @@ namespace MultiplayerUNO.UI {
         /// 不质疑按钮点击事件发生
         /// </summary>
         private void LblNoQuestion_Click(object sender, EventArgs e) {
-            SendMsgRespondToPlus4(6);
+            SendMsgRespondToPlus4(4);
             this.PnlQuestion.Visible = false;
         }
 

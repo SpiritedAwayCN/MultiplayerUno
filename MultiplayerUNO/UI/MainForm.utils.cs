@@ -106,7 +106,12 @@ namespace MultiplayerUNO.UI {
         /// 每间隔 1s 检查一下时间, 更新标识事件时间的 label
         /// </summary>
         private void TmrCheckLeftTime_Tick(object sender, EventArgs e) {
-            if (GameControl.TimeForYou <= 0) { return; }
+            if (GameControl.TimeForYou <= 0) {
+                UIInvoke(()=> {
+                    ImDummy();
+                });
+                return;
+            }
             int t = GameControl.TimeForYou;
             t -= this.TmrCheckLeftTime.Interval;
             if (t < 0) { t = 0; }
@@ -118,6 +123,17 @@ namespace MultiplayerUNO.UI {
                    t.ToString().PadLeft(2, '0');
                 t.ToString().PadLeft(2, '0');
             });
+        }
+
+        /// <summary>
+        /// 这个时候我不能出牌了(可能原因: 超时)
+        /// </summary>
+        private void ImDummy() {
+            this.PnlAfterGetOne.Visible = false;
+            this.PnlChooseColor.Visible = false;
+            this.PnlNormalShowCardorNot.Visible = false;
+            this.PnlPlus2.Visible = false;
+            this.PnlQuestion.Visible = false;
         }
 
         /// <summary>
