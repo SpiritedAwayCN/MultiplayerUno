@@ -308,9 +308,9 @@ namespace MultiplayerUNO.Backend
                 p.StartGameReset();
                 // TODO UI 测试的配置
                 // UI 调试 START
-                p.GainCard(cardPile.DrawCards(2));
+                //p.GainCard(cardPile.DrawCards(2));
                 // UI 调试 END
-                //p.GainCard(cardPile.DrawCards(7)); // 每个玩家发初始7张牌
+                p.GainCard(cardPile.DrawCards(7)); // 每个玩家发初始7张牌
             }
             currentPlayerNode = ingamePlayers.First;    // 第一个玩家首个行动
 
