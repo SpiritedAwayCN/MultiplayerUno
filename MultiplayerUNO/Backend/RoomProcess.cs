@@ -536,6 +536,7 @@ namespace MultiplayerUNO.Backend
                     json["lastCard"] = lastCard.CardId;
                     json["intInfo"] = drawingCardCounter;
                     json["turnID"] = currentPlayerNode.Value.ingameID;
+                    json["playerID"] = lastCardInfo >> 2;
                     json["time"] = lastTimerWaitSec - (int)(DateTime.Now.Ticks - lastTimerStartMs) / 10000;
                     break;
 
