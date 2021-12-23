@@ -42,9 +42,9 @@ namespace MultiplayerUNO.UI.BUtils {
             if (MainForm == null) { return; }
 
             // DEBUG START
-            MainForm.UIInvokeSync(() => {
-                MainForm.DebugLog("MyID: " + MainForm.MyID + "\r\n" + json.ToJson());
-            });
+            //MainForm.UIInvokeSync(() => {
+            //    MainForm.DebugLog("MyID: " + MainForm.MyID + "\r\n" + json.ToJson());
+            //});
             // DEBUG END
 
             int state = (int)json["state"];
@@ -78,6 +78,7 @@ namespace MultiplayerUNO.UI.BUtils {
                     break;
                 default: break;
             }
+            Thread.Sleep(500);
             return;
         }
 

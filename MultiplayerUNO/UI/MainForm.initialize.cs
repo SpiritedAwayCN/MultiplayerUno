@@ -44,7 +44,6 @@ namespace MultiplayerUNO.UI {
         /// 一人发一次的发牌方式
         /// </summary>
         private async Task DistributeCardAtGameStart_OnePersonOneTimeAsync() {
-            // TODO
             // 1. 表面上发 4 张牌
             AnimationSeq animaSeq = new AnimationSeq();
             // 自己最后发, 方便实现
@@ -489,6 +488,10 @@ namespace MultiplayerUNO.UI {
             //);
             lbl.Location = new Point(padding, padding + totalsize);
 
+            // 摸牌累计总数 label, LblPlus2Total
+            lbl = this.LblPlus2Total;
+            lbl.Location = new Point(padding, padding + totalsize);
+
             // 选择颜色的 panel, PnlChooseColor
             lbl = this.PnlChooseColor;
             lbl.Location = new Point(padding, padding + totalsize);
@@ -508,10 +511,15 @@ namespace MultiplayerUNO.UI {
             lbl = this.LblGameOver;
             lbl.Visible = false;
 
+            // 游戏结束展示所有人手牌的 panel, PnlShowResultWhenGameOver
+            lbl = this.PnlShowResultWhenGameOver;
+            lbl.BackColor = Color.DimGray;
+
             // DEBUG
             lbl = this.TxtDebug;
             lbl.Location = new Point(20, 110 + this.PnlChooseColor.Location.Y);
             lbl.SendToBack();
+            lbl.Visible = false;
         }
     }
 }

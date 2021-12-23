@@ -308,7 +308,11 @@ namespace MultiplayerUNO.Backend
                 p.StartGameReset();
                 // TODO UI 测试的配置
                 // UI 调试 START
-                //p.GainCard(cardPile.DrawCards(2));
+                //if (p.Name.IndexOf("Server") != -1) {
+                //    p.GainCard(cardPile.DrawCards(1));
+                //} else {
+                //    p.GainCard(cardPile.DrawCards(10));
+                //}
                 // UI 调试 END
                 p.GainCard(cardPile.DrawCards(7)); // 每个玩家发初始7张牌
             }

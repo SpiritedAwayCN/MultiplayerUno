@@ -38,9 +38,9 @@
             this.TmrDisplayCard = new System.Windows.Forms.Timer(this.components);
             this.LblGameOver = new System.Windows.Forms.Label();
             this.PnlPlus2 = new System.Windows.Forms.Panel();
-            this.LblPlus2Total = new System.Windows.Forms.Label();
             this.LblDonotPlayPlus2 = new System.Windows.Forms.Label();
             this.LblPlayPlus2 = new System.Windows.Forms.Label();
+            this.LblPlus2Total = new System.Windows.Forms.Label();
             this.TxtDebug = new System.Windows.Forms.TextBox();
             this.PnlAfterGetOne = new System.Windows.Forms.Panel();
             this.LblDonotShowAfterGetOne = new System.Windows.Forms.Label();
@@ -55,6 +55,7 @@
             this.PnlPlus2.SuspendLayout();
             this.PnlAfterGetOne.SuspendLayout();
             this.PnlNormalShowCardorNot.SuspendLayout();
+            this.PnlShowResultWhenGameOver.SuspendLayout();
             this.SuspendLayout();
             // 
             // LblGetCard
@@ -186,9 +187,10 @@
             // LblGameOver
             // 
             this.LblGameOver.AutoSize = true;
-            this.LblGameOver.BackColor = System.Drawing.Color.LightCyan;
+            this.LblGameOver.BackColor = System.Drawing.Color.Silver;
+            this.LblGameOver.Dock = System.Windows.Forms.DockStyle.Top;
             this.LblGameOver.Font = new System.Drawing.Font("微软雅黑", 13.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.LblGameOver.Location = new System.Drawing.Point(518, 100);
+            this.LblGameOver.Location = new System.Drawing.Point(0, 0);
             this.LblGameOver.Name = "LblGameOver";
             this.LblGameOver.Padding = new System.Windows.Forms.Padding(5);
             this.LblGameOver.Size = new System.Drawing.Size(240, 41);
@@ -200,33 +202,20 @@
             // 
             this.PnlPlus2.AutoSize = true;
             this.PnlPlus2.BackColor = System.Drawing.Color.OliveDrab;
-            this.PnlPlus2.Controls.Add(this.LblPlus2Total);
             this.PnlPlus2.Controls.Add(this.LblDonotPlayPlus2);
             this.PnlPlus2.Controls.Add(this.LblPlayPlus2);
-            this.PnlPlus2.Location = new System.Drawing.Point(30, 213);
+            this.PnlPlus2.Location = new System.Drawing.Point(30, 236);
             this.PnlPlus2.Name = "PnlPlus2";
-            this.PnlPlus2.Size = new System.Drawing.Size(360, 143);
+            this.PnlPlus2.Size = new System.Drawing.Size(360, 120);
             this.PnlPlus2.TabIndex = 22;
-            // 
-            // LblPlus2Total
-            // 
-            this.LblPlus2Total.AutoSize = true;
-            this.LblPlus2Total.BackColor = System.Drawing.Color.LightCyan;
-            this.LblPlus2Total.Font = new System.Drawing.Font("微软雅黑", 13.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.LblPlus2Total.Location = new System.Drawing.Point(40, 9);
-            this.LblPlus2Total.Name = "LblPlus2Total";
-            this.LblPlus2Total.Padding = new System.Windows.Forms.Padding(5);
-            this.LblPlus2Total.Size = new System.Drawing.Size(200, 41);
-            this.LblPlus2Total.TabIndex = 22;
-            this.LblPlus2Total.Text = "当前+2累计张数";
-            this.LblPlus2Total.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.PnlPlus2.VisibleChanged += new System.EventHandler(this.PnlPlus2_VisibleChanged);
             // 
             // LblDonotPlayPlus2
             // 
             this.LblDonotPlayPlus2.AutoSize = true;
             this.LblDonotPlayPlus2.BackColor = System.Drawing.Color.LightCyan;
             this.LblDonotPlayPlus2.Font = new System.Drawing.Font("微软雅黑", 13.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.LblDonotPlayPlus2.Location = new System.Drawing.Point(208, 72);
+            this.LblDonotPlayPlus2.Location = new System.Drawing.Point(198, 44);
             this.LblDonotPlayPlus2.Name = "LblDonotPlayPlus2";
             this.LblDonotPlayPlus2.Padding = new System.Windows.Forms.Padding(5);
             this.LblDonotPlayPlus2.Size = new System.Drawing.Size(128, 41);
@@ -240,7 +229,7 @@
             this.LblPlayPlus2.AutoSize = true;
             this.LblPlayPlus2.BackColor = System.Drawing.Color.LightCyan;
             this.LblPlayPlus2.Font = new System.Drawing.Font("微软雅黑", 13.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.LblPlayPlus2.Location = new System.Drawing.Point(23, 72);
+            this.LblPlayPlus2.Location = new System.Drawing.Point(24, 44);
             this.LblPlayPlus2.Name = "LblPlayPlus2";
             this.LblPlayPlus2.Padding = new System.Windows.Forms.Padding(5);
             this.LblPlayPlus2.Size = new System.Drawing.Size(104, 41);
@@ -249,9 +238,22 @@
             this.LblPlayPlus2.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.LblPlayPlus2.Click += new System.EventHandler(this.LblPlayPlus2_Click);
             // 
+            // LblPlus2Total
+            // 
+            this.LblPlus2Total.AutoSize = true;
+            this.LblPlus2Total.BackColor = System.Drawing.Color.LightCyan;
+            this.LblPlus2Total.Font = new System.Drawing.Font("微软雅黑", 13.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.LblPlus2Total.Location = new System.Drawing.Point(280, 30);
+            this.LblPlus2Total.Name = "LblPlus2Total";
+            this.LblPlus2Total.Padding = new System.Windows.Forms.Padding(5);
+            this.LblPlus2Total.Size = new System.Drawing.Size(200, 41);
+            this.LblPlus2Total.TabIndex = 22;
+            this.LblPlus2Total.Text = "当前+2累计张数";
+            this.LblPlus2Total.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
             // TxtDebug
             // 
-            this.TxtDebug.Location = new System.Drawing.Point(1143, 20);
+            this.TxtDebug.Location = new System.Drawing.Point(1104, 112);
             this.TxtDebug.Multiline = true;
             this.TxtDebug.Name = "TxtDebug";
             this.TxtDebug.ReadOnly = true;
@@ -328,8 +330,9 @@
             // 
             // PnlShowResultWhenGameOver
             // 
-            this.PnlShowResultWhenGameOver.BackColor = System.Drawing.Color.ForestGreen;
-            this.PnlShowResultWhenGameOver.Location = new System.Drawing.Point(470, 366);
+            this.PnlShowResultWhenGameOver.BackColor = System.Drawing.Color.DodgerBlue;
+            this.PnlShowResultWhenGameOver.Controls.Add(this.LblGameOver);
+            this.PnlShowResultWhenGameOver.Location = new System.Drawing.Point(472, 354);
             this.PnlShowResultWhenGameOver.Name = "PnlShowResultWhenGameOver";
             this.PnlShowResultWhenGameOver.Size = new System.Drawing.Size(473, 162);
             this.PnlShowResultWhenGameOver.TabIndex = 27;
@@ -364,12 +367,12 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.DimGray;
             this.ClientSize = new System.Drawing.Size(1692, 578);
+            this.Controls.Add(this.LblPlus2Total);
             this.Controls.Add(this.PnlShowResultWhenGameOver);
             this.Controls.Add(this.PnlNormalShowCardorNot);
             this.Controls.Add(this.PnlAfterGetOne);
             this.Controls.Add(this.TxtDebug);
             this.Controls.Add(this.PnlPlus2);
-            this.Controls.Add(this.LblGameOver);
             this.Controls.Add(this.PnlDisplayCard);
             this.Controls.Add(this.PnlQuestion);
             this.Controls.Add(this.PnlChooseColor);
@@ -381,7 +384,7 @@
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "MainForm";
-            this.Text = "右键切换不同的人";
+            this.Text = "UNO 大作战";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.MainForm_FormClosed);
             this.Load += new System.EventHandler(this.MainForm_Load);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.MainForm_KeyDown);
@@ -395,6 +398,8 @@
             this.PnlAfterGetOne.PerformLayout();
             this.PnlNormalShowCardorNot.ResumeLayout(false);
             this.PnlNormalShowCardorNot.PerformLayout();
+            this.PnlShowResultWhenGameOver.ResumeLayout(false);
+            this.PnlShowResultWhenGameOver.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 

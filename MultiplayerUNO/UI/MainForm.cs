@@ -152,8 +152,12 @@ namespace MultiplayerUNO.UI {
                 msgGameOver = "游戏平局";
             }
             UIInvokeSync(() => {
-                this.LblGameOver.Text = msgGameOver;
-                this.LblGameOver.Visible = true;
+                Label lbl = this.LblGameOver;
+                var h = lbl.Height; // 神奇的 autosize 和 height
+                lbl.AutoSize = false;
+                lbl.Height = h;
+                lbl.Text = msgGameOver;
+                lbl.Visible = true;
             });
 
             // 3. 展示手牌
@@ -191,7 +195,8 @@ namespace MultiplayerUNO.UI {
                     FontStyle.Regular, GraphicsUnit.Point, 134);
                 lbls[i] = lbl;
             }
-            float ratio = 0.9f;
+            //float ratio = 0.9f;
+            float ratio = 1.0f;
             UIInvokeSync(() => {
                 pnl.Size = new Size(
                     (int)(this.REF_WIDTH * ratio), (int)(this.REF_HEIGHT * ratio));
@@ -213,7 +218,8 @@ namespace MultiplayerUNO.UI {
             int startx = padding * 2 + lblSize.Width;
             Point[] startPoint = new Point[cnt];
             Point[] endPoint = new Point[cnt];
-            int lengthPerPlayer = pnl.Size.Width - startx- CardButton.WIDTH_MODIFIED; // 每个人的牌堆大小(取整)
+            // 每个人的牌堆大小(取整)
+            int lengthPerPlayer = pnl.Size.Width / 2 - startx - CardButton.WIDTH_MODIFIED;
             lengthPerPlayer = (lengthPerPlayer / CardButton.WIDTH_MODIFIED)
                                 * CardButton.WIDTH_MODIFIED;
             if (cnt <= 3) {
@@ -231,7 +237,7 @@ namespace MultiplayerUNO.UI {
                 for (int i = 0; i < cnt; ++i) {
                     startPoint[i] = new Point(
                         (int)(startx + (i / mod) * pnl.Size.Width / 2),
-                        (int)(((i + 1) % mod) / (mod + 1.0f) * pnl.Size.Height));
+                        (int)((((i + 1) % mod) + 1) / (mod + 1.0f) * pnl.Size.Height));
                     endPoint[i] = new Point(startPoint[i].X + lengthPerPlayer,
                         startPoint[i].Y);
                 }
@@ -251,6 +257,7 @@ namespace MultiplayerUNO.UI {
                         btn.Location = new Point(x, y - btn.Height / 2);
                     }
                 }
+                this.TmrCheckLeftTime.Stop(); // 停止 tmr 的愚蠢活动
                 pnl.BringToFront();
                 pnl.Visible = true;
             });
@@ -263,14 +270,17 @@ namespace MultiplayerUNO.UI {
                 Animation anima = null;
                 notok = false;
                 // 计算卡牌位置
-                for (int i = 0; i < cnt; ++i) {
-                    var p = cards[i];
+                for (int player = 0; player < cnt; ++player) {
+                    var p = cards[player];
                     if (idx + 1 < p.Length) { notok = true; }
                     if (idx >= p.Length) { continue; }
                     if (anima == null) {
                         anima = new Animation(this, p[idx]);
                         int x = CardButton.WIDTH_MODIFIED / 2 * (3 + idx);
-                        if (x > endPoint[i].X) { x = endPoint[i].X; }
+                        // TODO 垃圾代码到时候优化一下 endPoint 直接使用 maxlength
+                        if (x > (endPoint[player].X - startPoint[player].X)) {
+                            x = endPoint[player].X - startPoint[player].X;
+                        }
                         anima.SetTranslate(x, 0);
                     } else {
                         anima.AddControls(p[idx]);
@@ -499,7 +509,7 @@ namespace MultiplayerUNO.UI {
 
             if (btn.Card.Color == CardColor.Invalid) {
                 // +4/万能牌
-                // TODO 这里的动画
+                // TODO 这里的动画(暂时不做了, 直接 visible=true)
                 GameControl.InvalidCardToChooseColor = CardColor.Invalid;
                 UIInvoke(() => {
                     GameControl.ChooseColorIsTriggerAfterGetOneCard = false;
@@ -714,6 +724,11 @@ namespace MultiplayerUNO.UI {
             } else {
                 this.TxtDebug.SendToBack();
             }
+        }
+
+        private void PnlPlus2_VisibleChanged(object sender, EventArgs e) {
+            Control c = sender as Control;
+            this.LblPlus2Total.Visible = c.Visible;
         }
 
         public void DebugLog(string v) {
