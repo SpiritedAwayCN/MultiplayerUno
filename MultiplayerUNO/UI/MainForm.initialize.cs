@@ -388,20 +388,71 @@ namespace MultiplayerUNO.UI {
         private void DrawControlsDesignedByDesigner() {
             ConstructPnlChooseColor();
 
-
             // 所有按钮控件, 都是用同样的 icon
-            List<Control> lst = new List<Control>();
-            lst.Add(this.LblGetCard);
-            lst.Add(this.LblShowCard);
-            lst.Add(this.LblPlayPlus2);
-            lst.Add(this.LblDonotPlayPlus2);
-            lst.Add(this.LblShowAfterGetOne);
-            lst.Add(this.LblDonotShowAfterGetOne);
+            List<Control> lbls = new List<Control>();
+            lbls.Add(this.LblGetCard);
+            lbls.Add(this.LblShowCard);
+            lbls.Add(this.LblPlayPlus2);
+            lbls.Add(this.LblDonotPlayPlus2);
+            lbls.Add(this.LblShowAfterGetOne);
+            lbls.Add(this.LblDonotShowAfterGetOne);
+            lbls.Add(this.LblQuestion);
+            lbls.Add(this.LblNoQuestion);
 
-            foreach (Control c in lst) {
+            foreach (Control c in lbls) {
                 c.BackColor = Color.Transparent;
                 c.BackgroundImage = NetImage.RoundedRectangle;
                 c.BackgroundImageLayout = ImageLayout.Stretch;
+            }
+
+            //  panel
+            // (1) 背景都修改为 transparent
+            // (2) visible = false
+            List<Control> pnls = new List<Control>();
+            pnls.Add(this.PnlAfterGetOne);
+            pnls.Add(this.PnlQuestion);
+            pnls.Add(this.PnlPlus2);
+            pnls.Add(this.PnlNormalShowCardorNot);
+
+            foreach (Control c in pnls) {
+                // 这样的设置会使得 panel 颜色和父控件一致
+                c.BackColor = Color.Transparent;
+                // panel 设置为透明的(一个解决方案, 全部置底, 会有闪烁感)
+                c.VisibleChanged += (sender, e) => {
+                    c.SendToBack();
+                };
+                // 位置大小统一设置
+                // TODO magic number
+                c.Size = new Size(300, 140);
+                // 需要特殊处理 +2 中的一个显示数目 label, 其他都是俩
+                int i = 0;
+                int lblHeight = 0;
+                foreach (Control l in c.Controls) {
+                    if (!lbls.Contains(l)) { continue; }
+                    l.Location = new Point(
+                        (1 + i) * c.Size.Width / 3 - l.Width / 2,
+                        (c.Height - l.Height) / 2
+                    );
+                    lblHeight = l.Height;
+                    ++i;
+                }
+                c.Location = new Point(
+                    (this.REF_WIDTH - c.Size.Width) / 2,
+                    //(this.REF_HEIGHT + CardButton.HEIGHT_MODIFIED) / 2
+                    // 里面出牌按钮的最下方应该不能被遮住
+                    Players[ME].Center.Y - (int)(
+                        (CardButton.HighLightRatio + 0.5f) * CardButton.HEIGHT_MODIFIED
+                        + (lblHeight + c.Height) / 2 + 5 // offset:5
+                    )
+                );
+            }
+
+            pnls.Add(this.PnlChooseColor);
+            pnls.Add(this.PnlDisplayCard);
+            pnls.Add(this.PnlShowResultWhenGameOver);
+
+            foreach (Control c in pnls) {
+                c.Visible = false;
             }
 
             var pos = Piles[PileDropped].Location;
@@ -432,48 +483,18 @@ namespace MultiplayerUNO.UI {
             lbl.Location = new Point(20, 100);// TODO
             lbl.Visible = false;
 
-            // 质疑 panel, PnlQuestion
-            lbl = this.PnlQuestion;
-            lbl.Location = this.PnlChooseColor.Location;// TODO
-            lbl.Visible = false;
-
             // 展示牌 pnl, PnlDisplayCard
             lbl = this.PnlDisplayCard;
             lbl.Location = this.PnlChooseColor.Location;// TODO
-            lbl.Visible = false;
-            lbl.BackColor = Color.Transparent;
 
             // 游戏结束 lbl, LblGameOver
             lbl = this.LblGameOver;
             lbl.Location = this.PnlChooseColor.Location; // TODO
             lbl.Visible = false;
 
-            // +2 展示 pnl, PnlPlus2
-            lbl = this.PnlPlus2;
-            lbl.Location = this.PnlChooseColor.Location; // TODO
-            lbl.Visible = false;
-            lbl.BackColor = Color.Transparent;
-
-            // 摸完一张牌之后是否决定出牌的 panel, PnlAfterGetOne
-            lbl = this.PnlAfterGetOne;
-            lbl.Location = this.PnlChooseColor.Location; // TODO
-            lbl.Visible = false;
-            lbl.BackColor = Color.Transparent;
-
-            // 常规的出牌、摸牌 panel
-            lbl = this.PnlNormalShowCardorNot;
-            lbl.Location = this.PnlChooseColor.Location; // TODO
-            // 看看是不是轮到自己打牌(发牌动画结束之后设置)
-            lbl.Visible = false;
-            lbl.BackColor = Color.Transparent;
-
-            // 展示最终的出牌结果的 panel,
+            // 展示最终的出牌结果的 panel, PnlShowResultWhenGameOver
             lbl = this.PnlShowResultWhenGameOver;
             lbl.Location = this.PnlChooseColor.Location; // TODO
-            // 看看是不是轮到自己打牌(发牌动画结束之后设置)
-            lbl.Visible = false;
-
-
 
             // DEBUG
             lbl = this.TxtDebug;

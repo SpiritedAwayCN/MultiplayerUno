@@ -110,9 +110,10 @@ namespace MultiplayerUNO.UI {
 
             if (playerIdx == ME) {
                 cbtn.Click -= cbtn.HighLightCard;
-                // 如果是自己出牌, 同时修正剩余牌的位置
-                ReorganizeMyCardsAsync();
             }
+            // 如果是自己出牌, 同时修正剩余牌的位置
+            // 别人出牌也理一下牌
+            _ = ReorganizeMyCardsAsync();
         }
 
         /// <summary>
@@ -407,6 +408,8 @@ namespace MultiplayerUNO.UI {
                 // (2)
                 await t; // 同步
                 Players[ME].CardsCount++; // 更新牌
+                // 摸完牌之后洗牌
+                await ReorganizeMyCardsAsync();
                 // (3) 是否准备打牌
                 UIInvoke(() => {
                     if (canResponed) {

@@ -73,7 +73,7 @@
             // 
             // TmrCheckLeftTime
             // 
-            this.TmrCheckLeftTime.Interval = 1000;
+            this.TmrCheckLeftTime.Interval = 500;
             this.TmrCheckLeftTime.Tick += new System.EventHandler(this.TmrCheckLeftTime_Tick);
             // 
             // LblLeftTime

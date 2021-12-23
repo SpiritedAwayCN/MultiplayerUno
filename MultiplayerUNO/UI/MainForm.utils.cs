@@ -48,10 +48,12 @@ namespace MultiplayerUNO.UI {
         /// </summary>
         private async Task ReorganizeMyCardsAsync() {
             var myBtns = Players[ME].BtnsInHand;
+            GameControl.CBtnSelected = null; // 洗牌的时候之前选中的牌失效
             // z-index 排序, 顶部向右, 下面向左
             UIInvokeSync(() => {
                 for (int i = 1; i < myBtns.Count; ++i) {
                     myBtns[i].SendToBack();
+                    myBtns[i].Enabled = false; // 洗牌的时候不能点击
                 }
             });
             AnimationSeq animaseq2 = new AnimationSeq();
@@ -73,6 +75,11 @@ namespace MultiplayerUNO.UI {
                 animaseq2.AddAnimation(anima);
             }
             await animaseq2.RunAtTheSameTime();
+            UIInvokeSync(() => {
+                for (int i = 1; i < myBtns.Count; ++i) {
+                    myBtns[i].Enabled = true;
+                }
+            });
         }
 
         /// <summary>
@@ -112,16 +119,30 @@ namespace MultiplayerUNO.UI {
                 });
                 return;
             }
+            Label lbl = this.LblLeftTime;
             int t = GameControl.TimeForYou;
             t -= this.TmrCheckLeftTime.Interval;
             if (t < 0) { t = 0; }
             GameControl.TimeForYou = t;
             t /= 1000;
+            // 更新下位置
+            int playerIdx = GameControl.PlayerId2PlayerIndex[GameControl.TurnID];
+            Point pos;
+            if (playerIdx != ME) {
+                // 如果不是我自己就居中
+                pos = Players[playerIdx].Center;
+            } else {
+                var pnl = this.PnlNormalShowCardorNot;
+                pos = pnl.Location;
+                pos.Y += pnl.Height / 2;
+            }
+            pos.X -= lbl.Width / 2;
+            pos.Y -= lbl.Height / 2;
             UIInvoke(() => {
-                this.LblLeftTime.Visible = true;
-                this.LblLeftTime.Text =
-                   t.ToString().PadLeft(2, '0');
-                t.ToString().PadLeft(2, '0');
+                lbl.Location = pos;
+                lbl.BringToFront();
+                lbl.Visible = true;
+                lbl.Text = t.ToString().PadLeft(2, '0');
             });
         }
 
