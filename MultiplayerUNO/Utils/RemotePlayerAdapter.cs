@@ -52,7 +52,7 @@ namespace MultiplayerUNO.Utils
 
                     try
                     {
-                        byte[] contents = Encoding.UTF8.GetBytes(msg);
+                        byte[] contents = Encoding.UTF8.GetBytes(msg + "$");
                         serverSocket.Send(contents);
                     }catch(ObjectDisposedException e)
                     {
@@ -94,7 +94,13 @@ namespace MultiplayerUNO.Utils
                         break;
                     }
 
-                    if (msg != null) recvQueue.Add(msg);
+                    if (msg != null)
+                    {
+                        foreach(string sw in msg.Split('$')){
+                            if (sw.Length <= 0) continue;
+                            recvQueue.Add(sw);
+                        }
+                    }
 
                 }
             });

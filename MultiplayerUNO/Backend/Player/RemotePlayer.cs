@@ -35,7 +35,7 @@ namespace MultiplayerUNO.Backend.Player
                     try
                     {
                         string msg = sendQueue.Take(); //阻塞于此
-                        socket.Send(Encoding.UTF8.GetBytes(msg));
+                        socket.Send(Encoding.UTF8.GetBytes(msg + "$"));
                     }catch(ObjectDisposedException e)
                     {
                         Console.WriteLine(e.Message);
@@ -68,11 +68,16 @@ namespace MultiplayerUNO.Backend.Player
                         int n = clientSocket.Receive(content); //阻塞于此
                         string word = Encoding.UTF8.GetString(content, 0, n);
 
-                        GameRoom.InfoQueue.Add(new Room.MsgArgs
+                        foreach(string sw in word.Split('$'))
                         {
-                            player = this,
-                            msg = word
-                        });
+                            if (sw.Length <= 0) continue;
+                            GameRoom.InfoQueue.Add(new Room.MsgArgs
+                            {
+                                player = this,
+                                msg = sw
+                            });
+                        }
+                        
                     }
                     catch(ObjectDisposedException se)
                     {
@@ -114,7 +119,7 @@ namespace MultiplayerUNO.Backend.Player
                 byte[] content = new byte[BUFFERSIZE];
                 int n = clientSocket.Receive(content);
                 string word = Encoding.UTF8.GetString(content, 0, n);
-                JsonData json = JsonMapper.ToObject(word);
+                JsonData json = JsonMapper.ToObject(word.Split('$')[0]);
                 if (!((string)json["version"] == ProtocolVersion))
                     throw new ArgumentException("Inconsistent Version", "version");
 
