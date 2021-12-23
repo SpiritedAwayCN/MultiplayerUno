@@ -458,8 +458,8 @@ namespace MultiplayerUNO.UI {
             Control lbl = null;
 
             // 下面 3 个按钮位置
-            int padding = 10,
-                lblsize = 80;
+            int padding = SIGN_LABLE_PDDING,
+                lblsize = SIGN_LABLE_SIZE;
             int totalsize = padding * 2 + lblsize;
 
             // 打牌方向 label, LblDirection

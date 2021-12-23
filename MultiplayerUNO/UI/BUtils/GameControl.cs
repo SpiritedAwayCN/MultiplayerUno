@@ -8,12 +8,20 @@ using System.Windows.Forms;
 using MultiplayerUNO.UI.Players;
 using static MultiplayerUNO.Utils.Card;
 using MultiplayerUNO.Utils;
+using System.Threading;
 
 namespace MultiplayerUNO.UI.BUtils {
     /// <summary>
     /// 一些参数用于控制游戏(全局变量)
     /// </summary>
     public static class GameControl {
+        /// <summary>
+        /// 快速出反转牌可能导致前一个动画还没结束, 后一个动画就开始了
+        /// 通过这个变量构建起一个 waiting list(通过 await 构建)
+        /// </summary>
+        public static volatile Task LastLblDirectionTask = null;
+        public static volatile CancellationTokenSource LastLblDirectionTaskCancleToken;
+
         /// <summary>
         /// true: 选择颜色这个事件是由摸 1 张牌之后出牌触发的
         /// false: 选择颜色这个事件是由正常出牌触发的

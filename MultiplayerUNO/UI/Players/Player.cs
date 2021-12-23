@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -18,8 +19,8 @@ namespace MultiplayerUNO.UI.Players {
         public List<int> CardsOrigin = null;  // 别人的牌我们不知道, 设置为 null
                                               // 只会在初始化被用到, 之后都使用 BtnsInHand
 
-        public List<CardButton> BtnsInHand; // 别人的牌我们不知道, 只有一张背面的牌
-                                            // Count=1, 而不是null
+        public ArrayList BtnsInHand;        // 别人的牌我们不知道, 只有一张背面的牌
+                                            // Count=1, 而不是 null
 
         /// <summary>
         /// 用于显示一些信息: 用户昵称 + 剩余牌张数
@@ -52,9 +53,11 @@ namespace MultiplayerUNO.UI.Players {
             Name = name;
             IsUpDown = isUpDown;
             if (isMe) {
+                // 只会在初始化的时候用到, 没有并发问题
                 CardsOrigin = new List<int>();
             }
-            BtnsInHand = new List<CardButton>();
+            // 有并发问题, 洗牌和 UI 都会用到这个数组
+            BtnsInHand = ArrayList.Synchronized(new ArrayList());
             PosX = posX;
             PosY = posY;
             // center 计算

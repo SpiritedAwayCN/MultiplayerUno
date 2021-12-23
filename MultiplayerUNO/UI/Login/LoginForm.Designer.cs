@@ -35,10 +35,10 @@
             this.TxtHost = new System.Windows.Forms.TextBox();
             this.LblHost = new System.Windows.Forms.Label();
             this.GrpReady = new System.Windows.Forms.GroupBox();
+            this.BtnCancelReady = new System.Windows.Forms.Button();
             this.LblReadyInfo = new System.Windows.Forms.Label();
             this.BtnReady = new System.Windows.Forms.Button();
             this.BtnStart = new System.Windows.Forms.Button();
-            this.BtnCancelReady = new System.Windows.Forms.Button();
             this.GrpUserInfo.SuspendLayout();
             this.GrpReady.SuspendLayout();
             this.SuspendLayout();
@@ -73,7 +73,7 @@
             this.GrpUserInfo.Controls.Add(this.LblPort);
             this.GrpUserInfo.Controls.Add(this.TxtHost);
             this.GrpUserInfo.Controls.Add(this.LblHost);
-            this.GrpUserInfo.Location = new System.Drawing.Point(647, 255);
+            this.GrpUserInfo.Location = new System.Drawing.Point(192, 31);
             this.GrpUserInfo.Name = "GrpUserInfo";
             this.GrpUserInfo.Size = new System.Drawing.Size(412, 384);
             this.GrpUserInfo.TabIndex = 4;
@@ -157,12 +157,22 @@
             this.GrpReady.Controls.Add(this.LblReadyInfo);
             this.GrpReady.Controls.Add(this.BtnReady);
             this.GrpReady.Controls.Add(this.BtnStart);
-            this.GrpReady.Location = new System.Drawing.Point(210, 33);
+            this.GrpReady.Location = new System.Drawing.Point(746, 225);
             this.GrpReady.Name = "GrpReady";
             this.GrpReady.Size = new System.Drawing.Size(412, 384);
             this.GrpReady.TabIndex = 7;
             this.GrpReady.TabStop = false;
             this.GrpReady.Text = "游戏准备";
+            // 
+            // BtnCancelReady
+            // 
+            this.BtnCancelReady.Location = new System.Drawing.Point(227, 175);
+            this.BtnCancelReady.Name = "BtnCancelReady";
+            this.BtnCancelReady.Size = new System.Drawing.Size(125, 68);
+            this.BtnCancelReady.TabIndex = 8;
+            this.BtnCancelReady.Text = "取消准备";
+            this.BtnCancelReady.UseVisualStyleBackColor = true;
+            this.BtnCancelReady.Click += new System.EventHandler(this.BtnCancelReady_Click);
             // 
             // LblReadyInfo
             // 
@@ -192,16 +202,6 @@
             this.BtnStart.Text = "开始游戏";
             this.BtnStart.UseVisualStyleBackColor = true;
             this.BtnStart.Click += new System.EventHandler(this.BtnStart_Click);
-            // 
-            // BtnCancelReady
-            // 
-            this.BtnCancelReady.Location = new System.Drawing.Point(227, 175);
-            this.BtnCancelReady.Name = "BtnCancelReady";
-            this.BtnCancelReady.Size = new System.Drawing.Size(125, 68);
-            this.BtnCancelReady.TabIndex = 8;
-            this.BtnCancelReady.Text = "取消准备";
-            this.BtnCancelReady.UseVisualStyleBackColor = true;
-            this.BtnCancelReady.Click += new System.EventHandler(this.BtnCancelReady_Click);
             // 
             // LoginForm
             // 

@@ -38,6 +38,7 @@
             this.LblTest = new System.Windows.Forms.Label();
             this.btnTest = new System.Windows.Forms.Button();
             this.PnlTest = new System.Windows.Forms.Panel();
+            this.PnlVisibleFalse = new System.Windows.Forms.Panel();
             this.PnlInfo.SuspendLayout();
             this.PnlTest.SuspendLayout();
             this.SuspendLayout();
@@ -80,7 +81,7 @@
             // 
             // button2
             // 
-            this.button2.Location = new System.Drawing.Point(702, 262);
+            this.button2.Location = new System.Drawing.Point(241, 220);
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(119, 67);
             this.button2.TabIndex = 5;
@@ -183,11 +184,20 @@
             this.PnlTest.Size = new System.Drawing.Size(924, 58);
             this.PnlTest.TabIndex = 15;
             // 
+            // PnlVisibleFalse
+            // 
+            this.PnlVisibleFalse.Location = new System.Drawing.Point(102, 90);
+            this.PnlVisibleFalse.Name = "PnlVisibleFalse";
+            this.PnlVisibleFalse.Size = new System.Drawing.Size(200, 100);
+            this.PnlVisibleFalse.TabIndex = 16;
+            this.PnlVisibleFalse.Visible = false;
+            // 
             // TestForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(980, 619);
+            this.Controls.Add(this.PnlVisibleFalse);
             this.Controls.Add(this.PnlTest);
             this.Controls.Add(this.btnTest);
             this.Controls.Add(this.LblAlpha);
@@ -227,5 +237,6 @@
         private System.Windows.Forms.Label LblTest;
         private System.Windows.Forms.Button btnTest;
         private System.Windows.Forms.Panel PnlTest;
+        private System.Windows.Forms.Panel PnlVisibleFalse;
     }
 }

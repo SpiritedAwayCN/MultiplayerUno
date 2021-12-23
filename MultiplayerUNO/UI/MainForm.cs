@@ -64,7 +64,7 @@ namespace MultiplayerUNO.UI {
             if (ME == playerIdx) {
                 // 如果是自己出牌, 则在牌堆中找到这张牌
                 // 认为所有的牌都有不一样的编号(其实一样也没事, 问题不大)
-                foreach (var c in Players[ME].BtnsInHand) {
+                foreach (CardButton c in Players[ME].BtnsInHand) {
                     if (c.Card.CardId == lastCardID) {
                         cbtn = c;
                         break;
@@ -75,7 +75,7 @@ namespace MultiplayerUNO.UI {
             } else {
                 // 如果是别人的牌则需要 new 一张牌
                 cbtn = new CardButton(lastCardID, true, false);
-                CardButton cbtnBack = Players[playerIdx].BtnsInHand[0];
+                CardButton cbtnBack = Players[playerIdx].BtnsInHand[0] as CardButton;
                 // 必须同步, 这里的 Location 设置会影响后面的发牌动作
                 UIInvokeSync(() => {
                     this.Controls.Add(cbtn);
@@ -83,7 +83,7 @@ namespace MultiplayerUNO.UI {
                     cbtn.BringToFront();
                     // 注意如果是最后一张牌的话, 我们需要把底牌抹去
                     if (win) {
-                        this.Controls.Remove(Players[playerIdx].BtnsInHand[0]);
+                        this.Controls.Remove((CardButton)Players[playerIdx].BtnsInHand[0]);
                     }
                 });
             }
@@ -113,7 +113,7 @@ namespace MultiplayerUNO.UI {
             }
             // 如果是自己出牌, 同时修正剩余牌的位置
             // 别人出牌也理一下牌
-            _ = ReorganizeMyCardsAsync();
+            Task.Run(async () => { await ReorganizeMyCardsAsync(); });
         }
 
         /// <summary>
@@ -325,7 +325,7 @@ namespace MultiplayerUNO.UI {
             }
             // 自己, 需要摸好几张牌
             AnimationSeq animaseq = new AnimationSeq();
-            var pos = Players[ME].BtnsInHand[0].Location;
+            var pos = ((CardButton)Players[ME].BtnsInHand[0]).Location;
             pos.Y = Players[ME].Center.Y - CardButton.HEIGHT_MODIFIED / 2;
             for (int i = 0; i < num; ++i) {
                 int cardID = turnInfo.PlayerCards[i];
@@ -350,7 +350,7 @@ namespace MultiplayerUNO.UI {
                 await w; // 同步
                 Players[ME].CardsCount += num; // 更新卡牌数量
                 UIInvoke(() => { Players[ME].UpdateInfo(); });
-                _ = ReorganizeMyCardsAsync();
+                await ReorganizeMyCardsAsync();
             });
         }
 
@@ -392,7 +392,7 @@ namespace MultiplayerUNO.UI {
                     Players[playerIdx].UpdateInfo();
                     // 去除多余卡牌
                     while (Players[playerIdx].BtnsInHand.Count > 1) {
-                        var cbtn = Players[playerIdx].BtnsInHand[0];
+                        CardButton cbtn = Players[playerIdx].BtnsInHand[0] as CardButton;
                         this.Controls.Remove(cbtn);
                         Players[playerIdx].BtnsInHand.RemoveAt(0); // 加头去头
                     }
@@ -410,7 +410,7 @@ namespace MultiplayerUNO.UI {
             // (1)
             Animation anima = GetACardAnima(ME, turnInfo.LastCardID);
             var t = anima.Run();
-            var cbtn = Players[ME].BtnsInHand[0];
+            CardButton cbtn = Players[ME].BtnsInHand[0] as CardButton;
             Card c = new Card(turnInfo.LastCardID);
             bool canResponed = GameControl.FirstTurn() ||
                   c.CanResponseTo(GameControl.LastCard, GameControl.LastColor);
@@ -463,7 +463,7 @@ namespace MultiplayerUNO.UI {
             });
             // (1)
             Animation anima = new Animation(this, cbtn);
-            var pos = Players[playerIdx].BtnsInHand[0].Location; // 第 0 张牌是最右边的
+            var pos = ((CardButton)Players[playerIdx].BtnsInHand[0]).Location; // 第 0 张牌是最右边的
             pos.Y = Players[playerIdx].Center.Y - CardButton.HEIGHT_MODIFIED / 2;
             // 别人摸牌, 不需要翻开, 直接叠在一起即可
             // 自己摸牌, 需要翻开, 还需要插入手牌
@@ -673,7 +673,9 @@ namespace MultiplayerUNO.UI {
         }
 
         public void SetCardButtonEnable(bool enable) {
-            foreach (var cbtn in Players[ME].BtnsInHand) {
+            var lst = Players[ME].BtnsInHand;
+            for (int i = 0; i < lst.Count; ++i) {
+                var cbtn = lst[i] as CardButton;
                 cbtn.Enabled = enable;
             }
         }
@@ -694,6 +696,7 @@ namespace MultiplayerUNO.UI {
                 SendShowCardJson(true);
             }
             UIInvoke(() => {
+                SetCardButtonEnable(true);
                 this.PnlAfterGetOne.Visible = false;
             });
         }
@@ -707,12 +710,6 @@ namespace MultiplayerUNO.UI {
                 this.PnlAfterGetOne.Visible = false;
             });
         }
-
-
-
-
-
-
 
         // DEBUG
 

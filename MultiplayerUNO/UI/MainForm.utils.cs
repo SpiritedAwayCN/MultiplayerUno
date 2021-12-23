@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using static MultiplayerUNO.Utils.Card;
@@ -51,10 +52,11 @@ namespace MultiplayerUNO.UI {
             GameControl.CBtnSelected = null; // 洗牌的时候之前选中的牌失效
             // z-index 排序, 顶部向右, 下面向左
             UIInvokeSync(() => {
-                for (int i = 1; i < myBtns.Count; ++i) {
-                    myBtns[i].SendToBack();
-                    myBtns[i].Enabled = false; // 洗牌的时候不能点击
+                foreach (CardButton btn in myBtns) {
+                    btn.SendToBack();
                 }
+                // 洗牌的时候不能点击
+                SetCardButtonEnable(false);
             });
             AnimationSeq animaseq2 = new AnimationSeq();
             // 计算位置
@@ -65,7 +67,7 @@ namespace MultiplayerUNO.UI {
             float totalWidth = (dx * (myBtns.Count - 1) + CardButton.WIDTH_MODIFIED);
             float firstX = this.REF_WIDTH * 0.5f + (totalWidth / 2) - CardButton.WIDTH_MODIFIED;
             for (int i = 0; i < myBtns.Count; ++i) {
-                var btn = myBtns[i];
+                var btn = myBtns[i] as CardButton;
                 btn.IsHighlighted = false; // 所有的按钮都变为非高亮状态
                 Animation anima = new Animation(this, btn);
                 int offX = (int)(firstX - dx * i - btn.Location.X);
@@ -76,9 +78,7 @@ namespace MultiplayerUNO.UI {
             }
             await animaseq2.RunAtTheSameTime();
             UIInvokeSync(() => {
-                for (int i = 1; i < myBtns.Count; ++i) {
-                    myBtns[i].Enabled = true;
-                }
+                SetCardButtonEnable(true);
             });
         }
 
@@ -89,9 +89,29 @@ namespace MultiplayerUNO.UI {
             bool clockwise = !GameControl.DirectionIsClockwise;
             AnimationHighLight anima = new AnimationHighLight(this, this.LblDirection);
             anima.SetDirection(!clockwise);
-            anima.SetSteps(100);
+            anima.SetSteps(200);
             anima.SetScale(2.0f, 1);
-            anima.Run();
+
+            var t = GameControl.LastLblDirectionTask;
+            if (t != null && !t.IsCompleted) {
+                // 停止动画
+                while (!t.IsCanceled && !t.IsCompleted) {
+                    // 因为是在处理消息的线程里面, sleep 不会导致消息的乱序
+                    GameControl.LastLblDirectionTaskCancleToken.Cancel();
+                    Thread.Sleep(10);
+                }
+                UIInvokeSync(()=> {
+                    // 重置
+                    var c = this.LblDirection as Control;
+                    c.Size = new Size(SIGN_LABLE_SIZE, SIGN_LABLE_SIZE);
+                    c.Location = new Point(SIGN_LABLE_PDDING, SIGN_LABLE_PDDING);
+                    // 注意这里是原来的, 需要反一下
+                    c.BackgroundImage = ((Bitmap[])c.Tag)[clockwise ? 1 : 0];
+                });
+            }
+            var token = new CancellationTokenSource();
+            GameControl.LastLblDirectionTaskCancleToken = token;
+            GameControl.LastLblDirectionTask = anima.Run(token);
             GameControl.DirectionIsClockwise = clockwise;
         }
 
@@ -172,6 +192,8 @@ namespace MultiplayerUNO.UI {
         // 如下的比例是相对于 [-1,1]*[-1,1] 的
         public const float PILE_OFFSET_RATE = 0.08f;
         public const int OFFSET_FOR_LBLINFO = 10;
+        public const int SIGN_LABLE_SIZE = 80;
+        public const int SIGN_LABLE_PDDING = 10;
 
         // 游戏
         public const int INITIAL_CARD_NUM = 7;

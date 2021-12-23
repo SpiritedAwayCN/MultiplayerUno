@@ -53,7 +53,6 @@ namespace MultiplayerUNO.UI.BUtils {
                 return;
             }
             TurnInfo turnInfo = new TurnInfo(json);
-
             switch (state) {
                 case 1: // 某人打出了某张牌
                     SomeBodyShowCard(turnInfo);
@@ -78,6 +77,7 @@ namespace MultiplayerUNO.UI.BUtils {
                     break;
                 default: break;
             }
+            // 处理完消息之后 sleep 一会
             Thread.Sleep(500);
             return;
         }

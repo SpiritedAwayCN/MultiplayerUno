@@ -38,13 +38,13 @@
             this.TmrDisplayCard = new System.Windows.Forms.Timer(this.components);
             this.LblGameOver = new System.Windows.Forms.Label();
             this.PnlPlus2 = new System.Windows.Forms.Panel();
-            this.LblDonotPlayPlus2 = new System.Windows.Forms.Label();
             this.LblPlayPlus2 = new System.Windows.Forms.Label();
+            this.LblDonotPlayPlus2 = new System.Windows.Forms.Label();
             this.LblPlus2Total = new System.Windows.Forms.Label();
             this.TxtDebug = new System.Windows.Forms.TextBox();
             this.PnlAfterGetOne = new System.Windows.Forms.Panel();
-            this.LblDonotShowAfterGetOne = new System.Windows.Forms.Label();
             this.LblShowAfterGetOne = new System.Windows.Forms.Label();
+            this.LblDonotShowAfterGetOne = new System.Windows.Forms.Label();
             this.PnlNormalShowCardorNot = new System.Windows.Forms.Panel();
             this.LblShowCard = new System.Windows.Forms.Label();
             this.PnlShowResultWhenGameOver = new System.Windows.Forms.Panel();
@@ -210,20 +210,6 @@
             this.PnlPlus2.TabIndex = 22;
             this.PnlPlus2.VisibleChanged += new System.EventHandler(this.PnlPlus2_VisibleChanged);
             // 
-            // LblDonotPlayPlus2
-            // 
-            this.LblDonotPlayPlus2.AutoSize = true;
-            this.LblDonotPlayPlus2.BackColor = System.Drawing.Color.LightCyan;
-            this.LblDonotPlayPlus2.Font = new System.Drawing.Font("微软雅黑", 13.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.LblDonotPlayPlus2.Location = new System.Drawing.Point(211, 45);
-            this.LblDonotPlayPlus2.Name = "LblDonotPlayPlus2";
-            this.LblDonotPlayPlus2.Padding = new System.Windows.Forms.Padding(5);
-            this.LblDonotPlayPlus2.Size = new System.Drawing.Size(128, 41);
-            this.LblDonotPlayPlus2.TabIndex = 21;
-            this.LblDonotPlayPlus2.Text = "不打出+2";
-            this.LblDonotPlayPlus2.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.LblDonotPlayPlus2.Click += new System.EventHandler(this.LblDonotPlayPlus2_Click);
-            // 
             // LblPlayPlus2
             // 
             this.LblPlayPlus2.AutoSize = true;
@@ -237,6 +223,20 @@
             this.LblPlayPlus2.Text = "打出+2";
             this.LblPlayPlus2.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.LblPlayPlus2.Click += new System.EventHandler(this.LblPlayPlus2_Click);
+            // 
+            // LblDonotPlayPlus2
+            // 
+            this.LblDonotPlayPlus2.AutoSize = true;
+            this.LblDonotPlayPlus2.BackColor = System.Drawing.Color.LightCyan;
+            this.LblDonotPlayPlus2.Font = new System.Drawing.Font("微软雅黑", 13.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.LblDonotPlayPlus2.Location = new System.Drawing.Point(211, 45);
+            this.LblDonotPlayPlus2.Name = "LblDonotPlayPlus2";
+            this.LblDonotPlayPlus2.Padding = new System.Windows.Forms.Padding(5);
+            this.LblDonotPlayPlus2.Size = new System.Drawing.Size(128, 41);
+            this.LblDonotPlayPlus2.TabIndex = 21;
+            this.LblDonotPlayPlus2.Text = "不打出+2";
+            this.LblDonotPlayPlus2.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.LblDonotPlayPlus2.Click += new System.EventHandler(this.LblDonotPlayPlus2_Click);
             // 
             // LblPlus2Total
             // 
@@ -274,20 +274,6 @@
             this.PnlAfterGetOne.Size = new System.Drawing.Size(360, 143);
             this.PnlAfterGetOne.TabIndex = 25;
             // 
-            // LblDonotShowAfterGetOne
-            // 
-            this.LblDonotShowAfterGetOne.AutoSize = true;
-            this.LblDonotShowAfterGetOne.BackColor = System.Drawing.Color.LightCyan;
-            this.LblDonotShowAfterGetOne.Font = new System.Drawing.Font("微软雅黑", 13.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.LblDonotShowAfterGetOne.Location = new System.Drawing.Point(228, 60);
-            this.LblDonotShowAfterGetOne.Name = "LblDonotShowAfterGetOne";
-            this.LblDonotShowAfterGetOne.Padding = new System.Windows.Forms.Padding(5);
-            this.LblDonotShowAfterGetOne.Size = new System.Drawing.Size(96, 41);
-            this.LblDonotShowAfterGetOne.TabIndex = 21;
-            this.LblDonotShowAfterGetOne.Text = "不打出";
-            this.LblDonotShowAfterGetOne.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.LblDonotShowAfterGetOne.Click += new System.EventHandler(this.LblDonotShowAfterGetOne_Click);
-            // 
             // LblShowAfterGetOne
             // 
             this.LblShowAfterGetOne.AutoSize = true;
@@ -301,6 +287,20 @@
             this.LblShowAfterGetOne.Text = "打出";
             this.LblShowAfterGetOne.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.LblShowAfterGetOne.Click += new System.EventHandler(this.LblShowAfterGetOne_Click);
+            // 
+            // LblDonotShowAfterGetOne
+            // 
+            this.LblDonotShowAfterGetOne.AutoSize = true;
+            this.LblDonotShowAfterGetOne.BackColor = System.Drawing.Color.LightCyan;
+            this.LblDonotShowAfterGetOne.Font = new System.Drawing.Font("微软雅黑", 13.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.LblDonotShowAfterGetOne.Location = new System.Drawing.Point(228, 60);
+            this.LblDonotShowAfterGetOne.Name = "LblDonotShowAfterGetOne";
+            this.LblDonotShowAfterGetOne.Padding = new System.Windows.Forms.Padding(5);
+            this.LblDonotShowAfterGetOne.Size = new System.Drawing.Size(96, 41);
+            this.LblDonotShowAfterGetOne.TabIndex = 21;
+            this.LblDonotShowAfterGetOne.Text = "不打出";
+            this.LblDonotShowAfterGetOne.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.LblDonotShowAfterGetOne.Click += new System.EventHandler(this.LblDonotShowAfterGetOne_Click);
             // 
             // PnlNormalShowCardorNot
             // 

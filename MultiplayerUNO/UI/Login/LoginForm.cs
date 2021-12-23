@@ -122,6 +122,12 @@ namespace MultiplayerUNO.UI.Login {
         /// 游戏开始
         /// </summary>
         private void BtnJoinGame_Click(object sender, EventArgs e) {
+            // 输入中不能含有 '$'(被占用了)
+            string name = this.TxtUserName.Text;
+            if (name.IndexOf('$') != -1) {
+                MessageBox.Show("用户名不能含有字符 '$'");
+                return;
+            }
             SetAllControlsEnable(false);
             Task.Run(() => { InitializeAdapter(); });
         }

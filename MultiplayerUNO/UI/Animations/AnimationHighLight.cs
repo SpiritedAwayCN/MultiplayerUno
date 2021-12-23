@@ -51,10 +51,15 @@ namespace MultiplayerUNO.UI.Animations {
             return true;
         }
 
-        public void Run() {
-            Point pos = LableControlled.Location;
-            Size size = LableControlled.Size;
-            Task.Run(() => {
+        public Task Run() {
+            return Run(new CancellationTokenSource());
+        }
+
+
+        public Task Run(CancellationTokenSource token) {
+            return Task.Factory.StartNew(() => {
+                Point pos = LableControlled.Location;
+                Size size = LableControlled.Size;
                 // alpha
                 float delta = 2.0f / Steps;
                 float val = 1.0f;
@@ -86,8 +91,8 @@ namespace MultiplayerUNO.UI.Animations {
                     }
                     valScale += deltaScale;
                     // 余数
-                    float mod = valScale - 
-                        (float)Math.Floor(valScale / twiceIntervalScale)* twiceIntervalScale;
+                    float mod = valScale -
+                        (float)Math.Floor(valScale / twiceIntervalScale) * twiceIntervalScale;
                     float scale = StartScale + intervalScale - Math.Abs(intervalScale - mod);
                     Size sizeNew = new Size(
                             (int)(size.Width * scale), (int)(size.Height * scale));
@@ -101,10 +106,14 @@ namespace MultiplayerUNO.UI.Animations {
                         LableControlled.Size = sizeNew;
                         LableControlled.Location = posNew;
                     }));
-
+                    // 运行时也能取消, 单单使用 Cancel 无法取消
+                    if (token.IsCancellationRequested) {
+                        // 里面存储的 m_state 变量是 volitile 的
+                        return;
+                    }
                     Thread.Sleep(SLEEP_TIME);
                 }
-            });
+            }, token.Token);
         }
     }
 }
