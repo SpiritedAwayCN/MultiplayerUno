@@ -170,11 +170,11 @@ namespace MultiplayerUNO.UI {
         /// 这个时候我不能出牌了(可能原因: 超时)
         /// </summary>
         private void ImDummy() {
-            this.PnlAfterGetOne.Visible = false;
             this.PnlChooseColor.Visible = false;
-            this.PnlNormalShowCardorNot.Visible = false;
-            this.PnlPlus2.Visible = false;
-            this.PnlQuestion.Visible = false;
+            SetPnlAfterGetOneVisible(false);
+            SetPnlNormalShowCardorNotVisible(false);
+            SetPnlPlus2Visible(false);
+            SetPnlQuestionVisible(false);
         }
 
         /// <summary>
@@ -185,6 +185,35 @@ namespace MultiplayerUNO.UI {
                 this.Close();
             }
         }
+
+        #region panel 变成透明破产, 转化为直接把 panel 消失
+
+        public void SetPnlAfterGetOneVisible(bool visible) {
+            //this.PnlAfterGetOne.Visible = visible;
+            this.LblDonotShowAfterGetOne.Visible = visible;
+            this.LblShowAfterGetOne.Visible = visible;
+        }
+
+        public void SetPnlQuestionVisible(bool visible) {
+            //this.PnlQuestion.Visible = visible;
+            this.LblQuestion.Visible = visible;
+            this.LblNoQuestion.Visible = visible;
+        }
+
+        public void SetPnlPlus2Visible(bool visible) {
+            //this.PnlPlus2.Visible = visible;
+            this.LblPlayPlus2.Visible = visible;
+            this.LblDonotPlayPlus2.Visible = visible;
+            this.LblPlus2Total.Visible = visible;
+        }
+
+        public void SetPnlNormalShowCardorNotVisible(bool visible) {
+            //this.PnlNormalShowCardorNot.Visible = visible;
+            this.LblShowCard.Visible = visible;
+            this.LblGetCard.Visible = visible;
+        }
+
+        #endregion panel 变成透明破产, 转化为直接把 panel 消失
 
         #region 一些常数
 

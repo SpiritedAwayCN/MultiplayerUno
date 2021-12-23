@@ -312,7 +312,7 @@ namespace MultiplayerUNO.UI {
                 this.LblColor.Visible = true;
                 // 开局第一个出才显示谁先出牌
                 this.LblFirstShowCard.Visible = GameControl.FirstTurnFirstShow();
-                this.PnlNormalShowCardorNot.Visible = (GameControl.TurnID == MyID);
+                SetPnlNormalShowCardorNotVisible(GameControl.TurnID == MyID);
 
                 this.TmrCheckLeftTime.Start();
                 this.TmrControlGame.Start();
@@ -444,7 +444,26 @@ namespace MultiplayerUNO.UI {
                         + (lblHeight + c.Height) / 2 + 1 // offset:1
                     )
                 );
+
+                // 算完了吧, 算完了 panel 就可以再见了
+                // TODO 清空 panel, 他们已经没用了
+                while(c.Controls.Count > 0) {
+                    Control l = c.Controls[0];
+                    var loc = l.Location;
+                    c.Controls.Remove(l);
+                    this.Controls.Add(l);
+                    l.Location = new Point(loc.X + c.Location.X,
+                                           loc.Y + c.Location.Y);
+                }
+                this.Controls.Remove(c);
+                c.Dispose(); // 注意 panel 被释放了, 后面不应该引用他们
             }
+            pnls.Clear();
+
+            SetPnlAfterGetOneVisible(false);
+            SetPnlQuestionVisible(false);
+            SetPnlPlus2Visible(false);
+            SetPnlNormalShowCardorNotVisible(false);
 
             pnls.Add(this.PnlChooseColor);
             pnls.Add(this.PnlDisplayCard);
