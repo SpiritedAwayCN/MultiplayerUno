@@ -63,7 +63,7 @@
             this.LblGetCard.AutoSize = true;
             this.LblGetCard.BackColor = System.Drawing.Color.LightCyan;
             this.LblGetCard.Font = new System.Drawing.Font("微软雅黑", 13.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.LblGetCard.Location = new System.Drawing.Point(219, 51);
+            this.LblGetCard.Location = new System.Drawing.Point(235, 54);
             this.LblGetCard.Name = "LblGetCard";
             this.LblGetCard.Padding = new System.Windows.Forms.Padding(5);
             this.LblGetCard.Size = new System.Drawing.Size(72, 41);
@@ -122,7 +122,7 @@
             this.LblQuestion.AutoSize = true;
             this.LblQuestion.BackColor = System.Drawing.Color.LightCyan;
             this.LblQuestion.Font = new System.Drawing.Font("微软雅黑", 13.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.LblQuestion.Location = new System.Drawing.Point(37, 31);
+            this.LblQuestion.Location = new System.Drawing.Point(47, 28);
             this.LblQuestion.Name = "LblQuestion";
             this.LblQuestion.Padding = new System.Windows.Forms.Padding(5);
             this.LblQuestion.Size = new System.Drawing.Size(72, 41);
@@ -134,8 +134,8 @@
             // PnlQuestion
             // 
             this.PnlQuestion.BackColor = System.Drawing.Color.OliveDrab;
-            this.PnlQuestion.Controls.Add(this.LblNoQuestion);
             this.PnlQuestion.Controls.Add(this.LblQuestion);
+            this.PnlQuestion.Controls.Add(this.LblNoQuestion);
             this.PnlQuestion.Location = new System.Drawing.Point(779, 20);
             this.PnlQuestion.Name = "PnlQuestion";
             this.PnlQuestion.Size = new System.Drawing.Size(319, 101);
@@ -146,7 +146,7 @@
             this.LblNoQuestion.AutoSize = true;
             this.LblNoQuestion.BackColor = System.Drawing.Color.LightCyan;
             this.LblNoQuestion.Font = new System.Drawing.Font("微软雅黑", 13.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.LblNoQuestion.Location = new System.Drawing.Point(195, 31);
+            this.LblNoQuestion.Location = new System.Drawing.Point(190, 28);
             this.LblNoQuestion.Name = "LblNoQuestion";
             this.LblNoQuestion.Padding = new System.Windows.Forms.Padding(5);
             this.LblNoQuestion.Size = new System.Drawing.Size(96, 41);
@@ -202,8 +202,8 @@
             // 
             this.PnlPlus2.AutoSize = true;
             this.PnlPlus2.BackColor = System.Drawing.Color.OliveDrab;
-            this.PnlPlus2.Controls.Add(this.LblDonotPlayPlus2);
             this.PnlPlus2.Controls.Add(this.LblPlayPlus2);
+            this.PnlPlus2.Controls.Add(this.LblDonotPlayPlus2);
             this.PnlPlus2.Location = new System.Drawing.Point(30, 236);
             this.PnlPlus2.Name = "PnlPlus2";
             this.PnlPlus2.Size = new System.Drawing.Size(360, 120);
@@ -215,7 +215,7 @@
             this.LblDonotPlayPlus2.AutoSize = true;
             this.LblDonotPlayPlus2.BackColor = System.Drawing.Color.LightCyan;
             this.LblDonotPlayPlus2.Font = new System.Drawing.Font("微软雅黑", 13.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.LblDonotPlayPlus2.Location = new System.Drawing.Point(198, 44);
+            this.LblDonotPlayPlus2.Location = new System.Drawing.Point(211, 45);
             this.LblDonotPlayPlus2.Name = "LblDonotPlayPlus2";
             this.LblDonotPlayPlus2.Padding = new System.Windows.Forms.Padding(5);
             this.LblDonotPlayPlus2.Size = new System.Drawing.Size(128, 41);
@@ -229,7 +229,7 @@
             this.LblPlayPlus2.AutoSize = true;
             this.LblPlayPlus2.BackColor = System.Drawing.Color.LightCyan;
             this.LblPlayPlus2.Font = new System.Drawing.Font("微软雅黑", 13.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.LblPlayPlus2.Location = new System.Drawing.Point(24, 44);
+            this.LblPlayPlus2.Location = new System.Drawing.Point(51, 45);
             this.LblPlayPlus2.Name = "LblPlayPlus2";
             this.LblPlayPlus2.Padding = new System.Windows.Forms.Padding(5);
             this.LblPlayPlus2.Size = new System.Drawing.Size(104, 41);
@@ -267,8 +267,8 @@
             // 
             this.PnlAfterGetOne.AutoSize = true;
             this.PnlAfterGetOne.BackColor = System.Drawing.Color.OliveDrab;
-            this.PnlAfterGetOne.Controls.Add(this.LblDonotShowAfterGetOne);
             this.PnlAfterGetOne.Controls.Add(this.LblShowAfterGetOne);
+            this.PnlAfterGetOne.Controls.Add(this.LblDonotShowAfterGetOne);
             this.PnlAfterGetOne.Location = new System.Drawing.Point(30, 373);
             this.PnlAfterGetOne.Name = "PnlAfterGetOne";
             this.PnlAfterGetOne.Size = new System.Drawing.Size(360, 143);
@@ -279,7 +279,7 @@
             this.LblDonotShowAfterGetOne.AutoSize = true;
             this.LblDonotShowAfterGetOne.BackColor = System.Drawing.Color.LightCyan;
             this.LblDonotShowAfterGetOne.Font = new System.Drawing.Font("微软雅黑", 13.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.LblDonotShowAfterGetOne.Location = new System.Drawing.Point(213, 52);
+            this.LblDonotShowAfterGetOne.Location = new System.Drawing.Point(228, 60);
             this.LblDonotShowAfterGetOne.Name = "LblDonotShowAfterGetOne";
             this.LblDonotShowAfterGetOne.Padding = new System.Windows.Forms.Padding(5);
             this.LblDonotShowAfterGetOne.Size = new System.Drawing.Size(96, 41);
@@ -293,7 +293,7 @@
             this.LblShowAfterGetOne.AutoSize = true;
             this.LblShowAfterGetOne.BackColor = System.Drawing.Color.LightCyan;
             this.LblShowAfterGetOne.Font = new System.Drawing.Font("微软雅黑", 13.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.LblShowAfterGetOne.Location = new System.Drawing.Point(54, 52);
+            this.LblShowAfterGetOne.Location = new System.Drawing.Point(56, 60);
             this.LblShowAfterGetOne.Name = "LblShowAfterGetOne";
             this.LblShowAfterGetOne.Padding = new System.Windows.Forms.Padding(5);
             this.LblShowAfterGetOne.Size = new System.Drawing.Size(72, 41);
@@ -319,7 +319,7 @@
             this.LblShowCard.BackColor = System.Drawing.Color.LightCyan;
             this.LblShowCard.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
             this.LblShowCard.Font = new System.Drawing.Font("微软雅黑", 13.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.LblShowCard.Location = new System.Drawing.Point(63, 51);
+            this.LblShowCard.Location = new System.Drawing.Point(83, 54);
             this.LblShowCard.Name = "LblShowCard";
             this.LblShowCard.Padding = new System.Windows.Forms.Padding(5);
             this.LblShowCard.Size = new System.Drawing.Size(72, 41);
@@ -332,7 +332,7 @@
             // 
             this.PnlShowResultWhenGameOver.BackColor = System.Drawing.Color.DodgerBlue;
             this.PnlShowResultWhenGameOver.Controls.Add(this.LblGameOver);
-            this.PnlShowResultWhenGameOver.Location = new System.Drawing.Point(472, 354);
+            this.PnlShowResultWhenGameOver.Location = new System.Drawing.Point(755, 404);
             this.PnlShowResultWhenGameOver.Name = "PnlShowResultWhenGameOver";
             this.PnlShowResultWhenGameOver.Size = new System.Drawing.Size(473, 162);
             this.PnlShowResultWhenGameOver.TabIndex = 27;
