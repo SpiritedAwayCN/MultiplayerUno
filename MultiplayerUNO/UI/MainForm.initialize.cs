@@ -413,7 +413,7 @@ namespace MultiplayerUNO.UI {
             pnls.Add(this.PnlPlus2);
             pnls.Add(this.PnlNormalShowCardorNot);
 
-            foreach (Control c in pnls) {
+            foreach (Control c in pnls) { 
                 // 这样的设置会使得 panel 颜色和父控件一致
                 c.BackColor = Color.Transparent;
                 // panel 设置为透明的(一个解决方案, 全部置底, 会有闪烁感)
@@ -423,17 +423,17 @@ namespace MultiplayerUNO.UI {
                 // 位置大小统一设置
                 // TODO magic number
                 c.Size = new Size(300, 140);
-                // 需要特殊处理 +2 中的一个显示数目 label, 其他都是俩
-                int i = 0;
+                // 都是俩 label
+                int idx = 0;
                 int lblHeight = 0;
                 foreach (Control l in c.Controls) {
-                    if (!lbls.Contains(l)) { continue; }
+                    //if (!lbls.Contains(l)) { continue; }
                     l.Location = new Point(
-                        (1 + i) * c.Size.Width / 3 - l.Width / 2,
+                        (1 + idx) * c.Size.Width / 3 - l.Width / 2,
                         (c.Height - l.Height) / 2
                     );
                     lblHeight = l.Height;
-                    ++i;
+                    ++idx;
                 }
                 c.Location = new Point(
                     (this.REF_WIDTH - c.Size.Width) / 2,

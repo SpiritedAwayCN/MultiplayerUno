@@ -13,7 +13,7 @@ namespace MultiplayerUNO.UI.BUtils {
         public readonly int[] PlayerCards;
         public readonly JsonData JsonMsg;
 
-        /// <summary>
+        /// <summary> 
         /// 在构造函数内部可能会对一些 GameControl 中有意义的值进行赋值
         /// </summary>
         public TurnInfo(JsonData json) {

@@ -89,7 +89,7 @@ namespace MultiplayerUNO.UI {
             bool clockwise = !GameControl.DirectionIsClockwise;
             AnimationHighLight anima = new AnimationHighLight(this, this.LblDirection);
             anima.SetDirection(!clockwise);
-            anima.SetSteps(200);
+            anima.SetSteps(100);
             anima.SetScale(2.0f, 1);
 
             var t = GameControl.LastLblDirectionTask;

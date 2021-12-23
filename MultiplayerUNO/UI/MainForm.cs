@@ -711,6 +711,11 @@ namespace MultiplayerUNO.UI {
             });
         }
 
+        private void PnlPlus2_VisibleChanged(object sender, EventArgs e) {
+            Control c = sender as Control;
+            this.LblPlus2Total.Visible = c.Visible;
+        }
+
         // DEBUG
 
         private bool TxtDebugIsFront = false;
@@ -723,13 +728,9 @@ namespace MultiplayerUNO.UI {
             }
         }
 
-        private void PnlPlus2_VisibleChanged(object sender, EventArgs e) {
-            Control c = sender as Control;
-            this.LblPlus2Total.Visible = c.Visible;
-        }
-
         public void DebugLog(string v) {
             this.TxtDebug.Text += v + "\r\n";
+            this.TxtDebug.ScrollToCaret();
         }
     }
 }
