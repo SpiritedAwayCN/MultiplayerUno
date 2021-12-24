@@ -306,7 +306,7 @@ namespace MultiplayerUNO.Backend
             foreach (Player.Player p in ingamePlayers)
             {
                 p.StartGameReset();
-                // TODO UI 测试的配置
+                // TODO (UI DEUBG): 测试的配置
                 // UI 调试 START
                 //if (p.Name.IndexOf("Server") != -1) {
                 //    p.GainCard(cardPile.DrawCards(1));

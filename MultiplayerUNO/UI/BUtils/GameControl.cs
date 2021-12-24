@@ -53,13 +53,9 @@ namespace MultiplayerUNO.UI.BUtils {
         /// </summary>
         public static volatile bool DirectionIsClockwise;
         public static void SetGameDirection(int direction) {
-            // UI 方向编码:
-            //      1(顺时针)
-            // 服务器方向编码:
+            // 方向编码:
             //      1(逆时针, 编号升序), -1(顺时针, 编号降序)
-            // 在这里服务器默认发 1, 我们认为 1 是顺时针
-            // !!和上面定义不一致, 但是 UI 保持一致即可!!
-            DirectionIsClockwise = (direction == 1);
+            DirectionIsClockwise = (direction == -1);
         }
 
         /// <summary>

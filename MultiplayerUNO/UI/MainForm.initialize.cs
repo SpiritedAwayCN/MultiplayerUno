@@ -446,7 +446,7 @@ namespace MultiplayerUNO.UI {
                 );
 
                 // 算完了吧, 算完了 panel 就可以再见了
-                // TODO 清空 panel, 他们已经没用了
+                // 清空 panel, 他们已经没用了
                 while(c.Controls.Count > 0) {
                     Control l = c.Controls[0];
                     var loc = l.Location;

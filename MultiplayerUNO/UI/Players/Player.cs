@@ -90,8 +90,8 @@ namespace MultiplayerUNO.UI.Players {
         #endregion 一些 UI 的常数
 
         #region 位置编码方式
-        // |    2 3 4    |    2 3    |     2     |           |   1   |  //
-        // |  1       5  |  1     4  |  1     3  |  1     2  |       |  //
+        // |    4 3 2    |    3 2    |     2     |           |   1   |  //
+        // |  5       1  |  4     1  |  3     1  |  2     1  |       |  //
         // |      0      |     0     |     0     |     0     |   0   |  //
 
         /// <summary>
@@ -104,7 +104,7 @@ namespace MultiplayerUNO.UI.Players {
         /// </summary>
         public static int[] isUpDownMap_CODE = new int[] {
             0, 0,
-            0, 0b110, 0b1010, 0b10010, 0b100010
+            0b00, 0b110, 0b1010, 0b10010, 0b100010
         };
 
         // 中心位置,
@@ -113,10 +113,10 @@ namespace MultiplayerUNO.UI.Players {
         public static float[][] posX_CODE = new float[][] {
             null, null,
             new float[2]{ 0,  0},
-            new float[3]{ 0, -1f,    1f},
-            new float[4]{ 0, -1f,     0,   1f},
-            new float[5]{ 0, -1f, -0.5f, 0.5f,   1f},
-            new float[6]{ 0, -1f, -0.6f,    0, 0.6f, 1f}
+            new float[3]{ 0,  1f,   -1f},
+            new float[4]{ 0,  1f,     0,   -1f},
+            new float[5]{ 0,  1f,  0.5f, -0.5f,   -1f},
+            new float[6]{ 0,  1f,  0.6f,     0, -0.6f, -1f}
         };
         public static float[][] posY_CODE = new float[][] {
             null, null,

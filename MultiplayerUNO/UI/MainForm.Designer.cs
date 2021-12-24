@@ -332,7 +332,7 @@
             // 
             this.PnlShowResultWhenGameOver.BackColor = System.Drawing.Color.DodgerBlue;
             this.PnlShowResultWhenGameOver.Controls.Add(this.LblGameOver);
-            this.PnlShowResultWhenGameOver.Location = new System.Drawing.Point(755, 404);
+            this.PnlShowResultWhenGameOver.Location = new System.Drawing.Point(522, 354);
             this.PnlShowResultWhenGameOver.Name = "PnlShowResultWhenGameOver";
             this.PnlShowResultWhenGameOver.Size = new System.Drawing.Size(473, 162);
             this.PnlShowResultWhenGameOver.TabIndex = 27;
