@@ -127,24 +127,25 @@ namespace MultiplayerUNO.UI {
         }
 
         /// <summary>
-        /// 游戏结束
+        /// 游戏结束(注意此时不要使用 turnInfo 中的任何解析信息)
         /// 1. 打牌动画
         /// 2. 显示谁胜利了
         /// 3. 展示手牌
         /// </summary>
         internal void GameOver(TurnInfo turnInfo) {
-            // 1. 打牌动画
-            int playerIdx = turnInfo.GetPlayerIndex();
-            // TODO lastcard 可能不是上一张牌(平局)
-            ShowCard(playerIdx, turnInfo.LastCardID);
-
+            int turnID = (int)turnInfo.JsonMsg["turnID"];
+            // 不是平局
+            if (turnID != 0) {
+                // 1. 打牌动画
+                int playerIdx = turnInfo.GetPlayerIndex();
+                ShowCard(playerIdx, turnInfo.LastCardID);
+            }
             // 2. 显示谁胜利了
             string msgGameOver = "";
-            int winnerID = turnInfo.TurnID;
-            if (winnerID != 0) {
+            if (turnID != 0) {
                 // 某人获胜
                 string playerName = Players[
-                    GameControl.PlayerId2PlayerIndex[winnerID]
+                    GameControl.PlayerId2PlayerIndex[turnID]
                 ].Name;
                 msgGameOver = "游戏结束, 胜利者是: " + playerName;
             } else {

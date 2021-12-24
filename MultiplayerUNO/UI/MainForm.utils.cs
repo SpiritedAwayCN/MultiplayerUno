@@ -124,7 +124,6 @@ namespace MultiplayerUNO.UI {
         private void UpdateLblColor() {
             var c = GameControl.LastColor;
             Bitmap bmp = null;
-            // TODO 不够精致
             if (c == CardColor.Blue) {
                 bmp = UIImage._oButBlue;
             } else if (c == CardColor.Green) {
@@ -201,8 +200,20 @@ namespace MultiplayerUNO.UI {
             Point pos;
             int playerIdx = GameControl.PlayerId2PlayerIndex[GameControl.TurnID];
             if (playerIdx != ME) {
-                // 如果不是我自己就居中
-                pos = Players[playerIdx].Center;
+                // 如果不是我自己就放在牌堆边上, 居中会有闪烁感
+                // (1) 居中    
+                //pos = Players[playerIdx].Center;
+                // (2) 边上
+                    // 左边的人, 计时器放在左边, 其余都放在右边
+                var player = Players[playerIdx];
+                pos = player.Center;
+                int offset = (CardButton.WIDTH_MODIFIED + lbl.Width) / 2 + 5;//offset:5
+                if (/*player.IsUpDown && */player.PosX < 0) {
+                    // 左边
+                    pos.X -= offset;
+                } else {
+                    pos.X += offset;
+                }
             } else {
                 var pnl = this.PnlNormalShowCardorNot;
                 pos = pnl.Location;
@@ -292,8 +303,17 @@ namespace MultiplayerUNO.UI {
         /// </summary>
         public const int SIGN_LABLE_SIZE = 80, SIGN_LABLE_PDDING = 10;
 
-        // (2) 游戏控制
+        /// <summary>
+        /// 包含两个按钮的 panel 的大小
+        /// </summary>
+        public static Size TWO_BUTTON_PANEL_SIZE = new Size(300, 140);
+
+        /// <summary>
+        /// 两张卡牌之间的间隔大小
+        /// </summary>
         public const float INTERVAL_BETWEEN_CARDS_RATIO = 0.5f;
+
+        // (2) 游戏控制
         /// <summary>
         /// 用于显示一些提示信息的 label 的显示时间
         /// </summary>

@@ -52,6 +52,14 @@ namespace MultiplayerUNO.UI.Login {
                 this.LblHost.Text = SCSelect.HostInfo;
                 this.LblPort.Text = SCSelect.PortInfo;
 
+                // 服务器不需要设置域名
+                if(SCSelect.PlayerKind == PlayerKind.Server) {
+                    this.TxtHost.Text = SCSelect.DEFAULT_HOST;
+                    this.TxtHost.Enabled = false;
+                } else {
+                    this.TxtHost.Enabled = true;
+                }
+
                 // SCSelect.DEFAULT_NAME 
                 this.TxtUserName.Text =
                 (SCSelect.PlayerKind == PlayerKind.Client ? "Client" : "Server")

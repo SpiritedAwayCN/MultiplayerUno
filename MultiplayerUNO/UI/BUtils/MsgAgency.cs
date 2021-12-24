@@ -160,7 +160,8 @@ namespace MultiplayerUNO.UI.BUtils {
         /// 摸一张牌
         /// </summary>
         private static void GetACard(TurnInfo turnInfo) {
-            // TODO 平局不响应?如何实现, 什么意思?
+            // 平局不响应?如何实现, 什么意思?
+            // 不处理, 平局之后应该发 state=7, 马上进入游戏结算局面
 
             // 别人摸牌
             if (turnInfo.TurnID != MainForm.MyID) {

@@ -183,11 +183,10 @@ namespace MultiplayerUNO.UI {
         /// </summary>
         private void ConstructPnlChooseColor() {
             // 选择颜色的 panel 内部增加 4 个 label, 指代颜色
-            // TODO (magic number)
-            const int SIZE = 80;
-            const int PADDING = 10;
-            const int TOTAL_SIZE = PADDING * 2 + SIZE;
-            this.PnlChooseColor.Size = new Size(TOTAL_SIZE * 4, TOTAL_SIZE);
+            const int size = SIGN_LABLE_SIZE;
+            const int padding = SIGN_LABLE_PDDING;
+            const int totalSize = padding * 2 + size;
+            this.PnlChooseColor.Size = new Size(totalSize * 4, totalSize);
 
             Bitmap[] img4 = new Bitmap[4] {
                 UIImage._oButBlue, UIImage._oButGreen,
@@ -201,9 +200,9 @@ namespace MultiplayerUNO.UI {
             for (int i = 0; i < 4; ++i) {
                 Control lbl = new Label();
                 lbl.AutoSize = false;
-                lbl.Size = new Size(SIZE, SIZE);
+                lbl.Size = new Size(size, size);
                 this.PnlChooseColor.Controls.Add(lbl);
-                lbl.Location = new Point(PADDING + TOTAL_SIZE * i, PADDING);
+                lbl.Location = new Point(padding + totalSize * i, padding);
                 lbl.BackgroundImage = img4[i];
                 lbl.BackgroundImageLayout = ImageLayout.Stretch;
                 lbl.Tag = color4[i];// 使用 Tag 保存按钮对应的颜色
@@ -211,7 +210,6 @@ namespace MultiplayerUNO.UI {
                     // 设置 GameControl.InvalidCardToChooseColor
                     GameControl.InvalidCardToChooseColor =
                         (CardColor)(((Label)sender).Tag);
-                    // TODO 消失动画
                     this.PnlChooseColor.Visible = false;
                     SendShowCardJson(
                         GameControl.ChooseColorIsTriggerAfterGetOneCard);
@@ -571,8 +569,7 @@ namespace MultiplayerUNO.UI {
                     ((Control)sender).SendToBack();
                 };
                 // 位置大小统一设置
-                // TODO magic number
-                c.Size = new Size(300, 140);
+                c.Size = TWO_BUTTON_PANEL_SIZE;
                 // 都是俩 label
                 int idx = 0;
                 int lblHeight = 0;
