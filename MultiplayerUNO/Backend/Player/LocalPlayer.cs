@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace MultiplayerUNO.Backend.Player
 {
+    /// <summary>
+    /// 本地开服的玩家，房间中有且只有一个
+    /// </summary>
     public class LocalPlayer : Player
     {
         protected LocalPlayerAdapter adapter;

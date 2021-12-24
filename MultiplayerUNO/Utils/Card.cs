@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 
 namespace MultiplayerUNO.Utils
 {
-    // 一张牌
+    /// <summary>
+    /// 表示一张牌
+    /// </summary>
     public class Card
     {
         public enum CardColor
@@ -37,6 +39,13 @@ namespace MultiplayerUNO.Utils
             }
         }
 
+        /// <summary>
+        /// 牌是否可以相应
+        /// </summary>
+        /// <param name="newCard">响应的牌</param>
+        /// <param name="oldCard">被响应的牌</param>
+        /// <param name="color">被响应牌的颜色（仅万能/+4）时有效</param>
+        /// <returns></returns>
         public static bool CanResponseTo(Card newCard, Card oldCard, CardColor color = CardColor.Invalid)
         {
             if (newCard.Color == CardColor.Invalid) return true; // 万能与+4能响应任何牌
@@ -45,20 +54,36 @@ namespace MultiplayerUNO.Utils
             return newCard.Number == oldCard.Number; // 数字/图案，万能与+4已在第一个if中直接返回true
         }
 
+        /// <summary>
+        /// 是否可以响应另一张牌
+        /// </summary>
+        /// <param name="oldCard">被响应的牌</param>
+        /// <param name="color">被响应牌的颜色（仅万能/+4）时有效</param>
+        /// <returns></returns>
         public bool CanResponseTo(Card oldCard, CardColor color = CardColor.Invalid)
         {
             return CanResponseTo(this, oldCard, color);
         }
 
+        /// <summary>
+        /// 是+4吗
+        /// </summary>
+        /// <returns></returns>
         public bool IsPlus4()
         {
             return CardId >= 104;
         }
-
+        /// <summary>
+        /// 是+2吗
+        /// </summary>
+        /// <returns></returns>
         public bool IsPlus2() {
             return (CardId >> 3) == 11;
         }
-
+        /// <summary>
+        /// 是翻转吗
+        /// </summary>
+        /// <returns></returns>
         public bool IsReverse() {
             return (CardId >> 3) == 12;
         }

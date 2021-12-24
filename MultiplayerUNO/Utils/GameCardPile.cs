@@ -8,10 +8,13 @@ using MultiplayerUNO.Backend;
 
 namespace MultiplayerUNO.Utils
 {
+    /// <summary>
+    /// 处理一局游戏的牌堆，包含牌堆与弃牌堆
+    /// </summary>
     public class GameCardPile
     {
-        private LinkedList<Card> CardPile = new LinkedList<Card>();
-        private LinkedList<Card> DiscardPile = new LinkedList<Card>();
+        private LinkedList<Card> CardPile = new LinkedList<Card>(); // 牌堆
+        private LinkedList<Card> DiscardPile = new LinkedList<Card>(); // 弃牌堆
 
         public int CardPileLeft { get { return CardPile.Count; } }
         public int DiscardPileLeft { get { return DiscardPile.Count; } }
@@ -19,11 +22,16 @@ namespace MultiplayerUNO.Utils
         public GameCardPile()
         {
             for (int i = 0; i < 108; i++)
-                CardPile.AddLast(new Card(i));
+                CardPile.AddLast(new Card(i)); // 初始化：牌堆108张洗过的牌
         }
 
+        /// <summary>
+        /// 洗牌
+        /// </summary>
         public void ShuffleCards() {
+            //弃牌堆concat进牌堆，然后将牌堆打乱
             CardPile = new LinkedList<Card>(CardPile.Concat(DiscardPile).OrderBy(p => Guid.NewGuid().ToString()));
+            
             // TODO UI 测试的配置
             // 用于 UI 调试, 定制手牌 START
             //int[] cardID = new int[] {
@@ -56,9 +64,14 @@ namespace MultiplayerUNO.Utils
             //    }
             //}
             // 用于 UI 调试, 定制手牌 END
-            DiscardPile.Clear();
+            DiscardPile.Clear(); // 清空弃牌堆
         }
 
+        /// <summary>
+        /// 摸牌
+        /// </summary>
+        /// <param name="number">摸牌数</param>
+        /// <returns>摸上来的牌</returns>
         public Card[] DrawCards(int number)
         {
             if (number < 1) throw new ArgumentOutOfRangeException("number should be greater than 0.");
@@ -77,11 +90,19 @@ namespace MultiplayerUNO.Utils
             return res;
         }
 
+        /// <summary>
+        /// 摸一张牌
+        /// </summary>
+        /// <returns>摸上来的爬</returns>
         public Card DrawOneCard()
         {
             return DrawCards(1)[0];
         }
 
+        /// <summary>
+        /// 将一张牌置入弃牌堆
+        /// </summary>
+        /// <param name="card">被置入的牌</param>
         public void Move2DiscardPile(Card card)
         {
             DiscardPile.AddLast(card);
