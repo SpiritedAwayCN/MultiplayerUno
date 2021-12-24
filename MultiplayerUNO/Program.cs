@@ -16,7 +16,7 @@ namespace MultiplayerUNO {
             Application.SetCompatibleTextRenderingDefault(false);
             //Application.Run(new Form1());
 
-            // TODO BB UI 测试
+            // TODO (UI DEUBG)
             //Application.Run(new UI.TestForm());
             Application.Run(new UI.Login.LoginForm());
         }

@@ -35,6 +35,7 @@ namespace MultiplayerUNO.UI {
             GameControl.PlayerId2PlayerIndex = new Dictionary<int, int>();
             GameControl.GameInitialized = false;
             GameControl.CBtnSelected = null;
+            GameControl.LastColor = CardColor.Invalid;
             GameControl.CardsDropped = ArrayList.Synchronized(new ArrayList());
         }
 
@@ -303,16 +304,18 @@ namespace MultiplayerUNO.UI {
                 lbldir.BackgroundImage = GameControl.DirectionIsClockwise
                     ? UIImage.clockwise : UIImage.counterclockwise;
                 lbldir.BackgroundImageLayout = ImageLayout.Stretch;
+                lbldir.Visible = true;
+                
                 // color
                 UpdateLblColor();
                 lblcolor.BackgroundImageLayout = ImageLayout.Stretch;
+                lblcolor.Visible = true;
 
-                this.LblDirection.Visible = true;
+                this.LblLeftTime.Location = GetLblLeftTimeLocation();
                 this.LblLeftTime.Visible = true;
-                this.LblColor.Visible = true;
                 // 开局第一个出才显示谁先出牌
                 this.LblFirstShowCard.Visible = GameControl.FirstTurnFirstShow();
-                this.PnlNormalShowCardorNot.Visible = (GameControl.TurnID == MyID);
+                SetPnlNormalShowCardorNotVisible(GameControl.TurnID == MyID);
 
                 this.TmrCheckLeftTime.Start();
                 this.TmrControlGame.Start();
@@ -413,7 +416,7 @@ namespace MultiplayerUNO.UI {
             pnls.Add(this.PnlPlus2);
             pnls.Add(this.PnlNormalShowCardorNot);
 
-            foreach (Control c in pnls) {
+            foreach (Control c in pnls) { 
                 // 这样的设置会使得 panel 颜色和父控件一致
                 c.BackColor = Color.Transparent;
                 // panel 设置为透明的(一个解决方案, 全部置底, 会有闪烁感)
@@ -423,17 +426,17 @@ namespace MultiplayerUNO.UI {
                 // 位置大小统一设置
                 // TODO magic number
                 c.Size = new Size(300, 140);
-                // 需要特殊处理 +2 中的一个显示数目 label, 其他都是俩
-                int i = 0;
+                // 都是俩 label
+                int idx = 0;
                 int lblHeight = 0;
                 foreach (Control l in c.Controls) {
-                    if (!lbls.Contains(l)) { continue; }
+                    //if (!lbls.Contains(l)) { continue; }
                     l.Location = new Point(
-                        (1 + i) * c.Size.Width / 3 - l.Width / 2,
+                        (1 + idx) * c.Size.Width / 3 - l.Width / 2,
                         (c.Height - l.Height) / 2
                     );
                     lblHeight = l.Height;
-                    ++i;
+                    ++idx;
                 }
                 c.Location = new Point(
                     (this.REF_WIDTH - c.Size.Width) / 2,
@@ -444,7 +447,26 @@ namespace MultiplayerUNO.UI {
                         + (lblHeight + c.Height) / 2 + 1 // offset:1
                     )
                 );
+
+                // 算完了吧, 算完了 panel 就可以再见了
+                // 清空 panel, 他们已经没用了
+                while(c.Controls.Count > 0) {
+                    Control l = c.Controls[0];
+                    var loc = l.Location;
+                    c.Controls.Remove(l);
+                    this.Controls.Add(l);
+                    l.Location = new Point(loc.X + c.Location.X,
+                                           loc.Y + c.Location.Y);
+                }
+                this.Controls.Remove(c);
+                c.Dispose(); // 注意 panel 被释放了, 后面不应该引用他们
             }
+            pnls.Clear();
+
+            SetPnlAfterGetOneVisible(false);
+            SetPnlQuestionVisible(false);
+            SetPnlPlus2Visible(false);
+            SetPnlNormalShowCardorNotVisible(false);
 
             pnls.Add(this.PnlChooseColor);
             pnls.Add(this.PnlDisplayCard);

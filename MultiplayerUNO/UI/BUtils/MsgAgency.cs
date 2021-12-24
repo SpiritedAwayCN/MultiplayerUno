@@ -77,8 +77,8 @@ namespace MultiplayerUNO.UI.BUtils {
                     break;
                 default: break;
             }
-            // 处理完消息之后 sleep 一会
-            Thread.Sleep(500);
+            // 处理完消息之后 sleep 一会, 用于处理 AI 对战的情况
+            Thread.Sleep(1000);
             return;
         }
 

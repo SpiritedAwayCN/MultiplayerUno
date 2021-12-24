@@ -123,7 +123,7 @@ namespace MultiplayerUNO.UI {
             int num = turnInfo.IntInfo;
             UIInvoke(() => {
                 this.LblPlus2Total.Text = "需要摸牌数: " + num;
-                this.PnlPlus2.Visible = true;
+                SetPnlPlus2Visible(true);
             });
         }
 
@@ -308,7 +308,7 @@ namespace MultiplayerUNO.UI {
         /// </summary>
         internal void RespondToPlus4(TurnInfo turnInfo) {
             UIInvokeSync(() => {
-                this.PnlQuestion.Visible = true;
+                SetPnlQuestionVisible(true);
                 // TODO 其他功能键不能响应
             });
         }
@@ -359,7 +359,7 @@ namespace MultiplayerUNO.UI {
         /// </summary>
         internal void ShowOrGetNormal(TurnInfo turnInfo) {
             UIInvoke(() => {
-                this.PnlNormalShowCardorNot.Visible = true;
+                SetPnlNormalShowCardorNotVisible(true);
             });
         }
 
@@ -375,7 +375,7 @@ namespace MultiplayerUNO.UI {
                 GameControl.CBtnSelected.PerformClick();
                 GameControl.CBtnSelected = null;
             }
-            this.PnlNormalShowCardorNot.Visible = false;
+            SetPnlNormalShowCardorNotVisible(false);
         }
 
         /// <summary>
@@ -427,7 +427,7 @@ namespace MultiplayerUNO.UI {
                         cbtn.PerformClick();
                         // 设置卡牌按钮都无法响应
                         SetCardButtonEnable(false);
-                        this.PnlAfterGetOne.Visible = true;
+                        SetPnlAfterGetOneVisible(true);
                     } else {
                         // 不能响应直接回复不出牌
                         DonotShowCardAfterGetJson();
@@ -518,7 +518,7 @@ namespace MultiplayerUNO.UI {
             } else {
                 SendShowCardJson();
             }
-            this.PnlNormalShowCardorNot.Visible = false;
+            SetPnlNormalShowCardorNotVisible(false);
         }
 
         /// <summary>
@@ -561,7 +561,7 @@ namespace MultiplayerUNO.UI {
         /// </summary>
         private void LblQuestion_Click(object sender, EventArgs e) {
             SendMsgRespondToPlus4(6);
-            this.PnlQuestion.Visible = false;
+            SetPnlQuestionVisible(false);
         }
 
         /// <summary>
@@ -569,7 +569,7 @@ namespace MultiplayerUNO.UI {
         /// </summary>
         private void LblNoQuestion_Click(object sender, EventArgs e) {
             SendMsgRespondToPlus4(4);
-            this.PnlQuestion.Visible = false;
+            SetPnlQuestionVisible(false);
         }
 
         /// <summary>
@@ -657,7 +657,7 @@ namespace MultiplayerUNO.UI {
                 ["queryID"] = GameControl.QueryID
             };
             MsgAgency.PlayerAdapter.SendMsg2Server(json.ToJson());
-            this.PnlPlus2.Visible = false;
+            SetPnlPlus2Visible(false);
         }
 
         /// <summary>
@@ -669,7 +669,7 @@ namespace MultiplayerUNO.UI {
                 ["queryID"] = GameControl.QueryID
             };
             MsgAgency.PlayerAdapter.SendMsg2Server(json.ToJson());
-            this.PnlPlus2.Visible = false;
+            SetPnlPlus2Visible(false);
         }
 
         public void SetCardButtonEnable(bool enable) {
@@ -697,7 +697,7 @@ namespace MultiplayerUNO.UI {
             }
             UIInvoke(() => {
                 SetCardButtonEnable(true);
-                this.PnlAfterGetOne.Visible = false;
+                SetPnlAfterGetOneVisible(false);
             });
         }
 
@@ -707,11 +707,16 @@ namespace MultiplayerUNO.UI {
             // UI 恢复
             UIInvoke(() => {
                 SetCardButtonEnable(true);
-                this.PnlAfterGetOne.Visible = false;
+                SetPnlAfterGetOneVisible(false);
             });
         }
 
-        // DEBUG
+        private void PnlPlus2_VisibleChanged(object sender, EventArgs e) {
+            Control c = sender as Control;
+            this.LblPlus2Total.Visible = c.Visible;
+        }
+
+        // TODO (UI DEBUG)
 
         private bool TxtDebugIsFront = false;
         private void TxtDebug_Click(object sender, EventArgs e) {
@@ -723,13 +728,9 @@ namespace MultiplayerUNO.UI {
             }
         }
 
-        private void PnlPlus2_VisibleChanged(object sender, EventArgs e) {
-            Control c = sender as Control;
-            this.LblPlus2Total.Visible = c.Visible;
-        }
-
         public void DebugLog(string v) {
             this.TxtDebug.Text += v + "\r\n";
+            this.TxtDebug.ScrollToCaret();
         }
     }
 }
