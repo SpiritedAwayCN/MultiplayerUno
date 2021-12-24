@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using static MultiplayerUNO.Utils.Card;
@@ -245,6 +246,9 @@ namespace MultiplayerUNO.UI {
                 var player = Players[i];
 
                 var lbl = new Label();
+                lbl.Visible = false;
+                this.Controls.Add(lbl); // 注意 Autosize 只有在 Add 之后才会生效
+
                 lbl.ForeColor = Color.White;
                 lbl.Font = new Font("微软雅黑", 15F, FontStyle.Regular,
                                     GraphicsUnit.Point, ((byte)(134)));
@@ -253,11 +257,34 @@ namespace MultiplayerUNO.UI {
                 lbl.AutoSize = true;
                 int xOff = -lbl.Width / 2,
                     yOff = -lbl.Height / 2;
+                // 摆放规则 (1): 左右两张牌不太好
+                //      *  *  *
+                //      3  4  5
+                //   *2         6*
+                //         1
+                //         *
+                //if (player.IsUpDown) {
+                //    xOff += (int)(
+                //        (CardButton.WIDTH_MODIFIED / 2
+                //            + lbl.Width / 2 + OFFSET_FOR_LBLINFO)
+                //        * (player.PosX < 0 ? -1 : 1));
+                //} else {
+                //    yOff += (int)(
+                //        (CardButton.HEIGHT_MODIFIED / 2
+                //            + lbl.Height / 2 + OFFSET_FOR_LBLINFO)
+                //        * (player.PosY < 0 ? -1 : 1));
+                //}
+
+                // 摆放规则 (2)
+                //      *  *  *
+                //      3  4  5
+                //    2         6
+                //    *    1    *
+                //         *
                 if (player.IsUpDown) {
-                    xOff += (int)(
-                        (CardButton.WIDTH_MODIFIED / 2
-                            + lbl.Width / 2 + OFFSET_FOR_LBLINFO)
-                        * (player.PosX < 0 ? -1 : 1));
+                    yOff += (int)(
+                        (CardButton.HEIGHT_MODIFIED / 2
+                            + lbl.Height / 2 + OFFSET_FOR_LBLINFO));
                 } else {
                     yOff += (int)(
                         (CardButton.HEIGHT_MODIFIED / 2
@@ -269,7 +296,7 @@ namespace MultiplayerUNO.UI {
                     player.Center.Y + yOff
                 );
                 player.LblInfo = lbl;
-                this.Controls.Add(lbl);
+                lbl.Visible = true;
                 lbl.SendToBack(); // 放到最底层
             }
         }
@@ -305,7 +332,7 @@ namespace MultiplayerUNO.UI {
                     ? UIImage.clockwise : UIImage.counterclockwise;
                 lbldir.BackgroundImageLayout = ImageLayout.Stretch;
                 lbldir.Visible = true;
-                
+
                 // color
                 UpdateLblColor();
                 lblcolor.BackgroundImageLayout = ImageLayout.Stretch;
@@ -390,7 +417,127 @@ namespace MultiplayerUNO.UI {
         private void DrawControlsDesignedByDesigner() {
             ConstructPnlChooseColor();
 
-            // 所有按钮控件, 都是用同样的 icon
+            // 绘制功能按钮
+            DrawButtons();
+
+            // 参数
+            int padding = SIGN_LABLE_PDDING,
+                lblsize = SIGN_LABLE_SIZE;
+            int totalsize = padding * 2 + lblsize;
+
+            // 其他控件
+            Control lbl = null;
+
+            #region 3 个长时控件
+
+            // 打牌方向 label, LblDirection
+            lbl = this.LblDirection;
+            // tag 上保存了两张背景图, 0->顺时针, 1->逆时针
+            lbl.Tag = new Bitmap[2] { UIImage.clockwise, UIImage.counterclockwise };
+            lbl.Location = new Point(padding, padding);
+            lbl.BackColor = Color.Transparent;
+            lbl.Visible = false;
+
+            // 打牌颜色 label, LblColor
+            lbl = this.LblColor;
+            lbl.Location = new Point(padding + totalsize, padding);
+            lbl.BackColor = Color.Transparent;
+            lbl.Visible = false;
+
+            // 倒计时 label, LblLeftTime
+            lbl = this.LblLeftTime;
+            lbl.Location = new Point(padding + totalsize * 2, padding);
+            lbl.Visible = false;
+
+            #endregion 3 个长时控件
+
+            #region 提示信息 label
+
+            // 这个位置作为下面位置的标杆
+            Point loc = new Point(padding, padding + totalsize);
+            // 当人数 > 4时会挡住某个玩家, 此时放到左下角
+            // 放到右下角也会挡住自己的手牌, 感觉就直接放在左上角吧
+            //if (Players.Length > 4) {
+            //    var info = Players[1].LblInfo;
+            //    int y = info.Location.Y + info.Height + 5; //offset:5
+            //    loc = new Point(padding, y);
+            //}
+
+            List<Control> lbls = new List<Control>();
+
+            // (1) 用于显示一些信息的 label, LblMsg
+            lbl = this.LblMsg;
+            lbls.Add(lbl);
+            lbl.Location = loc;
+            // 剩余显示时间记录在 Tag 上
+            lbl.Tag = 0;
+            // 显示一会后消失
+            lbl.VisibleChanged += (sender, e) => {
+                if (this.LblMsg.Visible) {
+                    this.LblMsg.Tag = MSG_SHOW_TIME;
+                }
+            };
+            lbl.Visible = false;
+
+            loc.Y += lbl.Height + 5;//offset:5
+
+            // (2) 第一张牌随便出牌 label, LblFirstShowCard
+            lbl = this.LblFirstShowCard;
+            lbls.Add(lbl);
+            lbl.Location = loc;
+            lbl.Visible = false;
+
+            // (3) 用于在 Form 中显示游戏结束信息的 label, LblGameOverShowInForm
+            lbl = this.LblGameOverShowInForm;
+            lbls.Add(lbl);
+            lbl.Location = loc;
+
+            // (4) 摸牌累计总数 label, LblPlus2Total
+            lbl = this.LblPlus2Total;
+            lbls.Add(lbl);
+            lbl.Location = loc;
+
+            // (5) 选择颜色的 panel, PnlChooseColor
+            lbl = this.PnlChooseColor;
+            lbls.Add(lbl);
+            lbl.Location = loc;
+            // BringToFront() 失败? 应该是动画的问题, 现在暂时把它放在左上角
+            //lbl.Location = new Point(
+            //    (this.REF_WIDTH - lbl.Width) / 2,
+            //    (this.REF_HEIGHT - lbl.Height) / 2
+            //);
+            //lbl.VisibleChanged += (sender, e) => { (Control(sender)).BringToFront(); };
+            lbl.Visible = false;
+
+            foreach (Control control in lbls) {
+                control.VisibleChanged +=
+                    (sender, e) => { ((Control)sender).BringToFront(); };
+            }
+
+            #endregion 提示信息 label
+
+            // TODO 展示牌 panel, PnlDisplayCard(这个功能暂时废弃了)
+            lbl = this.PnlDisplayCard;
+            lbl.Location = this.PnlChooseColor.Location;
+            lbl.Visible = false;
+
+            // 游戏结束展示所有人手牌的 panel, PnlShowResultWhenGameOver
+            lbl = this.PnlShowResultWhenGameOver;
+            lbl.BackColor = Color.DimGray;
+            lbl.Visible = false;
+
+            // 回显收到 JSON 信息的 textbox, TxtDebug
+            lbl = this.TxtDebug;
+            lbl.Location = new Point(20, 110 + this.PnlChooseColor.Location.Y);
+            lbl.SendToBack();
+            lbl.Visible = false;
+        }
+
+        /// <summary>
+        /// 绘制用于点击的 8 个按钮(出牌、摸牌等)
+        /// </summary>
+        private void DrawButtons() {
+            // (1) 背景都是用同样的 icon
             List<Control> lbls = new List<Control>();
             lbls.Add(this.LblGetCard);
             lbls.Add(this.LblShowCard);
@@ -407,21 +554,21 @@ namespace MultiplayerUNO.UI {
                 c.BackgroundImageLayout = ImageLayout.Stretch;
             }
 
-            //  panel
-            // (1) 背景都修改为 transparent
-            // (2) visible = false
+            // [2] panels 一般设置
+            //   (1) 背景都修改为 transparent(事实上最终变成了删除 panel)
+            //   (2) visible = false
             List<Control> pnls = new List<Control>();
             pnls.Add(this.PnlAfterGetOne);
             pnls.Add(this.PnlQuestion);
             pnls.Add(this.PnlPlus2);
             pnls.Add(this.PnlNormalShowCardorNot);
 
-            foreach (Control c in pnls) { 
+            foreach (Control c in pnls) {
                 // 这样的设置会使得 panel 颜色和父控件一致
                 c.BackColor = Color.Transparent;
                 // panel 设置为透明的(一个解决方案, 全部置底, 会有闪烁感)
                 c.VisibleChanged += (sender, e) => {
-                    c.SendToBack();
+                    ((Control)sender).SendToBack();
                 };
                 // 位置大小统一设置
                 // TODO magic number
@@ -450,7 +597,7 @@ namespace MultiplayerUNO.UI {
 
                 // 算完了吧, 算完了 panel 就可以再见了
                 // 清空 panel, 他们已经没用了
-                while(c.Controls.Count > 0) {
+                while (c.Controls.Count > 0) {
                     Control l = c.Controls[0];
                     var loc = l.Location;
                     c.Controls.Remove(l);
@@ -468,80 +615,9 @@ namespace MultiplayerUNO.UI {
             SetPnlPlus2Visible(false);
             SetPnlNormalShowCardorNotVisible(false);
 
-            pnls.Add(this.PnlChooseColor);
-            pnls.Add(this.PnlDisplayCard);
-            pnls.Add(this.PnlShowResultWhenGameOver);
-
             foreach (Control c in pnls) {
                 c.Visible = false;
             }
-
-            var pos = Piles[PileDropped].Location;
-            Control lbl = null;
-
-            // 下面 3 个按钮位置
-            int padding = SIGN_LABLE_PDDING,
-                lblsize = SIGN_LABLE_SIZE;
-            int totalsize = padding * 2 + lblsize;
-
-            // 打牌方向 label, LblDirection
-            lbl = this.LblDirection;
-            // tag 上保存了两张背景图, 0->顺时针, 1->逆时针
-            lbl.Tag = new Bitmap[2] { UIImage.clockwise, UIImage.counterclockwise };
-            lbl.Location = new Point(padding, padding);
-            lbl.BackColor = Color.Transparent;
-
-            // 打牌颜色 label
-            lbl = this.LblColor;
-            lbl.Location = new Point(padding + totalsize, padding);
-            lbl.BackColor = Color.Transparent;
-
-            // 倒计时 label, LblLeftTime
-            lbl = this.LblLeftTime;
-            lbl.Location = new Point(padding + totalsize * 2, padding);
-
-            // 第一张牌随便出牌 label, LblFirstShowCard
-            lbl = this.LblFirstShowCard;
-            // 位置根据 panel 的中间位置设置(不能这样, 会把出牌按钮挡住)
-            //lbl.Location = new Point(
-            //    (this.REF_WIDTH - lbl.Width) / 2,
-            //    this.PnlNormalShowCardorNot.Location.Y 
-            //    + (this.PnlNormalShowCardorNot.Height - lbl.Height) / 2
-            //);
-            lbl.Location = new Point(padding, padding + totalsize);
-
-            // 摸牌累计总数 label, LblPlus2Total
-            lbl = this.LblPlus2Total;
-            lbl.Location = new Point(padding, padding + totalsize);
-
-            // 选择颜色的 panel, PnlChooseColor
-            lbl = this.PnlChooseColor;
-            lbl.Location = new Point(padding, padding + totalsize);
-            // TODO BringToFront() 失败?
-            //lbl.Location = new Point(
-            //    (this.REF_WIDTH - lbl.Width) / 2,
-            //    (this.REF_HEIGHT - lbl.Height) / 2
-            //);
-            //lbl.VisibleChanged += (sender, e) => { lbl.BringToFront(); };
-            lbl.Visible = false;
-
-            // TODO 展示牌 pnl, PnlDisplayCard(这个功能暂时废弃了)
-            lbl = this.PnlDisplayCard;
-            lbl.Location = this.PnlChooseColor.Location;
-
-            // 游戏结束 lbl, LblGameOver
-            lbl = this.LblGameOver;
-            lbl.Visible = false;
-
-            // 游戏结束展示所有人手牌的 panel, PnlShowResultWhenGameOver
-            lbl = this.PnlShowResultWhenGameOver;
-            lbl.BackColor = Color.DimGray;
-
-            // DEBUG
-            lbl = this.TxtDebug;
-            lbl.Location = new Point(20, 110 + this.PnlChooseColor.Location.Y);
-            lbl.SendToBack();
-            lbl.Visible = false;
         }
     }
 }

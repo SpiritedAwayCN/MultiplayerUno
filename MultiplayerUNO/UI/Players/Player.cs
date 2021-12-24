@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MultiplayerUNO.UI.BUtils;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
@@ -69,10 +70,23 @@ namespace MultiplayerUNO.UI.Players {
             IsRobot = isRobot;
         }
 
+        /// <summary>
+        /// 需要调用程序使用 UIInvoke
+        /// </summary>
         public void UpdateInfo() {
+            int x = LblInfo.Location.X + LblInfo.Width / 2;
             LblInfo.Text =
-                (IsRobot ? "(AI) " : "")
-                + Name + " (" + CardsCount + ")";
+                (IsRobot ? "[AI] " : "")
+                + Name
+                + " (" + CardsCount + ")";
+                //+ " (" + CardsCount.ToString().PadLeft(2, '0') + ")"; // 观感不佳
+            LblInfo.Location = new Point(
+                x - LblInfo.Width / 2, LblInfo.Location.Y);
+
+            // 大喊一声 UNO!!!
+            if (CardsCount == 1) {
+                MsgAgency.MainForm.ShowMsgToUser(Name + ": UNO!!!");
+            }
         }
 
         /// <summary>

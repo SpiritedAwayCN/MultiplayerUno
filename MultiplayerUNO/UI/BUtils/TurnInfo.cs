@@ -17,6 +17,7 @@ namespace MultiplayerUNO.UI.BUtils {
         /// 在构造函数内部可能会对一些 GameControl 中有意义的值进行赋值
         /// </summary>
         public TurnInfo(JsonData json) {
+            // TODO 检查解析 turninfo 的正确性
             JsonMsg = json;
             State = (int)json["state"];
             // 注意, 无意义字段可能缺失

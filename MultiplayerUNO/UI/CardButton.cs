@@ -93,6 +93,13 @@ namespace MultiplayerUNO.UI {
                 && !Card.CanResponseTo(GameControl.LastCard, GameControl.LastColor)) {
                 return;
             }
+            // 最后一张牌不能出 +4
+            var form = MsgAgency.MainForm;
+            if (form.Players[MainForm.ME].CardsCount == 1 &&
+                this.Card.IsPlus4()) {
+                form.ShowMsgToUser("最后一张牌不能出 +4");
+                return;
+            }
             int dy = (int)(HighLightRatio * WIDTH_MODIFIED);
             Animation anima = new Animation(MsgAgency.MainForm, this);
 

@@ -52,7 +52,6 @@ namespace MultiplayerUNO.UI.Login {
                 this.LblHost.Text = SCSelect.HostInfo;
                 this.LblPort.Text = SCSelect.PortInfo;
 
-                // TODO 去掉
                 // SCSelect.DEFAULT_NAME 
                 this.TxtUserName.Text =
                 (SCSelect.PlayerKind == PlayerKind.Client ? "Client" : "Server")
@@ -162,8 +161,7 @@ namespace MultiplayerUNO.UI.Login {
                 MsgAgency.ShowInfoThread.IsBackground = true; // 后台线程
                 MsgAgency.ShowInfoThread.Start();
             } catch (Exception e) {
-                MessageBox.Show(e.Message);
-                // TODO 返回到上一个界面
+                MessageBox.Show(e.Message + "\r\n建议重启程序!");
                 return;
             } finally {
                 UIInvoke(() => { SetAllControlsEnable(true); });
