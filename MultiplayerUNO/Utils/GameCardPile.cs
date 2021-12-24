@@ -24,7 +24,7 @@ namespace MultiplayerUNO.Utils
 
         public void ShuffleCards() {
             CardPile = new LinkedList<Card>(CardPile.Concat(DiscardPile).OrderBy(p => Guid.NewGuid().ToString()));
-            // TODO (UI DEUBG): UI 测试的配置
+            // TODO (UI DEUBG): 定制手牌
             // 用于 UI 调试, 定制手牌 START
             //int[] cardID = new int[] {
             //    //// +4

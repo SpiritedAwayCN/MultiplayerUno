@@ -35,6 +35,7 @@ namespace MultiplayerUNO.UI {
             GameControl.PlayerId2PlayerIndex = new Dictionary<int, int>();
             GameControl.GameInitialized = false;
             GameControl.CBtnSelected = null;
+            GameControl.LastColor = CardColor.Invalid;
             GameControl.CardsDropped = ArrayList.Synchronized(new ArrayList());
         }
 
@@ -303,13 +304,15 @@ namespace MultiplayerUNO.UI {
                 lbldir.BackgroundImage = GameControl.DirectionIsClockwise
                     ? UIImage.clockwise : UIImage.counterclockwise;
                 lbldir.BackgroundImageLayout = ImageLayout.Stretch;
+                lbldir.Visible = true;
+                
                 // color
                 UpdateLblColor();
                 lblcolor.BackgroundImageLayout = ImageLayout.Stretch;
+                lblcolor.Visible = true;
 
-                this.LblDirection.Visible = true;
+                this.LblLeftTime.Location = GetLblLeftTimeLocation();
                 this.LblLeftTime.Visible = true;
-                this.LblColor.Visible = true;
                 // 开局第一个出才显示谁先出牌
                 this.LblFirstShowCard.Visible = GameControl.FirstTurnFirstShow();
                 SetPnlNormalShowCardorNotVisible(GameControl.TurnID == MyID);

@@ -55,8 +55,8 @@ namespace MultiplayerUNO.UI.BUtils {
         /// 处理消息
         /// </summary>
         private static void DealWithMsg(string msg) {
-            // TODO (UI DEUBG)
-            //Console.WriteLine("GET: " + msg);
+            // TODO (UI DEUBG) 输出获取到的 JSON 信息
+            Console.WriteLine("GET: " + msg);
             JsonData json = JsonMapper.ToObject(msg);
             if (json.Keys.Contains("state")) {
                 // 游戏开始后的信息

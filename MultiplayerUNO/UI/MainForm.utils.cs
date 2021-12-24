@@ -83,7 +83,7 @@ namespace MultiplayerUNO.UI {
         }
 
         /// <summary>
-        /// 每调用一次, 更新一次旋转方向
+        /// 每调用一次, 更新一次旋转方向 (只能够被接收消息的线程调用)
         /// </summary>
         public void UpdateLblDirection() {
             bool clockwise = !GameControl.DirectionIsClockwise;
@@ -122,7 +122,15 @@ namespace MultiplayerUNO.UI {
             var c = GameControl.LastColor;
             Bitmap bmp = null;
             // TODO 不够精致
-            if (c == CardColor.Blue) { bmp = UIImage._oButBlue; } else if (c == CardColor.Green) { bmp = UIImage._oButGreen; } else if (c == CardColor.Red) { bmp = UIImage._oButRed; } else if (c == CardColor.Yellow) { bmp = UIImage._oButYellow; };
+            if (c == CardColor.Blue) {
+                bmp = UIImage._oButBlue;
+            } else if (c == CardColor.Green) {
+                bmp = UIImage._oButGreen;
+            } else if (c == CardColor.Red) {
+                bmp = UIImage._oButRed;
+            } else if (c == CardColor.Yellow) {
+                bmp = UIImage._oButYellow;
+            };
             var lbl = this.LblColor as Control;
             UIInvoke(() => {
                 lbl.BackgroundImage = bmp;
@@ -134,7 +142,7 @@ namespace MultiplayerUNO.UI {
         /// </summary>
         private void TmrCheckLeftTime_Tick(object sender, EventArgs e) {
             if (GameControl.TimeForYou <= 0) {
-                UIInvoke(()=> {
+                UIInvoke(() => {
                     ImDummy();
                 });
                 return;
@@ -146,8 +154,22 @@ namespace MultiplayerUNO.UI {
             GameControl.TimeForYou = t;
             t /= 1000;
             // 更新下位置
-            int playerIdx = GameControl.PlayerId2PlayerIndex[GameControl.TurnID];
+            Point pos = GetLblLeftTimeLocation();
+            UIInvoke(() => {
+                lbl.Location = pos;
+                lbl.BringToFront();
+                lbl.Visible = true;
+                lbl.Text = t.ToString().PadLeft(2, '0');
+            });
+        }
+
+        /// <summary>
+        /// 获取 LblLeftTime(用于显示时间的 label) 的位置
+        /// </summary>
+        private Point GetLblLeftTimeLocation() {
+            Label lbl = this.LblLeftTime;
             Point pos;
+            int playerIdx = GameControl.PlayerId2PlayerIndex[GameControl.TurnID];
             if (playerIdx != ME) {
                 // 如果不是我自己就居中
                 pos = Players[playerIdx].Center;
@@ -158,12 +180,7 @@ namespace MultiplayerUNO.UI {
             }
             pos.X -= lbl.Width / 2;
             pos.Y -= lbl.Height / 2;
-            UIInvoke(() => {
-                lbl.Location = pos;
-                lbl.BringToFront();
-                lbl.Visible = true;
-                lbl.Text = t.ToString().PadLeft(2, '0');
-            });
+            return pos;
         }
 
         /// <summary>

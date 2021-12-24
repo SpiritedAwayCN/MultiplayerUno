@@ -60,7 +60,10 @@ namespace MultiplayerUNO.UI.BUtils {
             }
 
             if (State == 1 || State == 5 || State == 7) {
-                if (GameControl.LastCard.Color == CardColor.Invalid) {
+                if (LastCardID == -1) {
+                    // 开局的时候, 上一张牌为 -1
+                    GameControl.LastColor = CardColor.Invalid;
+                } else if (GameControl.LastCard.Color == CardColor.Invalid) {
                     GameControl.LastColor = (CardColor)(IntInfo & 0b11);
                 } else {
                     // State=7 时可能为 -1 TODO

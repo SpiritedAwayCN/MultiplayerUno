@@ -716,7 +716,7 @@ namespace MultiplayerUNO.UI {
             this.LblPlus2Total.Visible = c.Visible;
         }
 
-        // DEBUG
+        // TODO (UI DEBUG)
 
         private bool TxtDebugIsFront = false;
         private void TxtDebug_Click(object sender, EventArgs e) {
