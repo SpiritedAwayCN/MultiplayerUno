@@ -161,7 +161,7 @@ namespace MultiplayerUNO.UI.Login {
                 MsgAgency.ShowInfoThread.IsBackground = true; // 后台线程
                 MsgAgency.ShowInfoThread.Start();
             } catch (Exception e) {
-                MessageBox.Show(e.Message + "\r\n建议重启程序!");
+                MessageBox.Show(e.Message);
                 return;
             } finally {
                 UIInvoke(() => { SetAllControlsEnable(true); });
@@ -178,10 +178,10 @@ namespace MultiplayerUNO.UI.Login {
             // 此时应该还要发送自己的信息
             // 服务器的客户端不需要发, 只有远程的客户端需要发
             if (SCSelect.PlayerKind == PlayerKind.Client) {
-                JsonData msg = new JsonData();
-                msg["version"] = MsgAgency.ProtocolVersion;
-                msg["name"] = SCSelect.UserName;
-                MsgAgency.PlayerAdapter.SendMsg2Server(msg.ToJson());
+                JsonData json = new JsonData();
+                json["version"] = MsgAgency.ProtocolVersion;
+                json["name"] = SCSelect.UserName;
+                MsgAgency.SendOneJsonDataMsg(json);
             }
             // 我看服务器端开始的时候不会给自己发自己的消息
             // 所以这里如下处理
@@ -252,10 +252,10 @@ namespace MultiplayerUNO.UI.Login {
         }
 
         private void BtnReady_Click(object sender, EventArgs e) {
-            JsonData msg = new JsonData() {
+            JsonData json = new JsonData() {
                 ["type"] = 1
             };
-            MsgAgency.PlayerAdapter.SendMsg2Server(msg.ToJson());
+            MsgAgency.SendOneJsonDataMsg(json);
             SetReadyBtnsEnable(false);
         }
 
@@ -271,17 +271,17 @@ namespace MultiplayerUNO.UI.Login {
         /// 开始游戏
         /// </summary>
         private void BtnStart_Click(object sender, EventArgs e) {
-            JsonData msg = new JsonData() {
+            JsonData json = new JsonData() {
                 ["type"] = 3
             };
-            MsgAgency.PlayerAdapter.SendMsg2Server(msg.ToJson());
+            MsgAgency.SendOneJsonDataMsg(json);
         }
 
         private void BtnCancelReady_Click(object sender, EventArgs e) {
-            JsonData msg = new JsonData() {
+            JsonData json = new JsonData() {
                 ["type"] = 2
             };
-            MsgAgency.PlayerAdapter.SendMsg2Server(msg.ToJson());
+            MsgAgency.SendOneJsonDataMsg(json);
             SetReadyBtnsEnable(true);
         }
 

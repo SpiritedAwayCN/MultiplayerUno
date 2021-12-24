@@ -15,7 +15,7 @@ namespace MultiplayerUNO.UI.BUtils {
         /// 登陆窗口
         /// </summary>
         public static LoginForm LoginForm = null;
-        
+
         /// <summary>
         /// 该字段为 true 标识是情况 (1), 在 InitState() 中使用.
         ///   (1) 在刚进入房间的时候, 服务器会给客户端发送两条信息 {type=0,type=3};
@@ -96,17 +96,14 @@ namespace MultiplayerUNO.UI.BUtils {
                 WhenFirstEnterTheRoom = false;
             } else { return; }
 
-            // TODO
-            // 认为马上就能收到一条 type=3 的消息
-            // 用于设置 seatID
-            string msg = TakeAMsg();
+            string msg = TakeOneMsg();
             if (msg == null) {
                 MessageBox.Show("初始化的时候未能马上收到一条 type=3 的信息");
                 return;
             }
             JsonData js2 = JsonMapper.ToObject(msg);
             if (!js2.Keys.Contains("type") || ((int)js2["type"]) != 3) {
-                MessageBox.Show("初始化的时候未能马上收到一条 type=3 的信息\r\n" + js2.ToJson());
+                MessageBox.Show("初始化的时候未能马上收到一条 type=3 的信息\n" + js2.ToJson());
                 return;
             }
             LoginForm.SeatID = (int)js2["player"]["seatID"];
@@ -117,7 +114,7 @@ namespace MultiplayerUNO.UI.BUtils {
         /// </summary>
         public static void SendMsgToQueryRoomStateWhenLogin() {
             JsonData json = new JsonData() { ["type"] = 0 };
-            PlayerAdapter.SendMsg2Server(json.ToJson());
+            SendOneJsonDataMsg(json);
         }
     }
 }

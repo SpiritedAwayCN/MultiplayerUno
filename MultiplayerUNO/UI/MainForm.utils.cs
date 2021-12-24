@@ -37,6 +37,9 @@ namespace MultiplayerUNO.UI {
         /// 关闭窗口的时候返回到原始的连接界面
         /// </summary>
         private void MainForm_FormClosed(object sender, FormClosedEventArgs e) {
+            this.TmrCheckLeftTime.Stop();
+            this.TmrControlGame.Stop();
+            this.TmrDisplayCard.Stop();
             MsgAgency.MainForm = null;
             if (MsgAgency.LoginForm != null) {
                 MsgAgency.SendMsgToQueryRoomStateWhenLogin();

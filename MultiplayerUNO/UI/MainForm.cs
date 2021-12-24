@@ -95,8 +95,11 @@ namespace MultiplayerUNO.UI {
                 cbtn.BringToFront();
             });
 
+            var t = anima.Run();
+            MsgAgency.TaskQueue.Enqueue(t);
             Task.Run(async () => {
-                await anima.Run(); // 动画结束加入弃牌堆
+                await t;
+                // 动画结束加入弃牌堆
                 UIInvoke(() => {
                     GameControl.AddDroppedCard(cbtn);
                     // 更新牌的张数
@@ -360,6 +363,7 @@ namespace MultiplayerUNO.UI {
                 animaseq.AddAnimation(anima);
             }
             var w = animaseq.Run();
+            MsgAgency.TaskQueue.Enqueue(w);
             Task.Run(async () => {
                 await w; // 同步
                 Players[ME].CardsCount += num; // 更新卡牌数量
@@ -383,7 +387,7 @@ namespace MultiplayerUNO.UI {
                 ["state"] = 2,
                 ["queryID"] = GameControl.QueryID
             };
-            MsgAgency.PlayerAdapter.SendMsg2Server(json.ToJson());
+            MsgAgency.SendOneJsonDataMsg(json);
             if (GameControl.CBtnSelected != null) {
                 // 选牌归位
                 GameControl.CBtnSelected.PerformClick();
@@ -399,6 +403,7 @@ namespace MultiplayerUNO.UI {
             int playerIdx = GameControl.PlayerId2PlayerIndex[turnInfo.TurnID];
             Animation anima = GetACardAnima(playerIdx, turnInfo.LastCardID);
             var w = anima.Run();
+            MsgAgency.TaskQueue.Enqueue(w);
             Task.Run(async () => {
                 await w;
                 Players[playerIdx].CardsCount += num;
@@ -424,6 +429,7 @@ namespace MultiplayerUNO.UI {
             // (1)
             Animation anima = GetACardAnima(ME, turnInfo.LastCardID);
             var t = anima.Run();
+            MsgAgency.TaskQueue.Enqueue(t);
             CardButton cbtn = Players[ME].BtnsInHand[0] as CardButton;
             Card c = new Card(turnInfo.LastCardID);
             bool canResponed = GameControl.FirstTurn() ||
@@ -460,7 +466,7 @@ namespace MultiplayerUNO.UI {
                 ["color"] = 0, // 缺了这个好像后端会报错 TODO
                 ["queryID"] = GameControl.QueryID
             };
-            MsgAgency.PlayerAdapter.SendMsg2Server(json.ToJson());
+            MsgAgency.SendOneJsonDataMsg(json);
         }
 
         /// <summary>
@@ -543,7 +549,7 @@ namespace MultiplayerUNO.UI {
             } else {
                 json["card"] = btn.Card.CardId;
             }
-            MsgAgency.PlayerAdapter.SendMsg2Server(json.ToJson());
+            MsgAgency.SendOneJsonDataMsg(json);
 
             // 此时需要阻塞, 向服务器寻求验证, 直到服务器反馈之后再出牌
             // 这里不处理, 认为这个事件处理结束, 可以直接让 Msg 中的收消息线程处理
@@ -577,7 +583,7 @@ namespace MultiplayerUNO.UI {
                 ["state"] = state,
                 ["queryID"] = GameControl.QueryID
             };
-            MsgAgency.PlayerAdapter.SendMsg2Server(json.ToJson());
+            MsgAgency.SendOneJsonDataMsg(json);
         }
 
 
@@ -653,7 +659,7 @@ namespace MultiplayerUNO.UI {
                 ["card"] = cbtn.Card.CardId,
                 ["queryID"] = GameControl.QueryID
             };
-            MsgAgency.PlayerAdapter.SendMsg2Server(json.ToJson());
+            MsgAgency.SendOneJsonDataMsg(json);
             SetPnlPlus2Visible(false);
         }
 
@@ -665,7 +671,7 @@ namespace MultiplayerUNO.UI {
                 ["state"] = 4,
                 ["queryID"] = GameControl.QueryID
             };
-            MsgAgency.PlayerAdapter.SendMsg2Server(json.ToJson());
+            MsgAgency.SendOneJsonDataMsg(json);
             SetPnlPlus2Visible(false);
         }
 
@@ -682,6 +688,7 @@ namespace MultiplayerUNO.UI {
         /// </summary>
         private void LblShowAfterGetOne_Click(object sender, EventArgs e) {
             var btn = GameControl.CBtnSelected;
+            if (btn == null) { return; }
             if (btn.Card.Color == CardColor.Invalid) {
                 // +4/万能牌
                 GameControl.InvalidCardToChooseColor = CardColor.Invalid;
