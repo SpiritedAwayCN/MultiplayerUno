@@ -19,7 +19,7 @@ Player - 玩家类，对于游戏本身只需考虑玩家，实际上派生了Lo
 
 Room实例中会维护游戏处理线程（下称为游戏处理线程），使用BlockingCollection `InfoQueue`实现同步，线程将不断尝试从`InfoQueue`中获取信息，并进行**事件驱动**式的处理。
 
-每个RemotePlayer有两个线程，一个用于接收客户端玩家信息，另一个将信息发送给客户端。它们都有各自的BlockingCollection，以实现游戏处理线程与自己的通信。
+每个RemotePlayer有两个线程，一个用于接收客户端玩家信息，另一个将信息发送给客户端。它们都有各自的BlockingCollection，以实现游戏处理线程与自己的通信。在使用 socket 进行通信的时候，可能因为网络延迟等原因，多条 json 消息可能会被合成一条，为了处理这种情况，我们在每条 json 的结尾加上 `$` 表示一条 json 的结束，在收到消息是利用分隔符 `$` 恢复出原始的一条（或者多条）消息。
 
 PlayerAdapter为前端与后端交互的接口，本地开服使用`LocalPlayerAdapter`，远程连接使用`RemotePlayerAdapter`，它们都继承自`PlayerAdapter`，提供`SendMsg`方法与阻塞队列`RecvQueue`，前端可以使用它们收发信息。
 
