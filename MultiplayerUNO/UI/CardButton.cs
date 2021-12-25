@@ -93,6 +93,13 @@ namespace MultiplayerUNO.UI {
                 && !Card.CanResponseTo(GameControl.LastCard, GameControl.LastColor)) {
                 return;
             }
+            // 最后一张牌不能出 +4
+            var form = MsgAgency.MainForm;
+            if (form.Players[MainForm.ME].CardsCount == 1 &&
+                this.Card.IsPlus4()) {
+                form.ShowMsgToUser("最后一张牌不能出 +4");
+                return;
+            }
             int dy = (int)(HighLightRatio * WIDTH_MODIFIED);
             Animation anima = new Animation(MsgAgency.MainForm, this);
 
@@ -131,7 +138,6 @@ namespace MultiplayerUNO.UI {
         /// 初始化数组 IMAGES(保存所有图片)
         /// </summary>
         private void InitCardPosInSprite() {
-            // TODO BB 和 Card 类结合更加紧密一下
             // (1) 计算位置
             Point[] CardPosInSprite = new Point[TotalCard];
             for (int i = INVALID_UP + 1; i < PLUS4_BASE; ++i) {

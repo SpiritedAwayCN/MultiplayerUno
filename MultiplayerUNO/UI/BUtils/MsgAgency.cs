@@ -2,6 +2,7 @@
 using MultiplayerUNO.UI.Login;
 using MultiplayerUNO.Utils;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,6 +15,13 @@ namespace MultiplayerUNO.UI.BUtils {
     /// 前后端通信类
     /// </summary>
     public static partial class MsgAgency {
+
+        /// <summary>
+        /// 收到这一条消息之后的一些 task, 需要等这些 task 结束再处理下一条消息,
+        /// 只处理开始游戏之后的
+        /// </summary>
+        public static ConcurrentQueue<Task> TaskQueue = new ConcurrentQueue<Task>();
+
         /// <summary>
         /// 游戏运行的 MainForm 主窗口, 在构造函数中设置, 在 Close 的时候设置为 null
         /// </summary>
@@ -33,7 +41,6 @@ namespace MultiplayerUNO.UI.BUtils {
                 mainForm.Show();
             });
         }
-
 
         /// <summary>
         /// 处理 state 的信息(游戏开始之后从服务端发来的消息)
@@ -69,7 +76,7 @@ namespace MultiplayerUNO.UI.BUtils {
                 case 5: // 回应 +4
                     ResponedToPlus4(turnInfo);
                     break;
-                case 6: // 质疑结果展示
+                case 6: // TODO 质疑结果展示(现在不会受到这条消息, 也没有测试过)
                     ShowCardAfterPlus4(turnInfo);
                     break;
                 case 7: // 游戏结束, 展示所有人手牌
@@ -79,6 +86,15 @@ namespace MultiplayerUNO.UI.BUtils {
             }
             // 处理完消息之后 sleep 一会, 用于处理 AI 对战的情况
             Thread.Sleep(1000);
+            // 等所有动画结束, 再接着处理下一条消息
+            // 为了放置 async/await 带来的死锁问题, 这里使用 sleep 实现
+            while (!TaskQueue.IsEmpty) {
+                Task task;
+                TaskQueue.TryDequeue(out task);
+                while (!task.IsCompleted && !task.IsCanceled && !task.IsFaulted) {
+                    Thread.Sleep(500);
+                }
+            }
             return;
         }
 
@@ -144,7 +160,8 @@ namespace MultiplayerUNO.UI.BUtils {
         /// 摸一张牌
         /// </summary>
         private static void GetACard(TurnInfo turnInfo) {
-            // TODO 平局不响应?如何实现, 什么意思?
+            // 平局不响应?如何实现, 什么意思?
+            // 不处理, 平局之后应该发 state=7, 马上进入游戏结算局面
 
             // 别人摸牌
             if (turnInfo.TurnID != MainForm.MyID) {

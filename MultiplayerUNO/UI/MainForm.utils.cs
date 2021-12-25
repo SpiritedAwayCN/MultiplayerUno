@@ -37,6 +37,9 @@ namespace MultiplayerUNO.UI {
         /// 关闭窗口的时候返回到原始的连接界面
         /// </summary>
         private void MainForm_FormClosed(object sender, FormClosedEventArgs e) {
+            this.TmrCheckLeftTime.Stop();
+            this.TmrControlGame.Stop();
+            this.TmrDisplayCard.Stop();
             MsgAgency.MainForm = null;
             if (MsgAgency.LoginForm != null) {
                 MsgAgency.SendMsgToQueryRoomStateWhenLogin();
@@ -121,7 +124,6 @@ namespace MultiplayerUNO.UI {
         private void UpdateLblColor() {
             var c = GameControl.LastColor;
             Bitmap bmp = null;
-            // TODO 不够精致
             if (c == CardColor.Blue) {
                 bmp = UIImage._oButBlue;
             } else if (c == CardColor.Green) {
@@ -138,7 +140,34 @@ namespace MultiplayerUNO.UI {
         }
 
         /// <summary>
-        /// 每间隔 1s 检查一下时间, 更新标识事件时间的 label
+        /// 控制整个游戏流程
+        ///    1. 是不是第一轮第一个出牌
+        ///    2. 更新颜色
+        ///    3. 更新 lblMsg 的可见性
+        /// </summary>
+        private void TmrControlGame_Tick(object sender, EventArgs e) {
+            var tmr = this.TmrControlGame;
+            // 1
+            bool myturn = (GameControl.TurnID == MyID);
+            // 2
+            bool ff = GameControl.FirstTurnFirstShow();
+            // 3 当前时刻如果 >0 则可见
+            int t = ((int)this.LblMsg.Tag);
+            bool msgVisible = (t > 0);
+            this.LblMsg.Tag = msgVisible ? t - tmr.Interval : 0;
+
+            UIInvoke(() => {
+                // 更新颜色
+                UpdateLblColor();
+                // 第一次出第一张牌随便出
+                this.LblFirstShowCard.Visible = ff;
+                // lblmsg
+                this.LblMsg.Visible = msgVisible;
+            });
+        }
+
+        /// <summary>
+        /// 每间隔一段时间检查一下时间, 更新标识事件时间的 label
         /// </summary>
         private void TmrCheckLeftTime_Tick(object sender, EventArgs e) {
             if (GameControl.TimeForYou <= 0) {
@@ -171,8 +200,20 @@ namespace MultiplayerUNO.UI {
             Point pos;
             int playerIdx = GameControl.PlayerId2PlayerIndex[GameControl.TurnID];
             if (playerIdx != ME) {
-                // 如果不是我自己就居中
-                pos = Players[playerIdx].Center;
+                // 如果不是我自己就放在牌堆边上, 居中会有闪烁感
+                // (1) 居中    
+                //pos = Players[playerIdx].Center;
+                // (2) 边上
+                    // 左边的人, 计时器放在左边, 其余都放在右边
+                var player = Players[playerIdx];
+                pos = player.Center;
+                int offset = (CardButton.WIDTH_MODIFIED + lbl.Width) / 2 + 5;//offset:5
+                if (/*player.IsUpDown && */player.PosX < 0) {
+                    // 左边
+                    pos.X -= offset;
+                } else {
+                    pos.X += offset;
+                }
             } else {
                 var pnl = this.PnlNormalShowCardorNot;
                 pos = pnl.Location;
@@ -201,6 +242,17 @@ namespace MultiplayerUNO.UI {
             if (e.KeyCode == Keys.Escape) {
                 this.Close();
             }
+        }
+
+        /// <summary>
+        /// 在 lblMsg 上面展示一些信息
+        /// </summary>
+        public void ShowMsgToUser(string msg) {
+            UIInvoke(() => {
+                this.LblMsg.Text = msg;
+                this.LblMsg.Visible = false; // 为了让下面的指令触发 visibleChanged 事件
+                this.LblMsg.Visible = true;
+            });
         }
 
         #region panel 变成透明破产, 转化为直接把 panel 消失
@@ -233,18 +285,39 @@ namespace MultiplayerUNO.UI {
         #endregion panel 变成透明破产, 转化为直接把 panel 消失
 
         #region 一些常数
+        // (2) UI 位置
 
-        // UI
-        // 如下的比例是相对于 [-1,1]*[-1,1] 的
+        /// <summary>
+        /// 发牌堆、弃牌堆相对于中间的偏移,
+        /// 如下的比例是相对于 [-1,1]*[-1,1] 的
+        /// </summary>
         public const float PILE_OFFSET_RATE = 0.08f;
+        
+        /// <summary>
+        /// 用户昵称到自己牌堆边界的距离
+        /// </summary>
         public const int OFFSET_FOR_LBLINFO = 10;
-        public const int SIGN_LABLE_SIZE = 80;
-        public const int SIGN_LABLE_PDDING = 10;
 
-        // 游戏
-        public const int INITIAL_CARD_NUM = 7;
+        /// <summary>
+        /// 提示信息 label 的大小与偏移
+        /// </summary>
+        public const int SIGN_LABLE_SIZE = 80, SIGN_LABLE_PDDING = 10;
+
+        /// <summary>
+        /// 包含两个按钮的 panel 的大小
+        /// </summary>
+        public static Size TWO_BUTTON_PANEL_SIZE = new Size(300, 140);
+
+        /// <summary>
+        /// 两张卡牌之间的间隔大小
+        /// </summary>
         public const float INTERVAL_BETWEEN_CARDS_RATIO = 0.5f;
 
+        // (2) 游戏控制
+        /// <summary>
+        /// 用于显示一些提示信息的 label 的显示时间
+        /// </summary>
+        public const int MSG_SHOW_TIME = 2000;
         #endregion 一些常数
     }
 }

@@ -40,7 +40,6 @@
             this.PnlPlus2 = new System.Windows.Forms.Panel();
             this.LblPlayPlus2 = new System.Windows.Forms.Label();
             this.LblDonotPlayPlus2 = new System.Windows.Forms.Label();
-            this.LblPlus2Total = new System.Windows.Forms.Label();
             this.TxtDebug = new System.Windows.Forms.TextBox();
             this.PnlAfterGetOne = new System.Windows.Forms.Panel();
             this.LblShowAfterGetOne = new System.Windows.Forms.Label();
@@ -50,6 +49,9 @@
             this.PnlShowResultWhenGameOver = new System.Windows.Forms.Panel();
             this.LblColor = new System.Windows.Forms.Label();
             this.LblDirection = new System.Windows.Forms.Label();
+            this.LblMsg = new System.Windows.Forms.Label();
+            this.LblPlus2Total = new System.Windows.Forms.Label();
+            this.LblGameOverShowInForm = new System.Windows.Forms.Label();
             this.PnlQuestion.SuspendLayout();
             this.PnlDisplayCard.SuspendLayout();
             this.PnlPlus2.SuspendLayout();
@@ -238,19 +240,6 @@
             this.LblDonotPlayPlus2.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.LblDonotPlayPlus2.Click += new System.EventHandler(this.LblDonotPlayPlus2_Click);
             // 
-            // LblPlus2Total
-            // 
-            this.LblPlus2Total.AutoSize = true;
-            this.LblPlus2Total.BackColor = System.Drawing.Color.LightCyan;
-            this.LblPlus2Total.Font = new System.Drawing.Font("微软雅黑", 13.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.LblPlus2Total.Location = new System.Drawing.Point(280, 30);
-            this.LblPlus2Total.Name = "LblPlus2Total";
-            this.LblPlus2Total.Padding = new System.Windows.Forms.Padding(5);
-            this.LblPlus2Total.Size = new System.Drawing.Size(200, 41);
-            this.LblPlus2Total.TabIndex = 22;
-            this.LblPlus2Total.Text = "当前+2累计张数";
-            this.LblPlus2Total.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
             // TxtDebug
             // 
             this.TxtDebug.Location = new System.Drawing.Point(1104, 112);
@@ -308,7 +297,7 @@
             this.PnlNormalShowCardorNot.BackColor = System.Drawing.SystemColors.HotTrack;
             this.PnlNormalShowCardorNot.Controls.Add(this.LblShowCard);
             this.PnlNormalShowCardorNot.Controls.Add(this.LblGetCard);
-            this.PnlNormalShowCardorNot.Location = new System.Drawing.Point(606, 167);
+            this.PnlNormalShowCardorNot.Location = new System.Drawing.Point(691, 167);
             this.PnlNormalShowCardorNot.Name = "PnlNormalShowCardorNot";
             this.PnlNormalShowCardorNot.Size = new System.Drawing.Size(360, 143);
             this.PnlNormalShowCardorNot.TabIndex = 26;
@@ -361,12 +350,56 @@
             this.LblDirection.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.LblDirection.Visible = false;
             // 
+            // LblMsg
+            // 
+            this.LblMsg.AutoSize = true;
+            this.LblMsg.BackColor = System.Drawing.Color.LightCyan;
+            this.LblMsg.Font = new System.Drawing.Font("微软雅黑", 13.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.LblMsg.Location = new System.Drawing.Point(390, 99);
+            this.LblMsg.Name = "LblMsg";
+            this.LblMsg.Padding = new System.Windows.Forms.Padding(5);
+            this.LblMsg.Size = new System.Drawing.Size(302, 41);
+            this.LblMsg.TabIndex = 28;
+            this.LblMsg.Text = "一些提示信息，2秒后消失";
+            this.LblMsg.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.LblMsg.Visible = false;
+            // 
+            // LblPlus2Total
+            // 
+            this.LblPlus2Total.AutoSize = true;
+            this.LblPlus2Total.BackColor = System.Drawing.Color.LightCyan;
+            this.LblPlus2Total.Font = new System.Drawing.Font("微软雅黑", 13.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.LblPlus2Total.Location = new System.Drawing.Point(280, 30);
+            this.LblPlus2Total.Name = "LblPlus2Total";
+            this.LblPlus2Total.Padding = new System.Windows.Forms.Padding(5);
+            this.LblPlus2Total.Size = new System.Drawing.Size(200, 41);
+            this.LblPlus2Total.TabIndex = 22;
+            this.LblPlus2Total.Text = "当前+2累计张数";
+            this.LblPlus2Total.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // LblGameOverShowInForm
+            // 
+            this.LblGameOverShowInForm.AutoSize = true;
+            this.LblGameOverShowInForm.BackColor = System.Drawing.Color.LightCyan;
+            this.LblGameOverShowInForm.Font = new System.Drawing.Font("微软雅黑", 13.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.LblGameOverShowInForm.Location = new System.Drawing.Point(420, 253);
+            this.LblGameOverShowInForm.Name = "LblGameOverShowInForm";
+            this.LblGameOverShowInForm.Padding = new System.Windows.Forms.Padding(5);
+            this.LblGameOverShowInForm.Size = new System.Drawing.Size(240, 41);
+            this.LblGameOverShowInForm.TabIndex = 29;
+            this.LblGameOverShowInForm.Text = "游戏结束，获胜者是";
+            this.LblGameOverShowInForm.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.LblGameOverShowInForm.Visible = false;
+            this.LblGameOverShowInForm.Click += new System.EventHandler(this.LblGameOverShowInForm_Click);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.DimGray;
             this.ClientSize = new System.Drawing.Size(1692, 578);
+            this.Controls.Add(this.LblGameOverShowInForm);
+            this.Controls.Add(this.LblMsg);
             this.Controls.Add(this.LblPlus2Total);
             this.Controls.Add(this.PnlShowResultWhenGameOver);
             this.Controls.Add(this.PnlNormalShowCardorNot);
@@ -426,12 +459,14 @@
         private System.Windows.Forms.Panel PnlPlus2;
         private System.Windows.Forms.Label LblDonotPlayPlus2;
         private System.Windows.Forms.Label LblPlayPlus2;
-        private System.Windows.Forms.Label LblPlus2Total;
         private System.Windows.Forms.TextBox TxtDebug;
         private System.Windows.Forms.Panel PnlAfterGetOne;
         private System.Windows.Forms.Label LblDonotShowAfterGetOne;
         private System.Windows.Forms.Label LblShowAfterGetOne;
         private System.Windows.Forms.Panel PnlNormalShowCardorNot;
         private System.Windows.Forms.Panel PnlShowResultWhenGameOver;
+        private System.Windows.Forms.Label LblMsg;
+        private System.Windows.Forms.Label LblPlus2Total;
+        private System.Windows.Forms.Label LblGameOverShowInForm;
     }
 }

@@ -28,17 +28,13 @@ namespace MultiplayerUNO.UI {
         /// </summary>
         public int REF_HEIGHT, REF_WIDTH;
 
-        Random rdm = new Random();
-
         /// <summary>
         /// 游戏人数
         /// </summary>
-        //public readonly int PlayersNumber; // TODO
         public int PlayersNumber;
-        public Player[] Players; // 0 号表示自己
-        public const int ME = 0;
-        public readonly int MyID;
-
+        public Player[] Players; 
+        public const int ME = 0;  // UI: index(0 号表示自己)
+        public readonly int MyID; // Backend: playerID
 
         // 牌堆
         // 为了处理方便, 这两张牌不会在被 MainForm 中去除
@@ -48,7 +44,7 @@ namespace MultiplayerUNO.UI {
         public const int PileDropped = 1;
 
         /// <summary>
-        /// 出牌动画, 某人出什么牌
+        /// 出牌动画, 某人出什么牌, 返回出牌动画的 task
         /// </summary>
         /// <param name="playerIdx">
         /// 注意这里是用于UI控制的 playerIdx, 而不是 playerID 
@@ -95,18 +91,21 @@ namespace MultiplayerUNO.UI {
             if (playerIdx != ME) {
                 anima.SetRotate();
             }
-            UIInvoke(() => {
+            UIInvokeSync(() => {
                 cbtn.BringToFront();
-                Task.Run(async () => {
-                    await anima.Run(); // 动画结束加入弃牌堆
-                    UIInvoke(() => {
-                        GameControl.AddDroppedCard(cbtn);
-                    });
-                });
             });
 
-            // 更新牌的张数
-            UIInvoke(() => { Players[playerIdx].UpdateInfo(); });
+            var t = anima.Run();
+            MsgAgency.TaskQueue.Enqueue(t);
+            Task.Run(async () => {
+                await t;
+                // 动画结束加入弃牌堆
+                UIInvoke(() => {
+                    GameControl.AddDroppedCard(cbtn);
+                    // 更新牌的张数
+                    Players[playerIdx].UpdateInfo();
+                });
+            });
 
             if (playerIdx == ME) {
                 cbtn.Click -= cbtn.HighLightCard;
@@ -128,23 +127,25 @@ namespace MultiplayerUNO.UI {
         }
 
         /// <summary>
-        /// 游戏结束
+        /// 游戏结束(注意此时不要使用 turnInfo 中的任何解析信息)
         /// 1. 打牌动画
         /// 2. 显示谁胜利了
         /// 3. 展示手牌
         /// </summary>
         internal void GameOver(TurnInfo turnInfo) {
-            // 1. 打牌动画
-            int playerIdx = turnInfo.GetPlayerIndex();
-            ShowCard(playerIdx, turnInfo.LastCardID); // TODO lastcard 可能不是上一张牌(平局)
-            
+            int turnID = (int)turnInfo.JsonMsg["turnID"];
+            // 不是平局
+            if (turnID != 0) {
+                // 1. 打牌动画
+                int playerIdx = turnInfo.GetPlayerIndex();
+                ShowCard(playerIdx, turnInfo.LastCardID);
+            }
             // 2. 显示谁胜利了
             string msgGameOver = "";
-            int winnerID = turnInfo.TurnID;
-            if (winnerID != 0) {
+            if (turnID != 0) {
                 // 某人获胜
                 string playerName = Players[
-                    GameControl.PlayerId2PlayerIndex[winnerID]
+                    GameControl.PlayerId2PlayerIndex[turnID]
                 ].Name;
                 msgGameOver = "游戏结束, 胜利者是: " + playerName;
             } else {
@@ -158,12 +159,32 @@ namespace MultiplayerUNO.UI {
                 lbl.Height = h;
                 lbl.Text = msgGameOver;
                 lbl.Visible = true;
+
+                lbl = this.LblGameOverShowInForm;
+                lbl.Text = msgGameOver + "\n[点击展示手牌]";
+                lbl.Visible = true;
+                lbl.BringToFront();
+
+                // 停止倒计时
+                this.TmrCheckLeftTime.Stop();
+                this.LblLeftTime.Visible = false;
             });
 
             // 3. 展示手牌
-            ShowCardsWhenGameOver(turnInfo);
+            //ShowCardsWhenGameOver(turnInfo);
+            this.LblGameOverShowInForm.Tag = turnInfo;
         }
 
+        /// <summary>
+        /// 根据 tag 中保存的信息 turninfo 展示手牌
+        /// </summary>
+        private void LblGameOverShowInForm_Click(object sender, EventArgs e) {
+            ShowCardsWhenGameOver((TurnInfo)this.LblGameOverShowInForm.Tag);
+        }
+
+        /// <summary>
+        /// 游戏结束展示手牌的动画
+        /// </summary>
         private void ShowCardsWhenGameOver(TurnInfo turnInfo) {
             Panel pnl = this.PnlShowResultWhenGameOver;
             // (1) 获取玩家和牌的列表
@@ -174,7 +195,7 @@ namespace MultiplayerUNO.UI {
             for (int i = 0; i < cnt; ++i) {
                 JsonData p = playerCards[i];
                 name[i] = (string)p["name"]
-                          + ((int)p["isRobot"] == 1 ? "[AI 托管]" : "");
+                          + ((int)p["isRobot"] == 1 ? "[AI]" : "");
                 p = p["handcards"];
                 cards[i] = new CardButton[p.Count];
                 for (int j = 0; j < p.Count; ++j) {
@@ -217,7 +238,7 @@ namespace MultiplayerUNO.UI {
             int padding = 10;
             int startx = padding * 2 + lblSize.Width;
             Point[] startPoint = new Point[cnt];
-            Point[] endPoint = new Point[cnt];
+            int maxMovementX; // 最大平移距离
             // 每个人的牌堆大小(取整)
             int lengthPerPlayer = pnl.Size.Width / 2 - startx - CardButton.WIDTH_MODIFIED;
             lengthPerPlayer = (lengthPerPlayer / CardButton.WIDTH_MODIFIED)
@@ -228,8 +249,6 @@ namespace MultiplayerUNO.UI {
                 for (int i = 0; i < cnt; ++i) {
                     startPoint[i] = new Point(startx,
                         (int)((i + 1) / (cnt + 1.0f) * pnl.Size.Height));
-                    endPoint[i] = new Point(startPoint[i].X + lengthPerPlayer,
-                        startPoint[i].Y);
                 }
             } else {
                 // 分两列
@@ -237,11 +256,10 @@ namespace MultiplayerUNO.UI {
                 for (int i = 0; i < cnt; ++i) {
                     startPoint[i] = new Point(
                         (int)(startx + (i / mod) * pnl.Size.Width / 2),
-                        (int)((((i + 1) % mod) + 1) / (mod + 1.0f) * pnl.Size.Height));
-                    endPoint[i] = new Point(startPoint[i].X + lengthPerPlayer,
-                        startPoint[i].Y);
+                        (int)(((i % mod) + 1) / (mod + 1.0f) * pnl.Size.Height));
                 }
             }
+            maxMovementX = lengthPerPlayer;
 
             // (4) 计算 label 位置, panel 可见
             UIInvokeSync(() => {
@@ -263,6 +281,7 @@ namespace MultiplayerUNO.UI {
             });
 
             // (5) 动画序列
+            // 每一个人的第 i 张牌为第 i 组动画
             List<Animation> lst = new List<Animation>();
             bool notok = true;
             int idx = 0;
@@ -276,10 +295,10 @@ namespace MultiplayerUNO.UI {
                     if (idx >= p.Length) { continue; }
                     if (anima == null) {
                         anima = new Animation(this, p[idx]);
-                        int x = CardButton.WIDTH_MODIFIED / 2 * (3 + idx);
-                        // TODO 垃圾代码到时候优化一下 endPoint 直接使用 maxlength
-                        if (x > (endPoint[player].X - startPoint[player].X)) {
-                            x = endPoint[player].X - startPoint[player].X;
+                        // 移动距离
+                        int x = CardButton.WIDTH_MODIFIED / 2 * (2 + idx);
+                        if (x > maxMovementX) {
+                            x = maxMovementX;
                         }
                         anima.SetTranslate(x, 0);
                     } else {
@@ -309,7 +328,6 @@ namespace MultiplayerUNO.UI {
         internal void RespondToPlus4(TurnInfo turnInfo) {
             UIInvokeSync(() => {
                 SetPnlQuestionVisible(true);
-                // TODO 其他功能键不能响应
             });
         }
 
@@ -346,6 +364,7 @@ namespace MultiplayerUNO.UI {
                 animaseq.AddAnimation(anima);
             }
             var w = animaseq.Run();
+            MsgAgency.TaskQueue.Enqueue(w);
             Task.Run(async () => {
                 await w; // 同步
                 Players[ME].CardsCount += num; // 更新卡牌数量
@@ -369,7 +388,7 @@ namespace MultiplayerUNO.UI {
                 ["state"] = 2,
                 ["queryID"] = GameControl.QueryID
             };
-            MsgAgency.PlayerAdapter.SendMsg2Server(json.ToJson());
+            MsgAgency.SendOneJsonDataMsg(json);
             if (GameControl.CBtnSelected != null) {
                 // 选牌归位
                 GameControl.CBtnSelected.PerformClick();
@@ -385,6 +404,7 @@ namespace MultiplayerUNO.UI {
             int playerIdx = GameControl.PlayerId2PlayerIndex[turnInfo.TurnID];
             Animation anima = GetACardAnima(playerIdx, turnInfo.LastCardID);
             var w = anima.Run();
+            MsgAgency.TaskQueue.Enqueue(w);
             Task.Run(async () => {
                 await w;
                 Players[playerIdx].CardsCount += num;
@@ -410,6 +430,7 @@ namespace MultiplayerUNO.UI {
             // (1)
             Animation anima = GetACardAnima(ME, turnInfo.LastCardID);
             var t = anima.Run();
+            MsgAgency.TaskQueue.Enqueue(t);
             CardButton cbtn = Players[ME].BtnsInHand[0] as CardButton;
             Card c = new Card(turnInfo.LastCardID);
             bool canResponed = GameControl.FirstTurn() ||
@@ -446,7 +467,7 @@ namespace MultiplayerUNO.UI {
                 ["color"] = 0, // 缺了这个好像后端会报错 TODO
                 ["queryID"] = GameControl.QueryID
             };
-            MsgAgency.PlayerAdapter.SendMsg2Server(json.ToJson());
+            MsgAgency.SendOneJsonDataMsg(json);
         }
 
         /// <summary>
@@ -479,23 +500,6 @@ namespace MultiplayerUNO.UI {
             // 注意这里即使不是自己, 我们也把牌加进去了(await 动画结束后删除)
             Players[playerIdx].BtnsInHand.Insert(0, cbtn);
             return anima;
-        }
-
-        /// <summary>
-        /// 控制整个游戏流程
-        ///    1. 检查能否出牌、摸牌
-        ///    2. 是不是第一轮第一个出牌
-        ///    3. 更新颜色
-        /// </summary>
-        private void TmrControlGame_Tick(object sender, EventArgs e) {
-            bool myturn = (GameControl.TurnID == MyID);
-            bool ff = GameControl.FirstTurnFirstShow();
-            UIInvoke(() => {
-                // 更新颜色
-                UpdateLblColor();
-                // 第一次出第一张牌随便出
-                this.LblFirstShowCard.Visible = ff;
-            });
         }
 
         /// <summary>
@@ -546,7 +550,7 @@ namespace MultiplayerUNO.UI {
             } else {
                 json["card"] = btn.Card.CardId;
             }
-            MsgAgency.PlayerAdapter.SendMsg2Server(json.ToJson());
+            MsgAgency.SendOneJsonDataMsg(json);
 
             // 此时需要阻塞, 向服务器寻求验证, 直到服务器反馈之后再出牌
             // 这里不处理, 认为这个事件处理结束, 可以直接让 Msg 中的收消息线程处理
@@ -580,7 +584,7 @@ namespace MultiplayerUNO.UI {
                 ["state"] = state,
                 ["queryID"] = GameControl.QueryID
             };
-            MsgAgency.PlayerAdapter.SendMsg2Server(json.ToJson());
+            MsgAgency.SendOneJsonDataMsg(json);
         }
 
 
@@ -656,7 +660,7 @@ namespace MultiplayerUNO.UI {
                 ["card"] = cbtn.Card.CardId,
                 ["queryID"] = GameControl.QueryID
             };
-            MsgAgency.PlayerAdapter.SendMsg2Server(json.ToJson());
+            MsgAgency.SendOneJsonDataMsg(json);
             SetPnlPlus2Visible(false);
         }
 
@@ -668,7 +672,7 @@ namespace MultiplayerUNO.UI {
                 ["state"] = 4,
                 ["queryID"] = GameControl.QueryID
             };
-            MsgAgency.PlayerAdapter.SendMsg2Server(json.ToJson());
+            MsgAgency.SendOneJsonDataMsg(json);
             SetPnlPlus2Visible(false);
         }
 
@@ -685,6 +689,7 @@ namespace MultiplayerUNO.UI {
         /// </summary>
         private void LblShowAfterGetOne_Click(object sender, EventArgs e) {
             var btn = GameControl.CBtnSelected;
+            if (btn == null) { return; }
             if (btn.Card.Color == CardColor.Invalid) {
                 // +4/万能牌
                 GameControl.InvalidCardToChooseColor = CardColor.Invalid;
