@@ -10,6 +10,9 @@ namespace MultiplayerUNO.Backend
 {
     public partial class Room
     {
+        /// <summary>
+        /// 出牌的AI
+        /// </summary>
         protected JsonData AutoPseudoActPlayer(Card lastCard, Player.Player turnPlayer, bool ai = false)
         {
             if(currentStatus == GameStatus.Plus4Loop)
@@ -34,6 +37,8 @@ namespace MultiplayerUNO.Backend
             }; // 默认不出
             
             if(!ai) return json;
+
+            // AI策略：能出就出
 
             Card intendCard = null;
             if(lastCard != null)
@@ -60,6 +65,9 @@ namespace MultiplayerUNO.Backend
             return json;
         }
 
+        /// <summary>
+        /// 摸上牌后是否响应的AI
+        /// </summary>
         protected JsonData AutoResponseOrNot(bool ai = false)
         {
             JsonData json = new JsonData
@@ -69,14 +77,17 @@ namespace MultiplayerUNO.Backend
                 ["color"] = 0,
                 ["queryID"] = queryID
             };
-
+            // 默认不出
             if (!ai || (lastCard != null && !gainCard.CanResponseTo(lastCard, (Card.CardColor)(lastCardInfo & 3)))) return json;
-
+            // AI策略：能出就出
             json["action"] = 1;
             if (gainCard.Color == Card.CardColor.Invalid) json["color"] = gainCard.CardId & 3;
             return json;
         }
 
+        /// <summary>
+        /// 叠+2时的AI
+        /// </summary>
         protected JsonData AutoPlus2Action(bool ai = false)
         {
             JsonData json = new JsonData
@@ -86,7 +97,8 @@ namespace MultiplayerUNO.Backend
             }; // 默认不出接受摸牌
 
             if (!ai) return json;
-
+            
+            // AI策略：能出就出
             Card intendCard = null;
             foreach (Card card in currentPlayerNode.Value.handCards)
             {

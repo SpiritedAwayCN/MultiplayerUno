@@ -12,6 +12,9 @@ using LitJson;
 
 namespace MultiplayerUNO.Backend
 {
+    /// <summary>
+    /// 游戏房间类
+    /// </summary>
     public partial class Room
     {
         public static readonly int MinPlayerNumber = 2;
@@ -19,26 +22,30 @@ namespace MultiplayerUNO.Backend
 
         public static readonly int MaxSeatIDCounter = 4096;
 
+        /// <summary>
+        /// InfoQueue存储的数据格式
+        /// </summary>
         public class MsgArgs
         {
-            public Player.Player player;
-            public string msg;
-            public MsgType type = MsgType.Remote;
+            public Player.Player player;    // 发送玩家
+            public string msg;  // 字符串数据
+            public MsgType type = MsgType.Remote; // 信息类型
         }
+
 
         public enum MsgType
         {
-            Remote,
-            PlayerJoin,
-            PlayerLeave,
-            PlayerTimeout,
-            RobotResponse
+            Remote,     // 由前端发送
+            PlayerJoin, // 玩家进入房间
+            PlayerLeave, // 玩家离开房间
+            PlayerTimeout, // 玩家超时
+            RobotResponse // AI接管自动响应
         }
 
 
-        public BlockingCollection<MsgArgs> InfoQueue { get; }
+        public BlockingCollection<MsgArgs> InfoQueue { get; } // 信息处理专用Queue
 
-        public const string Version = "0.1.0";
+        public const string Version = "0.1.0"; 
 
         protected IPEndPoint iPEndPoint;
         protected Thread listenThread;
@@ -64,28 +71,36 @@ namespace MultiplayerUNO.Backend
 
         protected Socket listenSocket;
         protected LinkedList<Player.Player> ingamePlayers;
-        protected int assignedSeatID = 0;
+        protected int assignedSeatID = 0; // 已分配的UID，永远不减
 
+        /// <summary>
+        /// 初始化房间
+        /// </summary>
         public void InitializeRoom()
         {
+            // 开启游戏处理线程
             processThread = new Thread(ProcessThreadFunc);
             processThread.IsBackground = true;
             processThread.Start();
 
+            // 绑定socket
             listenSocket.Bind(iPEndPoint);
             listenSocket.Listen(10);
+
+            // 监听线程
             listenThread = new Thread(() =>
             {
                 while (true)
                 {
                     try
                     {
-                        Socket rSocket = listenSocket.Accept();
+                        Socket rSocket = listenSocket.Accept(); // 建立连接
                         RemotePlayer remotePlayer = new RemotePlayer(rSocket, this);
                         new Thread(() =>
                         {
                             if (remotePlayer.OpenStream())
                             {
+                                // 成功进入房间，通知处理线程
                                 InfoQueue.Add(new MsgArgs()
                                 {
                                     player = remotePlayer,
@@ -110,25 +125,31 @@ namespace MultiplayerUNO.Backend
                 }
             });
 
-            listenThread.IsBackground = true;
+            listenThread.IsBackground = true; //后台线程
             listenThread.Start();
         }
 
-
+        /// <summary>
+        /// 游戏状态
+        /// </summary>
         protected enum GameStatus
         {
-            Waiting, 
-            Common, 
-            QueryPlayer, 
-            Plus2Loop,
-            CardsDrawing,
-            Plus4Loop,
-            Questioning,
-            GameEnd
+            Waiting, // 等待 
+            Common,  // 普通
+            QueryPlayer, // 不出摸牌询问
+            Plus2Loop, // 叠+2
+            CardsDrawing, // 摸牌
+            Plus4Loop, // +4质疑
+            Questioning, // 已弃用
+            GameEnd // 游戏结束
         };
 
 
-        protected GameStatus currentStatus;
+        protected GameStatus currentStatus; // 当前状态
+
+        /// <summary>
+        /// 核心：游戏处理线程
+        /// </summary>
         public void ProcessThreadFunc()
         {
             while (true)
@@ -136,7 +157,7 @@ namespace MultiplayerUNO.Backend
                 MsgArgs msgArgs = null;
                 try
                 {
-                    msgArgs = InfoQueue.Take();
+                    msgArgs = InfoQueue.Take(); // 不断尝试从消息中取出信息
                 }catch(ObjectDisposedException e)
                 {
                     Console.WriteLine(e.Message);
@@ -149,11 +170,13 @@ namespace MultiplayerUNO.Backend
                 
                 if(msgArgs.type == MsgType.PlayerJoin)
                 {
+                    // Server自己发出的玩家加入信息
                     PlayerJoin(msgArgs.player);
                     continue;
                 }
                 if(msgArgs.type == MsgType.PlayerLeave)
                 {
+                    // Server发出的玩家离开信息
                     PlayerLeave(msgArgs.player);
                     continue;
                 }
@@ -167,6 +190,7 @@ namespace MultiplayerUNO.Backend
 
                 try
                 {
+                    // 根据当前状态调用对应的处理函数
                     switch (currentStatus)
                     {
                         case GameStatus.Waiting:
@@ -188,6 +212,7 @@ namespace MultiplayerUNO.Backend
                 }
                 catch (TieExceptions)
                 {
+                    // 平局异常，游戏结束
                     JsonData json = new JsonData
                     {
                         ["turnID"] = 0
@@ -196,6 +221,7 @@ namespace MultiplayerUNO.Backend
                 }
                 catch (PlayerFinishException e)
                 {
+                    // 有玩家打完了牌，游戏结束
                     JsonData json = new JsonData
                     {
                         ["turnID"] = e.player.ingameID,
@@ -216,6 +242,9 @@ namespace MultiplayerUNO.Backend
             }
         }
 
+        /// <summary>
+        /// 游戏结束后的操作
+        /// </summary>
         protected void GameEndProcess(JsonData json)
         {
             gameTimer.Dispose(); //终止计时器
@@ -226,7 +255,7 @@ namespace MultiplayerUNO.Backend
             json["playerCards"].SetJsonType(JsonType.Array);
 
             foreach (Player.Player p in ingamePlayers)
-                json["playerCards"].Add(p.BuildPlayerMapJson(true));
+                json["playerCards"].Add(p.BuildPlayerMapJson(true)); // 此时显示所有玩家的手牌
             string sendJson = json.ToJson();
 
             // 以下：剔除所有被AI接管的玩家
@@ -241,10 +270,13 @@ namespace MultiplayerUNO.Backend
             }
             ingamePlayers = tempPlayers;
 
-            currentStatus = GameStatus.Waiting;
+            currentStatus = GameStatus.Waiting; //切换回等待状态
 
         }
 
+        /// <summary>
+        /// 玩家加入房间
+        /// </summary>
         public void PlayerJoin(Player.Player player)
         {
             if(ingamePlayers.Count >= MaxPlayerNumber || currentStatus != GameStatus.Waiting
@@ -259,11 +291,11 @@ namespace MultiplayerUNO.Backend
             // 玩家加入房间
             ingamePlayers.AddLast(player);
             
-            assignedSeatID++;
-            player.seatID = assignedSeatID;
+            assignedSeatID++; // 玩家UID递增
+            player.seatID = assignedSeatID; // UID复制
 
-            JsonData json = BuildPlayerWaitingJson();
-            player.SendMessage(json.ToJson());
+            JsonData json = BuildPlayerWaitingJson(); // 构造等待状态下的房间信息json
+            player.SendMessage(json.ToJson()); // 发送给加入的player
 
             string joinJson = new JsonData
             {
@@ -272,9 +304,12 @@ namespace MultiplayerUNO.Backend
             }.ToJson();
 
             foreach (Player.Player p in ingamePlayers)
-                p.SendMessage(joinJson);
+                p.SendMessage(joinJson); // 向房间内所有玩家广播进入信息
         }
 
+        /// <summary>
+        /// 玩家离开
+        /// </summary>
         public bool PlayerLeave(Player.Player player)
         {
             if(currentStatus == GameStatus.Waiting)
@@ -290,7 +325,7 @@ namespace MultiplayerUNO.Backend
                 }.ToJson();
 
                 foreach (Player.Player p in ingamePlayers)
-                    p.SendMessage(leaveJson);
+                    p.SendMessage(leaveJson); // 广播玩家离开
             }
             else
             {
@@ -303,24 +338,30 @@ namespace MultiplayerUNO.Backend
                 }.ToJson();
 
                 foreach (Player.Player p in ingamePlayers)
-                    p.SendMessage(leaveJson);
+                    p.SendMessage(leaveJson); // 广播
             }
 
             return true;
         }
 
 
+        /// <summary>
+        /// 供前端调用，关闭房间
+        /// </summary>
         public void CloseRoom()
         {
-            listenSocket.Close();
+            listenSocket.Close(); // 关套接字
 
             foreach(Player.Player player in ingamePlayers)
             {
                 RemotePlayer remotePlayer = player as RemotePlayer;
-                remotePlayer?.Leave();
+                remotePlayer?.Leave(); // 强制远程玩家离开
             }
         }
 
+        /// <summary>
+        /// 构造等待状态下房间内玩家json
+        /// </summary>
         public JsonData BuildPlayerWaitingJson()
         {
 

@@ -8,22 +8,31 @@ namespace MultiplayerUNO.Backend
 {
     public partial class Room
     {
-        protected const int NormalWaitingTime = 45000;
-        protected const int ShortWaitingTime = 10000;
+        protected const int NormalWaitingTime = 45000;  // 默认等待时间
+        protected const int ShortWaitingTime = 10000; // 摸牌后是否出牌等待时间
 
+        /// <summary>
+        /// 无效，向对应玩家重发游戏格局json
+        /// </summary>
         protected void SendInvalidIInfo(Player.Player sendPlayer)
         {
             sendPlayer.SendMessage(BuildGamePatternJson().ToJson());
         }
 
+        /// <summary>
+        /// +4质疑中 处理
+        /// </summary>
         protected void ProcPlus4Loop(JsonData jsonData, Player.Player sendPlayer)
         {
+            // 如果请求游戏状态json
             int state = (int)jsonData["state"];
             if (state == 0)
             {
                 sendPlayer.SendMessage(BuildGameStateJson(sendPlayer).ToJson());
                 return;
             }
+
+            // 判断发送玩家、请求ID是否对应
             int responseID = (int)jsonData["queryID"];
             if (responseID != queryID || sendPlayer.ingameID != currentPlayerNode.Value.ingameID)
             {
@@ -45,14 +54,19 @@ namespace MultiplayerUNO.Backend
             }
         }
 
+        /// <summary>
+        /// 叠+2处理
+        /// </summary>
         protected void ProcPlus2Loop(JsonData jsonData, Player.Player sendPlayer)
         {
+            // 如果请求游戏状态json
             int state = (int)jsonData["state"];
             if (state == 0)
             {
                 sendPlayer.SendMessage(BuildGameStateJson(sendPlayer).ToJson());
                 return;
             }
+            // 判断请求id与发送者是否合法
             int responseID = (int)jsonData["queryID"];
             if (responseID != queryID || sendPlayer.ingameID != currentPlayerNode.Value.ingameID)
             {
@@ -67,6 +81,7 @@ namespace MultiplayerUNO.Backend
 
                 if (responseCard == null || responseCard.Number != 11)
                 {
+                    // 玩家没有这张牌，或这张牌不是+2
                     SendInvalidIInfo(sendPlayer);
                     return;
                 }
@@ -81,10 +96,14 @@ namespace MultiplayerUNO.Backend
 
         }
 
+        /// <summary>
+        /// 摸牌后询问
+        /// </summary>
         protected void ProcQuery(JsonData jsonData, Player.Player sendPlayer)
         {
+            // 如果请求游戏状态json
             int state = (int)jsonData["state"];
-           if(state == 0)
+            if(state == 0)
             {
                 sendPlayer.SendMessage(BuildGameStateJson(sendPlayer).ToJson());
                 return;
@@ -98,7 +117,7 @@ namespace MultiplayerUNO.Backend
             if(gainCard.Color == Card.CardColor.Invalid)
             {
                 colorId = (int)jsonData["color"];
-                if(colorId >> 2 != 0)
+                if(colorId >> 2 != 0) // 万能/+4牌，需要指定颜色
                 {
                     SendInvalidIInfo(sendPlayer);
                     return;
@@ -107,6 +126,7 @@ namespace MultiplayerUNO.Backend
 
             if(responseID != queryID)
             {
+                // 请求编号需要一致
                 SendInvalidIInfo(sendPlayer);
                 return;
             }
@@ -116,6 +136,7 @@ namespace MultiplayerUNO.Backend
                 // 出的情况
                 if (lastCard != null && !gainCard.CanResponseTo(lastCard, (Card.CardColor)(lastCardInfo & 3)))
                 {
+                    // 需要可以响应
                     SendInvalidIInfo(sendPlayer);
                     return;
                 }
@@ -142,6 +163,7 @@ namespace MultiplayerUNO.Backend
 
                 if(currentPlayerNode.Value.isRobot == 1) // AI接管时
                 {
+                    // 能出则出
                     InfoQueue.Add(new MsgArgs
                     {
                         msg = AutoPseudoActPlayer(lastCard, currentPlayerNode.Value, true).ToJson(),
@@ -160,15 +182,15 @@ namespace MultiplayerUNO.Backend
 
         protected void ProcCommon(JsonData jsonData, Player.Player sendPlayer)
         {
+            // 如果请求游戏状态json
             int state = (int)jsonData["state"];
             if (state == 0)
             {
                 sendPlayer.SendMessage(BuildGameStateJson(sendPlayer).ToJson());
                 return;
             }
-
+            // 需要请求id一致
             int responseID = (int)jsonData["queryID"];
-
             if (responseID != queryID || sendPlayer.ingameID != currentPlayerNode.Value.ingameID) {
                 SendInvalidIInfo(sendPlayer);
                 return;
@@ -176,11 +198,12 @@ namespace MultiplayerUNO.Backend
             
             if(state == 1)
             {
-                // 出了牌的情形，首先
+                // 出了牌的情形
                 int cardId = (int)jsonData["card"];
                 int colorId = (int)jsonData["color"];
                 Card responseCard = FindCardInPlayerHandcards(cardId, sendPlayer);
 
+                // 必须是可响应的牌
                 if(responseCard == null || (responseCard.Color == Card.CardColor.Invalid && colorId >> 2 != 0))
                 {
                     SendInvalidIInfo(sendPlayer);
@@ -230,6 +253,9 @@ namespace MultiplayerUNO.Backend
             }
         }
 
+        /// <summary>
+        /// 房间处于等待状态的处理
+        /// </summary>
         protected void ProcWaiting(JsonData jsonData, Player.Player sendPlayer)
         {
             int type = (int)jsonData["type"];
@@ -237,9 +263,11 @@ namespace MultiplayerUNO.Backend
             switch (type)
             {
                 case 0:
+                    // 请求状态json
                     sendPlayer.SendMessage(BuildPlayerWaitingJson().ToJson());
                     return;
                 case 1:
+                    // 玩家准备
                     if(sendPlayer.IsReady == false)
                     {
                         sendPlayer.IsReady = true;
@@ -256,6 +284,7 @@ namespace MultiplayerUNO.Backend
                     }
                     return;
                 case 2:
+                    // 玩家取消准备
                     if (sendPlayer.IsReady)
                     {
                         sendPlayer.IsReady = false;
@@ -275,6 +304,7 @@ namespace MultiplayerUNO.Backend
 
             if (type != 3) return;
 
+            // 玩家开始游戏
             bool canStart = true;
             foreach (Player.Player p in ingamePlayers)
                 if(p.IsReady == false)
@@ -284,6 +314,7 @@ namespace MultiplayerUNO.Backend
                 }
             if (!canStart || ingamePlayers.Count < MinPlayerNumber)
             {
+                // 有人未准备 或 未到达最小游戏人数，开始失败
                 sendPlayer.SendMessage("{\"type\":6}");
                 return;
             }
@@ -297,9 +328,9 @@ namespace MultiplayerUNO.Backend
             lastCardInfo = -1; // 仅lastCard为+4/万能时有意义
             queryID = 1; // 重置请求编号计数器
             drawingCardCounter = 0; // +2的摸牌计数器
-            plus4ColorID = -1;
-            plus4Player = null;
-            plus4ResponseCard = null;
+            plus4ColorID = -1; // 被+4响应牌的颜色
+            plus4Player = null; // 打出+4的玩家
+            plus4ResponseCard = null; //被+4响应牌
 
             currentStatus = GameStatus.Common;  // 进入1号状态
 
@@ -334,6 +365,9 @@ namespace MultiplayerUNO.Backend
 
         }
 
+        /// <summary>
+        /// 随机打乱房间内的玩家，并分配playerID
+        /// </summary>
         protected void ShuffleIngamePlayers()
         {
             Player.Player[] tempPlayers = new Player.Player[ingamePlayers.Count];
@@ -366,6 +400,9 @@ namespace MultiplayerUNO.Backend
             }
         }
 
+        /// <summary>
+        /// 查找玩家手牌中某编号的牌，没有则返回null
+        /// </summary>
         protected Card FindCardInPlayerHandcards(int cardID, Player.Player player)
         {
             foreach(Card card in player.handCards)
@@ -375,18 +412,22 @@ namespace MultiplayerUNO.Backend
             return null;
         }
 
+        /// <summary>
+        /// 4号状态的处理，摸完牌后立即转移至正常状态
+        /// </summary>
         protected void DrawCardBack2Common(int cardCount, Player.Player drawnPlayer, bool toNext = true)
         {
             Card[] drawnCards = cardPile.DrawCards(cardCount);
             drawnPlayer.GainCard(drawnCards); // 摸牌
 
+            // 以下，构造json
             JsonData json = new JsonData
             {
                 ["state"] = 4,
                 ["lastCard"] = cardCount, // 摸上的牌数目
                 ["turnID"] = drawnPlayer.ingameID
             };
-            string basicJson = json.ToJson();
+            string basicJson = json.ToJson(); // 无手牌信息的json
 
             json["playerCards"] = new JsonData();
             json["playerCards"].SetJsonType(JsonType.Array);
@@ -394,7 +435,7 @@ namespace MultiplayerUNO.Backend
             {
                 json["playerCards"].Add(card.CardId);
             }
-            string personalJson = json.ToJson();
+            string personalJson = json.ToJson(); // 有手牌信息的json
 
             foreach (Player.Player p in ingamePlayers)
             {   // 4号状态
@@ -428,6 +469,9 @@ namespace MultiplayerUNO.Backend
 
         }
 
+        /// <summary>
+        /// 玩家摸牌
+        /// </summary>
         protected void PlayerHandCard(Player.Player sendPlayer, Card responseCard, int colorId)
         {
             if (colorId < 0) colorId = 0;
@@ -500,8 +544,11 @@ namespace MultiplayerUNO.Backend
         protected int drawingCardCounter;
         protected Player.Player plus4Player;
 
-        protected int queryID;
+        protected int queryID; // 请求编号
 
+        /// <summary>
+        /// 开始计时器
+        /// </summary>
         protected void TimerStart(MsgArgs msg, int waitingTime = NormalWaitingTime)
         {
             // gameTimer?.Dispose();
@@ -514,6 +561,9 @@ namespace MultiplayerUNO.Backend
             lastTimerWaitSec = waitingTime;
         }
 
+        /// <summary>
+        /// 构造游戏格局json
+        /// </summary>
         protected JsonData BuildGamePatternJson(Player.Player player = null)
         {
             JsonData json = new JsonData
@@ -521,6 +571,8 @@ namespace MultiplayerUNO.Backend
                 ["state"] = (int)currentStatus,
                 ["queryID"] = queryID
             };
+
+            // 不同的状态不同的构造方式，详见定义文档
             switch (currentStatus)
             {
                 case GameStatus.Common:
@@ -549,6 +601,9 @@ namespace MultiplayerUNO.Backend
             return json;
         }
 
+        /// <summary>
+        /// 构造游戏状态json，格式见文档
+        /// </summary>
         protected JsonData BuildGameStateJson(Player.Player queryPlayer)
         {
             JsonData json = new JsonData {
@@ -568,7 +623,10 @@ namespace MultiplayerUNO.Backend
             return json;
         }
         
-
+        /// <summary>
+        /// 下一个出牌玩家
+        /// </summary>
+        /// <param name="skip">是否跳过下一个玩家</param>
         protected void Change2NextTurnPlayerNode(bool skip = false)
         {
             if(direction == 1) //正常逆时针
