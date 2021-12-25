@@ -12,7 +12,7 @@
 
 ### 程序架构
 
-![](img\arch.png)
+![](img/arch.png)
 
 Room - 处理游戏过程的类
 Player - 玩家类，对于游戏本身只需考虑玩家，实际上派生了LocalPlayer（  本地开服玩家）与RemotePlayer（远程连接玩家）两个子类，不同的玩家类别底层具有不同的消息发送机制
@@ -27,7 +27,7 @@ PlayerAdapter为前端与后端交互的接口，本地开服使用`LocalPlayerA
 
 本质上，UNO游戏是一个有穷状态自动机，如下：
 
-![](img\dfa.png)
+![](img/dfa.png)
 
 游戏束流线程本质上也是在执行上述流程，详见`Room`类中的代码注释。
 
